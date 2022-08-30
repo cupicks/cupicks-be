@@ -3,7 +3,7 @@ import * as morgan from "morgan";
 import * as express from "express";
 import { TNODE_ENV } from "constants/_.lodaer";
 
-import { authRouter } from "../src/routes/routers/_.exporter";
+import { authRouter } from "./routes/routers/_.exporter";
 
 /**
  * `Singleton`
