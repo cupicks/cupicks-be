@@ -9,7 +9,7 @@ import {
 } from "./exceptions/custom.exception";
 
 import { IBaseDto } from "./dtos/i.base.dto";
-import { SignupUserDto } from "./dtos/signup.user.dto";
+import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
 
@@ -17,6 +17,7 @@ export {
     Env,
     IBaseDto,
     SignupUserDto,
+    ISignupUserDto,
     CreateRecipeDto,
     ICreateRecipeDto,
     IngredientDto,

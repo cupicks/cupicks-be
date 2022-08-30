@@ -1,9 +1,9 @@
 import * as joi from "joi";
 import { ObjectSchema } from "joi";
 
-import { IBaseDto } from "./i.base.dto";
+import { IBaseDto } from "../i.base.dto";
 
-interface ISignupUserDto {
+export interface ISignupUserDto {
     nickname: string;
     email: string;
     password: string;
