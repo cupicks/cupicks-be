@@ -14,25 +14,25 @@ export default class RecipeController {
         try {
             console.log(req.body);
             // 입력값 유효성 검사
-            await joi
-                .object({
-                    title: joi.string().trim().min(2).max(20).required(),
-                    content: joi.string().trim().max(255).required(),
-                    isIced: joi.boolean().required(),
-                    cupSize: joi.number().equal(355, 473, 591),
-                    ingredientList: joi
-                        .array()
-                        .items(
-                            joi.object({
-                                ingredientName: joi.string().trim().min(1).max(20).required(),
-                                ingredientColor: joi.string().trim().min(7).max(7).required(),
-                                ingredientAmount: joi.number().max(1000).required(),
-                            }),
-                        )
-                        .min(1)
-                        .max(20),
-                })
-                .validateAsync(req.body);
+            // await joi
+            //     .object({
+            //         title: joi.string().trim().min(2).max(20).required(),
+            //         content: joi.string().trim().max(255).required(),
+            //         isIced: joi.boolean().required(),
+            //         cupSize: joi.number().equal(355, 473, 591),
+            //         ingredientList: joi
+            //             .array()
+            //             .items(
+            //                 joi.object({
+            //                     ingredientName: joi.string().trim().min(1).max(20).required(),
+            //                     ingredientColor: joi.string().trim().min(7).max(7).required(),
+            //                     ingredientAmount: joi.number().max(1000).required(),
+            //                 }),
+            //             )
+            //             .min(1)
+            //             .max(20),
+            //     })
+            //     .validateAsync(req.body);
         } catch (err) {
             console.log(err);
 
