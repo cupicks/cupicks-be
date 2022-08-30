@@ -2,7 +2,7 @@ import App from "./app";
 import Env from "./models/env/env";
 import EnvProvider from "./modules/providers/env.provider";
 import { getNodeEnvValue } from "./models/env/private/env.private";
-import { TNODE_ENV } from "constants/_.lodaer";
+import { TNODE_ENV } from "./constants/_.lodaer";
 
 /**
  * `IIFE`
