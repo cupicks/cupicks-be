@@ -10,6 +10,7 @@ import {
 
 import { IBaseDto } from "./dtos/i.base.dto";
 import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
+import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
 
@@ -18,6 +19,8 @@ export {
     IBaseDto,
     SignupUserDto,
     ISignupUserDto,
+    SigninUserDto,
+    ISigninUserDto,
     CreateRecipeDto,
     ICreateRecipeDto,
     IngredientDto,

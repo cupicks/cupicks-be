@@ -10,7 +10,7 @@ export interface ISignupUserDto {
     imageUrl: string;
 }
 
-export class SignupUserDto implements IBaseDto {
+export class SignupUserDto implements IBaseDto, ISignupUserDto {
     nickname: string;
     email: string;
     password: string;
