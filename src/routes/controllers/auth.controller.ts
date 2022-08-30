@@ -1,4 +1,3 @@
-import * as joi from "joi";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { SignupUserDto, CustomException, UnkownTypeError, UnkownError, SigninUserDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.lodaer";
@@ -10,16 +9,8 @@ export default class AuthController {
         else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
     };
 
-    public createUser: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public signup: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // const result = await joi.object<SignupUserDto>({
-            //     email: joi.string().required().trim().max(20),
-            //     nickname: joi.string().required().trim().min(2).max(10),
-            //     password: joi.string().required().trim().min(8).max(15),
-            //     imageUrl: joi.string().required().max(255)
-            // }).validateAsync({...req.body});
-            // console.log(result);
-
             const signupUserDto: SignupUserDto = await new JoiValidator().validateAsync<SignupUserDto>(
                 new SignupUserDto({
                     ...req.body,
@@ -31,8 +22,6 @@ export default class AuthController {
                 message: "성공의 경우",
             });
         } catch (err) {
-            console.log(err);
-
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
@@ -49,8 +38,6 @@ export default class AuthController {
                     ...req.body,
                 }),
             );
-
-            console.log(singInUserDto);
 
             return res.json({
                 message: "성공의 경우",
