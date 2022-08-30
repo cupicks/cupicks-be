@@ -20,7 +20,7 @@ export default class AuthController {
             // }).validateAsync({...req.body});
             // console.log(result);
 
-            const signupUserDto = await new JoiValidator().validateAsync<SignupUserDto>(
+            const signupUserDto: SignupUserDto = await new JoiValidator().validateAsync<SignupUserDto>(
                 new SignupUserDto({
                     ...req.body,
                     imageUrl: "http://hello.com",
