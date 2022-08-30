@@ -3,7 +3,7 @@ import * as morgan from "morgan";
 import * as express from "express";
 import { TNODE_ENV } from "constants/_.lodaer";
 
-import { authRouter } from "./routes/routers/_.exporter";
+import { authRouter, recipeRouter } from "./routes/routers/_.exporter";
 
 /**
  * `Singleton`
@@ -21,6 +21,7 @@ export default class App {
 
     setMiddleware(MODE: TNODE_ENV) {
         if (MODE === "dev") {
+            this.app;
             this.app.use(cors());
             this.app.use(morgan("dev"));
         } else if (MODE === "prod") {
@@ -45,6 +46,7 @@ export default class App {
 
     setRouter() {
         this.app.use("/api/auth", authRouter);
+        this.app.use("/api/recipe", recipeRouter);
     }
 
     runServer(MODE: TNODE_ENV, PORT: number) {
