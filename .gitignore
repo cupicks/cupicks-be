@@ -11,5 +11,3 @@
 .env
 *.env.*
 !*.env.*
-
-nodemon.json
