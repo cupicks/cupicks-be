@@ -17,7 +17,7 @@
     "test:cov": "cross-env NODE_ENV=test jest --findRelatedTests test/ --runInBand --coverage --silent",
     "test:clear": "jest --clearCache",
     "prepare": "husky install",
-    "dev": "nodemon"
+    "start:nodemon": "nodemon"
   },
   "dependencies": {
     "cors": "^2.8.5",
