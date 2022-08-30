@@ -46,7 +46,7 @@ export default class App {
 
     setRouter() {
         this.app.use("/api/auth", authRouter);
-        this.app.use("/api/recipe", recipeRouter);
+        this.app.use("/api/recipes", recipeRouter);
     }
 
     runServer(MODE: TNODE_ENV, PORT: number) {
