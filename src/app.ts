@@ -15,6 +15,7 @@ export default class App {
         this.app = express();
 
         this.setMiddleware(MODE);
+        this.setRouter();
         this.runServer(MODE, PORT);
     }
 
@@ -28,6 +29,18 @@ export default class App {
         } else {
             this.app.use(cors());
         }
+
+        this.app.use(express.json());
+        this.app.use(express.urlencoded({ extended: false }));
+
+        // React 에서 JSON.stringify(formData)
+
+        // Multer 미들웨어를 쓰고 일단 업로드하고 유저 있는지 확인
+        // - 유저 확인하는 미들웨어 넣는 게 ...
+        // - multer 안에서 repo 를 열라는 사람도 있었는데 ...
+        // - multer 안에서 filter 안에서 사용하는 사람도 있었는데 ...
+
+        // parsing 라이브러리나 솔루션을 찾아서 multipart/form-data 를 파싱하는 것
     }
 
     setRouter() {
