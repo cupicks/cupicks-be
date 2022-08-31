@@ -46,6 +46,29 @@ export class NotFoundException extends CustomException {
     }
 }
 
+export class JwtAuthorizationException extends CustomException {
+    name: string;
+    statusCode: number;
+    constructor(message: string) {
+        super(message);
+
+        this.name = "JwtAuthorizationException";
+        this.statusCode = 401;
+    }
+}
+export class ForBiddenException extends CustomException {
+    name: string;
+    statusCode: number;
+    constructor(message: string) {
+        super(message);
+
+        this.name = "ForBiddenException";
+        this.statusCode = 403;
+    }
+}
+
+// 500!
+
 export class UnkownError extends CustomException {
     name: string;
     statusCode: number;
@@ -75,6 +98,16 @@ export class UnOverrideDtoError extends CustomException {
         super(message);
 
         this.name = "UnOverrideDtoError";
+        this.statusCode = 500;
+    }
+}
+export class DatabaseConnectionError extends CustomException {
+    name: string;
+    statusCode: number;
+    constructor(message: string) {
+        super(message);
+
+        this.name = "DatabaseConnectionError";
         this.statusCode = 500;
     }
 }
