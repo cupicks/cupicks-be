@@ -1,26 +1,31 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { SignupUserDto, CustomException, UnkownTypeError, UnkownError, SigninUserDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
-import * as joi from "joi";
+import { AuthService } from "../services/_.exporter";
 
 export default class AuthController {
-    public errorHandler = (err: unknown): CustomException => {
-        if (err instanceof CustomException) return err;
-        else if (err instanceof Error) return new UnkownError(err.message);
-        else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
-    };
+    private authService: AuthService;
+    private joiValidator: JoiValidator;
+
+    constructor() {
+        this.authService = new AuthService();
+        this.joiValidator = new JoiValidator();
+    }
 
     public signup: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const signupUserDto: SignupUserDto = await new JoiValidator().validateAsync<SignupUserDto>(
+            const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
                     ...req.body,
                     imageUrl: "http://hello.com",
                 }),
             );
 
+            const result = await this.authService.signup(signupUserDto);
+
             return res.json({
                 message: "성공의 경우",
+                result,
             });
         } catch (err) {
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
@@ -34,7 +39,7 @@ export default class AuthController {
 
     public signin: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const singInUserDto: SigninUserDto = await new JoiValidator().validateAsync<SigninUserDto>(
+            const singInUserDto: SigninUserDto = await this.joiValidator.validateAsync<SigninUserDto>(
                 new SigninUserDto({
                     ...req.body,
                 }),
@@ -51,5 +56,11 @@ export default class AuthController {
                 message: exception.message,
             });
         }
+    };
+
+    public errorHandler = (err: unknown): CustomException => {
+        if (err instanceof CustomException) return err;
+        else if (err instanceof Error) return new UnkownError(err.message);
+        else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
     };
 }
