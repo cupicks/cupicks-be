@@ -3,8 +3,9 @@ import EnvProvider from "./modules/providers/env.provider";
 import { getNodeEnvValue } from "./models/env/private/env.private";
 
 import { Env } from "./models/_.loader";
-import { TNODE_ENV } from "./constants/_.lodaer";
 import { JwtProvider } from "./modules/_.lodaer";
+import { TNODE_ENV } from "./constants/_.loader";
+import { BcryptProvider } from "./modules/_.loader";
 
 /**
  * `IIFE`
@@ -17,6 +18,7 @@ import { JwtProvider } from "./modules/_.lodaer";
     const env: Env = envProvider.getEnvInstance();
 
     JwtProvider.init(env.JWT);
+    BcryptProvider.init(env.SALT);
 
     new App(MODE, env.PORT);
 })();

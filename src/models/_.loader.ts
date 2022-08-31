@@ -2,8 +2,9 @@ import { Env, IJwtEnv } from "./env/env";
 import {
     CustomException,
     JwtAuthorizationException,
-    ConflictException,
+    ForBiddenException,
     NotFoundException,
+    ConflictException,
     UnkownTypeError,
     UnkownError,
     UnOverrideDtoError,
@@ -25,6 +26,7 @@ export {
     IIngredientDto,
     CustomException, // 500
     JwtAuthorizationException, // 401
+    ForBiddenException, // 403
     NotFoundException, // 404
     ConflictException, // 409
     UnkownTypeError, // 500

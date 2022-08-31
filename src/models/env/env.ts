@@ -1,5 +1,5 @@
 import { getEnvStringValue, getEnvNumberValue, getEnvLiteralTypeValue } from "./private/env.private";
-import { TALGORITHM } from "../../constants/_.lodaer";
+import { TALGORITHM } from "../../constants/_.loader";
 
 export interface IJwtEnv {
     ACCESS_EXPIRED_IN: string;
@@ -10,6 +10,7 @@ export interface IJwtEnv {
 
 export class Env {
     PORT;
+    SALT;
 
     JWT: IJwtEnv;
 
@@ -22,6 +23,7 @@ export class Env {
             HASH_ALGOIRHTM: this.getEnvLiteralTypeValue("JWT_HASH_ALGOIRHTM"),
             SECRET_KEY: this.getEnvStringValue("SECRET_KEY"),
         };
+        this.SALT = this.getEnvNumberValue("SALT");
     }
 
     private getEnvStringValue = getEnvStringValue;
