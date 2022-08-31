@@ -1,20 +1,8 @@
-import { SignupUserDto } from "../../models/_.loader";
-import { PoolConnection } from "mysql2/promise";
+import {} from "models/dtos/user/user.dto";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { UserDto, SignupUserDto } from "../../models/_.loader";
 
 export class AuthRepository {
-    public isExistsByEmail = async (conn: PoolConnection, email: string): Promise<boolean> => {
-        // 쿼리문 추가하면 끝
-
-        return false;
-    };
-
-    public createUser = async (conn: PoolConnection, userDto: SignupUserDto): Promise<object | null> => {
-        // 쿼리문 추가하면 끝
-
-        if (userDto.email.length < 1) {
-            return userDto;
-        } else return null;
-    };
     // 있는 지만 확인하는 것 : boolean = isExists
     // 찾는 것 : 해당 대상을 꺼내고 = find
     // 생성 = create
@@ -24,4 +12,53 @@ export class AuthRepository {
     // find모델
     // findUserByUserId
     // findUserByEmail
+
+    public isExistsByEmail = async (conn: PoolConnection, email: string): Promise<boolean> => {
+        // 쿼리문 추가하면 끝
+        const isExistsQuery = `SELECT user_id FROM user WHERE email = "${email}";`;
+        const isExistsResult = await conn.query<RowDataPacket[][]>(isExistsQuery);
+
+        const rowDataPacket = isExistsResult[0];
+
+        return rowDataPacket?.length === 1;
+    };
+
+    public createUser = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {
+        const createUserQuery = userDto.imageUrl
+            ? `INSERT INTO user (email, nickname, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.imageUrl}");`
+            : `INSERT INTO user (email, nickname) VALUES ("${userDto.email}", "${userDto.nickname}");`;
+
+        const createdUserResult = await conn.query<ResultSetHeader>(createUserQuery, {});
+        const userResultSetHeader = createdUserResult[0];
+
+        const { affectedRows, insertId } = userResultSetHeader;
+        if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
+
+        const userId = insertId;
+
+        return userId;
+    };
+
+    public createUserDetailByUserId = async (
+        conn: PoolConnection,
+        userId: number,
+        password: string,
+        date: string,
+    ): Promise<void> => {
+        const createQuery = `INSERT INTO user_detail (user_id, password, created_at, updated_at) VALUES (${userId}, "${password}", "${date}", "${date}");`;
+        const createdResult = await conn.query<ResultSetHeader>(createQuery);
+        const resultSetHeader = createdResult[0];
+
+        const { affectedRows } = resultSetHeader;
+        if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
+
+    public createUserRefreshTokenRowByUserId = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const craeteUserRefreshTokenQuery = `INSERT INTO user_refresh_token (user_id) VALUES (${userId});`;
+        const createdUserRefreshTokenResutl = await conn.query<ResultSetHeader>(craeteUserRefreshTokenQuery);
+
+        const userRefreshTokenResultSetHeader = createdUserRefreshTokenResutl[0];
+        const { affectedRows } = userRefreshTokenResultSetHeader;
+        if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
 }
