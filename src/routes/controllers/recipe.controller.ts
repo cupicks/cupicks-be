@@ -1,6 +1,7 @@
 import { RequestHandler, NextFunction } from "express";
 import * as joi from "joi";
 import { CustomException, UnkownError, UnkownTypeError } from "../../models/_.loader";
+import BcryptProvider from "../../modules/providers/bcrypt.provider";
 
 export default class RecipeController {
     public errorHandler = (err: unknown): CustomException => {
@@ -12,7 +13,8 @@ export default class RecipeController {
     public createPost: RequestHandler = async (req, res, next: NextFunction) => {
         //
         try {
-            console.log(req.body);
+            const result = await new BcryptProvider().hashedPassword("941103", 10);
+            console.log(result);
             // 입력값 유효성 검사
             // await joi
             //     .object({

@@ -1,8 +1,9 @@
 import Env from "./env/env";
 import {
     CustomException,
-    ConflictException,
+    ForBiddenException,
     NotFoundException,
+    ConflictException,
     UnkownTypeError,
     UnkownError,
     UnOverrideDtoError,
@@ -22,6 +23,7 @@ export {
     IngredientDto,
     IIngredientDto,
     CustomException, // 500
+    ForBiddenException, // 403
     NotFoundException, // 404
     ConflictException, // 409
     UnkownTypeError, // 500
