@@ -1,6 +1,6 @@
 import * as jwtLib from "jsonwebtoken";
 import { CustomException, IJwtEnv, JwtAuthorizationException, UnkownTypeError } from "../../models/_.loader";
-import { TALGORITHM } from "../../constants/_.lodaer";
+import { TALGORITHM } from "../../constants/_.loader";
 
 export class JwtProvider {
     static isInit = false;

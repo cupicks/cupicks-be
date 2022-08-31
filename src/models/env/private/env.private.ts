@@ -1,5 +1,4 @@
-import { TNODE_ENV } from "constants/types/t.node.env";
-import { TALGORITHM } from "constants/_.lodaer";
+import { TALGORITHM, TNODE_ENV } from "../../../constants/_.loader";
 
 function getNodeEnvValue(KEY: string): TNODE_ENV {
     const VALUE = process.env[KEY];
