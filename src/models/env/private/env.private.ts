@@ -1,4 +1,5 @@
 import { TNODE_ENV } from "constants/types/t.node.env";
+import { TALGORITHM } from "constants/_.lodaer";
 
 function getNodeEnvValue(KEY: string): TNODE_ENV {
     const VALUE = process.env[KEY];
@@ -27,4 +28,9 @@ function getEnvNumberValue(KEY: string): number {
     return NUMBER_VALUE;
 }
 
-export { getNodeEnvValue, getEnvStringValue, getEnvNumberValue };
+function getEnvLiteralTypeValue<T extends TALGORITHM>(KEY: string) {
+    //     const VALUE = process.env[KEY];
+    //     if (VALUE === undefined) throw new Error(`${KEY} 는 undefined 일 수 없습니다.`);
+}
+
+export { getNodeEnvValue, getEnvStringValue, getEnvNumberValue, getEnvLiteralTypeValue };

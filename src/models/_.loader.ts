@@ -1,6 +1,7 @@
-import Env from "./env/env";
+import { Env, IJwtEnv } from "./env/env";
 import {
     CustomException,
+    JwtAuthorizationException,
     ConflictException,
     NotFoundException,
     UnkownTypeError,
@@ -15,6 +16,7 @@ import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.d
 
 export {
     Env,
+    IJwtEnv,
     IBaseDto,
     SignupUserDto,
     CreateRecipeDto,
@@ -22,6 +24,7 @@ export {
     IngredientDto,
     IIngredientDto,
     CustomException, // 500
+    JwtAuthorizationException, // 401
     NotFoundException, // 404
     ConflictException, // 409
     UnkownTypeError, // 500
