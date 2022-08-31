@@ -67,13 +67,13 @@ export class UnOverrideDtoError extends CustomException {
     }
 }
 
-export class BadParameterException extends CustomException {
+export class ForBiddenException extends CustomException {
     name: string;
     statusCode: number;
     constructor(message: string) {
         super(message);
 
-        this.name = "BadParameterException";
-        this.statusCode = 400;
+        this.name = "ForBiddenException";
+        this.statusCode = 403;
     }
 }

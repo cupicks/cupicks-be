@@ -1,11 +1,10 @@
 import * as bcrypt from "bcrypt";
-import { TSALT_ENV } from "../../constants/_.loader";
-import { BadParameterException, CustomException, UnkownTypeError } from "../../models/_.loader";
+import { ForBiddenException, CustomException, UnkownTypeError } from "../../models/_.loader";
 
 export default class BcryptProvider {
     // property
     static isInit = false;
-    static SALT: TSALT_ENV;
+    static SALT: number;
 
     static init(SALT: number) {
         if (this.isInit === true) return;
@@ -13,7 +12,7 @@ export default class BcryptProvider {
         this.isInit = true;
     }
 
-    public hashedPassword = async (inputPassword: string, salt: TSALT_ENV) => {
+    public hashedPassword = async (inputPassword: string, salt: number) => {
         this.validateIsInit();
 
         try {
@@ -40,7 +39,7 @@ export default class BcryptProvider {
 
     public errorHandler = (err: unknown): CustomException => {
         if (err instanceof CustomException) return err;
-        else if (err instanceof Error) return new BadParameterException(err.message);
+        else if (err instanceof Error) return new ForBiddenException(err.message);
         else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
     };
 }
