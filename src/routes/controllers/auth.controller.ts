@@ -1,7 +1,7 @@
 import * as joi from "joi";
 import { Request, Response } from "express";
 import { SignupUserDto, CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
-import { JoiValidator } from "../../modules/_.lodaer";
+import { JoiValidator } from "../../modules/_.loader";
 
 export default class AuthController {
     public errorHandler = (err: unknown): CustomException => {

@@ -66,3 +66,14 @@ export class UnOverrideDtoError extends CustomException {
         this.statusCode = 500;
     }
 }
+
+export class BadParameterException extends CustomException {
+    name: string;
+    statusCode: number;
+    constructor(message: string) {
+        super(message);
+
+        this.name = "BadParameterException";
+        this.statusCode = 400;
+    }
+}
