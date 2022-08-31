@@ -1,4 +1,4 @@
-import { Env, IJwtEnv } from "./env/env";
+import { Env, IJwtEnv, IMysqlEnv } from "./env/env";
 import {
     CustomException,
     JwtAuthorizationException,
@@ -8,6 +8,7 @@ import {
     UnkownTypeError,
     UnkownError,
     UnOverrideDtoError,
+    DatabaseConnectionError,
 } from "./exceptions/custom.exception";
 
 import { IBaseDto } from "./dtos/i.base.dto";
@@ -18,6 +19,7 @@ import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.d
 export {
     Env,
     IJwtEnv,
+    IMysqlEnv,
     IBaseDto,
     SignupUserDto,
     CreateRecipeDto,
@@ -32,4 +34,5 @@ export {
     UnkownTypeError, // 500
     UnkownError, // 500
     UnOverrideDtoError, // 500
+    DatabaseConnectionError, //500
 };

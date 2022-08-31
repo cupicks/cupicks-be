@@ -1,7 +1,7 @@
 import * as bcrypt from "bcrypt";
 import { ForBiddenException, CustomException, UnkownTypeError } from "../../models/_.loader";
 
-export default class BcryptProvider {
+export class BcryptProvider {
     // property
     static isInit = false;
     static SALT: number;

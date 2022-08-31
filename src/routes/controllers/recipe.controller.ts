@@ -1,7 +1,7 @@
 import { RequestHandler, NextFunction } from "express";
 import * as joi from "joi";
 import { CustomException, UnkownError, UnkownTypeError } from "../../models/_.loader";
-import BcryptProvider from "../../modules/providers/bcrypt.provider";
+import { BcryptProvider } from "../../modules/_.loader";
 
 export default class RecipeController {
     public errorHandler = (err: unknown): CustomException => {
