@@ -12,8 +12,10 @@ import {
 } from "./exceptions/custom.exception";
 
 import { IBaseDto } from "./dtos/i.base.dto";
+import { UserDto, IUserDto } from "./dtos/user/user.dto";
 import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
 import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
+
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
 
@@ -22,6 +24,8 @@ export {
     IJwtEnv,
     IMysqlEnv,
     IBaseDto,
+    UserDto,
+    IUserDto,
     SignupUserDto,
     ISignupUserDto,
     SigninUserDto,

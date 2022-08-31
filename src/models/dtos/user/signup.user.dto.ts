@@ -7,14 +7,14 @@ export interface ISignupUserDto {
     nickname: string;
     email: string;
     password: string;
-    imageUrl: string;
+    imageUrl: string | undefined;
 }
 
 export class SignupUserDto implements IBaseDto, ISignupUserDto {
     nickname: string;
     email: string;
     password: string;
-    imageUrl: string;
+    imageUrl: string | undefined;
 
     constructor({ nickname, email, password, imageUrl }: ISignupUserDto) {
         this.nickname = nickname;
