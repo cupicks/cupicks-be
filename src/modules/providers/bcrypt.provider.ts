@@ -12,15 +12,15 @@ export class BcryptProvider {
         this.isInit = true;
     }
 
-    public hashedPassword = async (inputPassword: string, salt: number) => {
+    public hashPassword(inputPassword: string) {
         this.validateIsInit();
 
         try {
-            return await bcrypt.hash(inputPassword, salt);
+            return bcrypt.hashSync(inputPassword, BcryptProvider.SALT);
         } catch (err) {
             throw this.errorHandler(err);
         }
-    };
+    }
 
     public comparedPassword(inputPassword: string, existPassword: string) {
         this.validateIsInit();
