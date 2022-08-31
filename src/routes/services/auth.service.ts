@@ -1,14 +1,16 @@
 import { AuthRepository } from "../repositories/_.exporter";
-import { MysqlProvider } from "../../modules/_.loader";
-import { ConflictException, SignupUserDto, UnkownError, UserDto } from "../../models/_.loader";
+import { BcryptProvider, MysqlProvider } from "../../modules/_.loader";
+import { ConflictException, SigninUserDto, SignupUserDto, UnkownError, UserDto } from "../../models/_.loader";
 
 export class AuthService {
-    private authRepository: AuthRepository;
     private mysqlProvider: MysqlProvider;
+    private bcryptProvider: BcryptProvider;
+    private authRepository: AuthRepository;
 
     constructor() {
-        this.authRepository = new AuthRepository();
         this.mysqlProvider = new MysqlProvider();
+        this.bcryptProvider = new BcryptProvider();
+        this.authRepository = new AuthRepository();
     }
 
     signup = async (userDto: SignupUserDto): Promise<UserDto> => {
@@ -16,6 +18,7 @@ export class AuthService {
 
         try {
             await conn.query("START TRANSACTION;");
+            userDto.password = this.bcryptProvider.hashPassword(userDto.password);
 
             const date = new Date().toISOString().slice(0, 19).replace("T", " ");
 
@@ -36,6 +39,17 @@ export class AuthService {
                 updatedAt: date,
                 ...userDto,
             });
+        } catch (err) {
+            await conn.query("ROLLBACK;");
+            conn.release();
+            throw err;
+        }
+    };
+
+    signin = async (userDto: SigninUserDto) => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
         } catch (err) {
             await conn.query("ROLLBACK;");
             conn.release();
