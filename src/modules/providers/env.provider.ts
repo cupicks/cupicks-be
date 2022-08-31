@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import Env from "../../models/env/env";
+import { Env } from "../../models/env/env";
 
 export default class EnvProvider {
     static init() {

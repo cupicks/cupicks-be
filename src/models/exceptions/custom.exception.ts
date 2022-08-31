@@ -67,6 +67,16 @@ export class UnOverrideDtoError extends CustomException {
     }
 }
 
+export class JwtAuthorizationException extends CustomException {
+    name: string;
+    statusCode: number;
+    constructor(message: string) {
+        super(message);
+
+        this.name = "JwtAuthorizationException";
+        this.statusCode = 401;
+    }
+}
 export class ForBiddenException extends CustomException {
     name: string;
     statusCode: number;
