@@ -16,8 +16,7 @@ export class BcryptProvider {
         this.validateIsInit();
 
         try {
-            console.log(`매개변수 ${inputPassword} ${salt}`);
-            return await bcrypt.hashSync(inputPassword, salt);
+            return await bcrypt.hash(inputPassword, salt);
         } catch (err) {
             throw this.errorHandler(err);
         }
@@ -27,7 +26,7 @@ export class BcryptProvider {
         this.validateIsInit();
 
         try {
-            bcrypt.compare(inputPassword, existPassword);
+            return bcrypt.compare(inputPassword, existPassword);
         } catch (err) {
             throw this.errorHandler(err);
         }

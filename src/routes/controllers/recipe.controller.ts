@@ -1,4 +1,5 @@
 import { RequestHandler, Request, Response, NextFunction } from "express";
+
 import { CustomException, UnkownError, ValidationException } from "../../models/_.loader";
 import { CreateRecipeDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
@@ -13,27 +14,21 @@ export default class RecipeController {
     public createPost: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const createRecipe = await new JoiValidator().validateAsync<CreateRecipeDto>(new CreateRecipeDto(req.body));
+            return res.end();
+        } catch (err) {
+            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
 
-            // 입력값 유효성 검사
-            // await joi
-            //     .object({
-            //         title: joi.string().trim().min(2).max(20).required(),
-            //         content: joi.string().trim().max(255).required(),
-            //         isIced: joi.boolean().required(),
-            //         cupSize: joi.number().equal(355, 473, 591),
-            //         ingredientList: joi
-            //             .array()
-            //             .items(
-            //                 joi.object({
-            //                     ingredientName: joi.string().trim().min(1).max(20).required(),
-            //                     ingredientColor: joi.string().trim().min(7).max(7).required(),
-            //                     ingredientAmount: joi.number().max(1000).required(),
-            //                 }),
-            //             )
-            //             .min(1)
-            //             .max(20),
-            //     })
-            //     .validateAsync(req.body);
+    public test: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            console.log(req.file);
+            res.end();
         } catch (err) {
             console.log(err);
             const exception = this.errorHandler(err);

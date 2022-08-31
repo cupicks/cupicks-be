@@ -1,4 +1,5 @@
 import { Env, IJwtEnv, IMysqlEnv } from "./env/env";
+import { IS3ConfigEnv } from "./env/env";
 import {
     CustomException,
     ValidationException,
@@ -21,6 +22,7 @@ export {
     Env,
     IJwtEnv,
     IMysqlEnv,
+    IS3ConfigEnv,
     IBaseDto,
     SignupUserDto,
     CreateRecipeDto,
