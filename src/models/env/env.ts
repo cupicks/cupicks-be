@@ -16,16 +16,24 @@ export interface IMysqlEnv {
     CONNECTION_LIMIT: number;
 }
 
+export interface IS3ConfigEnv {
+    S3_ACCESS_KEY: string;
+    S3_SECRET_KEY: string;
+    REGION: string;
+    BUCKET: string;
+}
+
 export class Env {
     PORT;
     SALT;
 
     JWT: IJwtEnv;
     MYSQL: IMysqlEnv;
+    S3: IS3ConfigEnv;
 
     constructor() {
         this.PORT = this.getEnvNumberValue("PORT");
-
+        this.SALT = this.getEnvNumberValue("SALT");
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
             REFRESH_EXPIRED_IN: this.getEnvStringValue("JWT_REFRESH_EXPIRED_IN"),
@@ -39,7 +47,12 @@ export class Env {
             PASSWORD: this.getEnvStringValue("MYSQL_PASSWORD"),
             CONNECTION_LIMIT: this.getEnvNumberValue("MYSQL_CONNECTION_LIMIT"),
         };
-        this.SALT = this.getEnvNumberValue("SALT");
+        this.S3 = {
+            S3_ACCESS_KEY: this.getEnvStringValue("S3_ACCESS_KEY"),
+            S3_SECRET_KEY: this.getEnvStringValue("S3_SECRET_KEY"),
+            REGION: this.getEnvStringValue("REGION"),
+            BUCKET: this.getEnvStringValue("BUCKET"),
+        };
     }
 
     private getEnvStringValue = getEnvStringValue;

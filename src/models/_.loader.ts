@@ -1,4 +1,4 @@
-import { Env, IJwtEnv, IMysqlEnv } from "./env/env";
+import { Env, IJwtEnv, IMysqlEnv, IS3ConfigEnv } from "./env/env";
 import {
     CustomException,
     JwtAuthorizationException,
@@ -23,6 +23,7 @@ export {
     Env,
     IJwtEnv,
     IMysqlEnv,
+    IS3ConfigEnv,
     IBaseDto,
     UserDto,
     IUserDto,
