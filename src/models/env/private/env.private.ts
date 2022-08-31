@@ -29,8 +29,27 @@ function getEnvNumberValue(KEY: string): number {
 }
 
 function getEnvLiteralTypeValue<T extends TALGORITHM>(KEY: string) {
-    //     const VALUE = process.env[KEY];
-    //     if (VALUE === undefined) throw new Error(`${KEY} 는 undefined 일 수 없습니다.`);
+    const VALUE = process.env[KEY];
+    if (VALUE === undefined) throw new Error(`${KEY} 는 undefined 일 수 없습니다.`);
+
+    const VALUE_TARGETS: TALGORITHM[] = [
+        "HS256",
+        "HS384",
+        "HS512",
+        "RS256",
+        "RS384",
+        "RS512",
+        "ES256",
+        "ES384",
+        "ES512",
+        "PS256",
+        "PS384",
+        "PS512",
+    ];
+    const TYPED_VALUE = VALUE_TARGETS.find((v) => v === VALUE);
+    if (TYPED_VALUE === undefined) throw new Error(`${KEY} 는 리터럴 타입이어야 합니다. 오탈자를 확인해주세요.`);
+
+    return TYPED_VALUE;
 }
 
 export { getNodeEnvValue, getEnvStringValue, getEnvNumberValue, getEnvLiteralTypeValue };

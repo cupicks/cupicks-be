@@ -1,9 +1,10 @@
 import App from "./app";
 import EnvProvider from "./modules/providers/env.provider";
 import { getNodeEnvValue } from "./models/env/private/env.private";
+
+import { Env } from "./models/_.loader";
 import { TNODE_ENV } from "./constants/_.lodaer";
 import { JwtProvider } from "./modules/_.lodaer";
-import { Env } from "./models/_.loader";
 
 /**
  * `IIFE`

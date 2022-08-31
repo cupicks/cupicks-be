@@ -19,7 +19,7 @@ export class Env {
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
             REFRESH_EXPIRED_IN: this.getEnvStringValue("JWT_REFRESH_EXPIRED_IN"),
-            HASH_ALGOIRHTM: "RS256",
+            HASH_ALGOIRHTM: this.getEnvLiteralTypeValue("JWT_HASH_ALGOIRHTM"),
             SECRET_KEY: this.getEnvStringValue("SECRET_KEY"),
         };
     }
