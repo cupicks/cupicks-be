@@ -59,5 +59,28 @@
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
     "*.{ts}": "prettier --write"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": ".",
+    "testRegex": ".*\\.test\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "coverageDirectory": "./coverage",
+    "coveragePathIgnorePatterns": [
+      "dist/",
+      "backup/",
+      "backup_integration/",
+      "coverage/lcov-report"
+    ],
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ]
   }
 }
