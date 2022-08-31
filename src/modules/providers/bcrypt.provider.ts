@@ -12,16 +12,15 @@ export class BcryptProvider {
         this.isInit = true;
     }
 
-    public hashedPassword = async (inputPassword: string, salt: number) => {
+    public hashPassword(inputPassword: string) {
         this.validateIsInit();
 
         try {
-            console.log(`매개변수 ${inputPassword} ${salt}`);
-            return await bcrypt.hashSync(inputPassword, salt);
+            return bcrypt.hashSync(inputPassword, BcryptProvider.SALT);
         } catch (err) {
             throw this.errorHandler(err);
         }
-    };
+    }
 
     public comparedPassword(inputPassword: string, existPassword: string) {
         this.validateIsInit();

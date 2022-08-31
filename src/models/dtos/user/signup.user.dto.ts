@@ -1,20 +1,20 @@
 import * as joi from "joi";
 import { ObjectSchema } from "joi";
 
-import { IBaseDto } from "./i.base.dto";
+import { IBaseDto } from "../i.base.dto";
 
-interface ISignupUserDto {
+export interface ISignupUserDto {
     nickname: string;
     email: string;
     password: string;
-    imageUrl: string;
+    imageUrl: string | undefined;
 }
 
-export class SignupUserDto implements IBaseDto {
+export class SignupUserDto implements IBaseDto, ISignupUserDto {
     nickname: string;
     email: string;
     password: string;
-    imageUrl: string;
+    imageUrl: string | undefined;
 
     constructor({ nickname, email, password, imageUrl }: ISignupUserDto) {
         this.nickname = nickname;
