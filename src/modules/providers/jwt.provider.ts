@@ -20,12 +20,23 @@ export class JwtProvider {
     }
 
     public signAccessToken() {
-        this.validateIsInit();
-
-        jwtLib.sign({}, JwtProvider.SECRET_KEY, {
-            expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
-            algorithm: JwtProvider.HASH_ALGOIRHTM,
-        });
+        // this.validateIsInit();
+        const result = jwtLib.sign(
+            {
+                name: "axisotherwise",
+            },
+            JwtProvider.SECRET_KEY,
+            {
+                expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
+                issuer: "axisotherwise",
+                algorithm: "HS512",
+            },
+        );
+        console.log(result);
+        // jwtLib.sign({}, JwtProvider.SECRET_KEY, {
+        //     expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
+        //     algorithm: JwtProvider.HASH_ALGOIRHTM,
+        // });
     }
 
     public signRefreshToken(payload: object) {

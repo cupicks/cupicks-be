@@ -10,6 +10,7 @@ export interface ICreateRecipeDto {
     content: string;
     isIced: boolean;
     cupSize: number;
+    isPublic: boolean;
     ingredientList: IngredientDto[];
 }
 
@@ -18,13 +19,15 @@ export class CreateRecipeDto implements IBaseDto {
     content: string;
     isIced: boolean;
     cupSize: number;
+    isPublic: boolean;
     ingredientList: IngredientDto[];
 
-    constructor({ title, content, isIced, cupSize, ingredientList = [] }: ICreateRecipeDto) {
+    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [] }: ICreateRecipeDto) {
         this.title = title;
         this.content = content;
         this.isIced = isIced;
         this.cupSize = cupSize;
+        this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
 
         // 클래스가 아닙니다.
@@ -35,7 +38,8 @@ export class CreateRecipeDto implements IBaseDto {
             title: joi.string().trim().min(2).max(20).required(),
             content: joi.string().trim().max(255).required(),
             isIced: joi.boolean().required(),
-            cupSize: joi.number().equal(355, 473, 591).required(),
+            cupSize: joi.string().equal(355, 473, 591).required(),
+            isPublic: joi.boolean().required(),
             ingredientList: joi.array().items(
                 joi.object({
                     ingredientName: joi.string().trim().min(1).max(20).required(),
@@ -49,6 +53,7 @@ export class CreateRecipeDto implements IBaseDto {
                             if (!value.startsWith("#")) {
                                 throw new Error("색상은 #으로 시작합니다.");
                             }
+                            return value;
                         }),
                     ingredientAmount: joi.number().max(1000).required(),
                 }),

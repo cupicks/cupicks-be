@@ -5,6 +5,8 @@ import { Env } from "./models/_.loader";
 import { TNODE_ENV } from "./constants/_.loader";
 import { BcryptProvider, EnvProvider, JwtProvider, MysqlProvider } from "./modules/_.loader";
 
+import * as jwt from "jsonwebtoken";
+
 /**
  * `IIFE`
  */
