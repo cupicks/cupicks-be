@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.161.0",
+    "@types/jsonwebtoken": "^8.5.9",
     "@types/multer": "^1.4.7",
     "@types/multer-s3": "^3.0.0",
     "bcrypt": "^5.0.1",
@@ -41,7 +42,6 @@
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.13",
     "@types/jest": "^28.1.8",
-    "@types/jsonwebtoken": "^8.5.9",
     "@types/morgan": "^1.9.3",
     "@types/node": "^15.14.9",
     "@types/prettier": "^2.7.0",
