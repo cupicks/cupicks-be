@@ -1,6 +1,7 @@
 import {} from "models/dtos/user/user.dto";
+import { IUserPacket } from "models/packets/i.user.packet";
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { UserDto, SignupUserDto } from "../../models/_.loader";
+import { SignupUserDto } from "../../models/_.loader";
 
 export class AuthRepository {
     // 있는 지만 확인하는 것 : boolean = isExists
@@ -23,10 +24,20 @@ export class AuthRepository {
         return rowDataPacket?.length === 1;
     };
 
+    public findUserByEmail = async (conn: PoolConnection, email: string): Promise<IUserPacket | null> => {
+        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE email = "${email}" LIMIT 1;`;
+        const findResult = await conn.query<IUserPacket[]>(findQuery);
+
+        const userDataPacket = findResult[0];
+        const user = userDataPacket[0];
+
+        return userDataPacket.length !== 1 ? null : user;
+    };
+
     public createUser = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {
         const createUserQuery = userDto.imageUrl
-            ? `INSERT INTO user (email, nickname, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.imageUrl}");`
-            : `INSERT INTO user (email, nickname) VALUES ("${userDto.email}", "${userDto.nickname}");`;
+            ? `INSERT INTO user (email, nickname, password, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}");`
+            : `INSERT INTO user (email, nickname, password) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}");`;
 
         const createdUserResult = await conn.query<ResultSetHeader>(createUserQuery, {});
         const userResultSetHeader = createdUserResult[0];
@@ -39,13 +50,8 @@ export class AuthRepository {
         return userId;
     };
 
-    public createUserDetailByUserId = async (
-        conn: PoolConnection,
-        userId: number,
-        password: string,
-        date: string,
-    ): Promise<void> => {
-        const createQuery = `INSERT INTO user_detail (user_id, password, created_at, updated_at) VALUES (${userId}, "${password}", "${date}", "${date}");`;
+    public createUserDetailByUserId = async (conn: PoolConnection, userId: number, date: string): Promise<void> => {
+        const createQuery = `INSERT INTO user_detail (user_id, created_at, updated_at) VALUES (${userId}, "${date}", "${date}");`;
         const createdResult = await conn.query<ResultSetHeader>(createQuery);
         const resultSetHeader = createdResult[0];
 

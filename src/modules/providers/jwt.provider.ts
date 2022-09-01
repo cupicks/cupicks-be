@@ -7,34 +7,59 @@ export class JwtProvider {
     static ACCESS_EXPIRED_IN: string;
     static REFRESH_EXPIRED_IN: string;
     static HASH_ALGOIRHTM: TALGORITHM;
-    static SECRET_KEY: string;
+    static HASH_PRIVATE_PEM_KEY: string;
+    static HASH_PUBLIC_PEM_KEY: string;
+    static HASH_PASSPHRASE: string;
 
-    static init({ ACCESS_EXPIRED_IN, REFRESH_EXPIRED_IN, HASH_ALGOIRHTM, SECRET_KEY }: IJwtEnv) {
+    static init({
+        ACCESS_EXPIRED_IN,
+        REFRESH_EXPIRED_IN,
+        HASH_ALGOIRHTM,
+        HASH_PRIVATE_PEM_KEY,
+        HASH_PUBLIC_PEM_KEY,
+        HASH_PASSPHRASE,
+    }: IJwtEnv) {
         if (this.isInit === true) return;
 
         this.ACCESS_EXPIRED_IN = ACCESS_EXPIRED_IN;
         this.REFRESH_EXPIRED_IN = REFRESH_EXPIRED_IN;
         this.HASH_ALGOIRHTM = HASH_ALGOIRHTM;
-        this.SECRET_KEY = SECRET_KEY;
+        this.HASH_PRIVATE_PEM_KEY = HASH_PRIVATE_PEM_KEY;
+        this.HASH_PUBLIC_PEM_KEY = HASH_PUBLIC_PEM_KEY;
+        this.HASH_PASSPHRASE = HASH_PASSPHRASE;
         this.isInit = true;
     }
 
-    public signAccessToken() {
+    public signAccessToken(): string {
         this.validateIsInit();
 
-        jwtLib.sign({}, JwtProvider.SECRET_KEY, {
-            expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
-            algorithm: JwtProvider.HASH_ALGOIRHTM,
-        });
+        return jwtLib.sign(
+            {},
+            {
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
+            },
+            {
+                expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
+            },
+        );
     }
 
-    public signRefreshToken(payload: object) {
+    public signRefreshToken(payload: object): string {
         this.validateIsInit();
 
-        jwtLib.sign(payload, JwtProvider.SECRET_KEY, {
-            expiresIn: JwtProvider.REFRESH_EXPIRED_IN,
-            algorithm: JwtProvider.HASH_ALGOIRHTM,
-        });
+        return jwtLib.sign(
+            payload,
+            {
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
+            },
+            {
+                expiresIn: JwtProvider.REFRESH_EXPIRED_IN,
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
+            },
+        );
     }
 
     /** @throws { CustomException } */
@@ -42,7 +67,7 @@ export class JwtProvider {
         this.validateIsInit();
 
         try {
-            jwtLib.decode(token);
+            return jwtLib.decode(token);
         } catch (err) {
             throw this.errorHandler(err);
         }
@@ -53,7 +78,9 @@ export class JwtProvider {
         this.validateIsInit();
 
         try {
-            jwtLib.verify(token, JwtProvider.SECRET_KEY);
+            return jwtLib.verify(token, JwtProvider.HASH_PUBLIC_PEM_KEY, {
+                algorithms: ["RS256"],
+            });
         } catch (err) {
             throw this.errorHandler(err);
         }
