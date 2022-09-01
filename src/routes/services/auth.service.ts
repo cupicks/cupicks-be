@@ -1,3 +1,4 @@
+import * as jwtLib from "jsonwebtoken";
 import { AuthRepository } from "../repositories/_.exporter";
 import { BcryptProvider, JwtProvider, MysqlProvider } from "../../modules/_.loader";
 import {
@@ -73,8 +74,14 @@ export class AuthService {
             if (isSamePassword === false)
                 throw new ForBiddenException(`${userDto.password} 와 일치하지 않는 비밀번호 입니다.`);
 
-            const accessToken = this.jwtProvider.signAccessToken();
-            const refreshToken = this.jwtProvider.signRefreshToken({});
+            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
+                userId: findedUser.userId,
+            });
+            const refreshToken = this.jwtProvider.sign<jwtLib.IRefreshTokenPayload>({
+                userId: findedUser.userId,
+                nickname: findedUser.nickname,
+                email: findedUser.email,
+            });
 
             await this.authRepository.updateUserRefreshTokenRowByUserId(conn, findedUser.userId, refreshToken);
 

@@ -82,6 +82,10 @@ export class JwtProvider {
         }
     }
 
+    public extractToken(bearerToken: string): string {
+        return bearerToken.substring(7);
+    }
+
     private validateIsInit = () => {
         if (JwtProvider.isInit === false) throw new Error(`JwtProvider 는 init 전에 사용할 수 없습니다.`);
     };
