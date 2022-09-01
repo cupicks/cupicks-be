@@ -19,19 +19,25 @@ export class JwtProvider {
         this.isInit = true;
     }
 
-    public signAccessToken() {
+    public signAccessToken(): string {
+        console.log(
+            JwtProvider.ACCESS_EXPIRED_IN,
+            JwtProvider.REFRESH_EXPIRED_IN,
+            JwtProvider.HASH_ALGOIRHTM,
+            JwtProvider.SECRET_KEY,
+        );
         this.validateIsInit();
 
-        jwtLib.sign({}, JwtProvider.SECRET_KEY, {
+        return jwtLib.sign({}, JwtProvider.SECRET_KEY, {
             expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
             algorithm: JwtProvider.HASH_ALGOIRHTM,
         });
     }
 
-    public signRefreshToken(payload: object) {
+    public signRefreshToken(payload: object): string {
         this.validateIsInit();
 
-        jwtLib.sign(payload, JwtProvider.SECRET_KEY, {
+        return jwtLib.sign(payload, JwtProvider.SECRET_KEY, {
             expiresIn: JwtProvider.REFRESH_EXPIRED_IN,
             algorithm: JwtProvider.HASH_ALGOIRHTM,
         });
@@ -42,7 +48,7 @@ export class JwtProvider {
         this.validateIsInit();
 
         try {
-            jwtLib.decode(token);
+            return jwtLib.decode(token);
         } catch (err) {
             throw this.errorHandler(err);
         }
@@ -53,7 +59,7 @@ export class JwtProvider {
         this.validateIsInit();
 
         try {
-            jwtLib.verify(token, JwtProvider.SECRET_KEY);
+            return jwtLib.verify(token, JwtProvider.SECRET_KEY);
         } catch (err) {
             throw this.errorHandler(err);
         }
