@@ -1,7 +1,7 @@
 import * as bcrypt from "bcrypt";
 import { ForBiddenException, CustomException, UnkownTypeError } from "../../models/_.loader";
 
-export default class BcryptProvider {
+export class BcryptProvider {
     // property
     static isInit = false;
     static SALT: number;
@@ -12,28 +12,29 @@ export default class BcryptProvider {
         this.isInit = true;
     }
 
-    public hashedPassword = async (inputPassword: string, salt: number) => {
+    public hashPassword(inputPassword: string): string {
         this.validateIsInit();
 
         try {
-            console.log(`매개변수 ${inputPassword} ${salt}`);
-            return await bcrypt.hashSync(inputPassword, salt);
-        } catch (err) {
-            throw this.errorHandler(err);
-        }
-    };
-
-    public comparedPassword(inputPassword: string, existPassword: string) {
-        this.validateIsInit();
-
-        try {
-            bcrypt.compare(inputPassword, existPassword);
+            return bcrypt.hashSync(inputPassword, BcryptProvider.SALT);
         } catch (err) {
             throw this.errorHandler(err);
         }
     }
 
-    private validateIsInit = () => {
+    public async comparedPassword(inputPassword: string, existPassword: string): Promise<boolean> {
+        this.validateIsInit();
+
+        console.log(inputPassword, existPassword);
+
+        try {
+            return await bcrypt.compare(inputPassword, existPassword);
+        } catch (err) {
+            throw this.errorHandler(err);
+        }
+    }
+
+    private validateIsInit = (): void => {
         if (BcryptProvider.isInit === false) throw new Error("BcryptProvider는 init 전 사용할 수 없어요.");
     };
 

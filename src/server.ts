@@ -1,16 +1,14 @@
 import App from "./app";
-import EnvProvider from "./modules/providers/env.provider";
 import { getNodeEnvValue } from "./models/env/private/env.private";
 
 import { Env } from "./models/_.loader";
-import { JwtProvider } from "./modules/_.lodaer";
 import { TNODE_ENV } from "./constants/_.loader";
-import { BcryptProvider } from "./modules/_.loader";
+import { BcryptProvider, EnvProvider, JwtProvider, MysqlProvider } from "./modules/_.loader";
 
 /**
  * `IIFE`
  */
-(() => {
+(async () => {
     EnvProvider.init();
 
     const MODE: TNODE_ENV = getNodeEnvValue("NODE_ENV");
@@ -19,6 +17,7 @@ import { BcryptProvider } from "./modules/_.loader";
 
     JwtProvider.init(env.JWT);
     BcryptProvider.init(env.SALT);
+    MysqlProvider.init(env.MYSQL);
 
     new App(MODE, env.PORT);
 })();

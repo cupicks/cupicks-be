@@ -35,13 +35,13 @@ DROP TABLE IF EXISTS recipe;
 CREATE TABLE IF NOT EXISTS user (
     user_id     INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     email       VARCHAR(20)     NOT NULL    UNIQUE,
+    password    VARCHAR(255)    NOT NULL,
     nickname    VARCHAR(10)     NOT NULL,
     image_url   VARCHAR(255)    NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_detail (
     user_id     INT             NOT NULL    PRIMARY KEY,
-    password    VARCHAR(255)    NOT NULL,
     created_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS user_detail (
 
 CREATE TABLE IF NOT EXISTS user_refresh_token (
     user_id         INT             NOT NULL    PRIMARY KEY,
-    refresh_token   VARCHAR(255)    NULL,
+    refresh_token   VARCHAR(1000)    NULL,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -63,7 +63,9 @@ CREATE TABLE IF NOT EXISTS recipe (
     title       VARCHAR(20)         NOT NULL,
     content     VARCHAR(255)        NOT NULL,
     is_iced     BOOLEAN             NOT NULL,
-    is_public   BOOLEAN             NOT NULL
+    is_public   BOOLEAN             NOT NULL,
+    created_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS recipe_ingredient_list (
