@@ -1,13 +1,22 @@
 import { AuthRepository } from "../repositories/_.exporter";
-import { BcryptProvider, MysqlProvider } from "../../modules/_.loader";
-import { ConflictException, SigninUserDto, SignupUserDto, UnkownError, UserDto } from "../../models/_.loader";
+import { BcryptProvider, JwtProvider, MysqlProvider } from "../../modules/_.loader";
+import {
+    ConflictException,
+    ForBiddenException,
+    NotFoundException,
+    SigninUserDto,
+    SignupUserDto,
+    UserDto,
+} from "../../models/_.loader";
 
 export class AuthService {
+    private jwtProvider: JwtProvider;
     private mysqlProvider: MysqlProvider;
     private bcryptProvider: BcryptProvider;
     private authRepository: AuthRepository;
 
     constructor() {
+        this.jwtProvider = new JwtProvider();
         this.mysqlProvider = new MysqlProvider();
         this.bcryptProvider = new BcryptProvider();
         this.authRepository = new AuthRepository();
@@ -27,7 +36,7 @@ export class AuthService {
 
             const createdUserId = await this.authRepository.createUser(conn, userDto);
 
-            await this.authRepository.createUserDetailByUserId(conn, createdUserId, userDto.password, date);
+            await this.authRepository.createUserDetailByUserId(conn, createdUserId, date);
             await this.authRepository.createUserRefreshTokenRowByUserId(conn, createdUserId);
 
             await conn.query("COMMIT;");
@@ -46,10 +55,36 @@ export class AuthService {
         }
     };
 
-    signin = async (userDto: SigninUserDto) => {
+    signin = async (
+        userDto: SigninUserDto,
+    ): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
+            await conn.query("START TRANSACTION;");
+
+            const findedUser = await this.authRepository.findUserByEmail(conn, userDto.email);
+            if (findedUser === null) throw new NotFoundException(`${userDto.email} 은 존재하지 않는 이메일입니다.`);
+
+            const isSamePassword = await this.bcryptProvider.comparedPassword(userDto.password, findedUser.password);
+            if (isSamePassword === false)
+                throw new ForBiddenException(`${userDto.password} 와 일치하지 않는 비밀번호 입니다.`);
+
+            const accessToken = this.jwtProvider.signAccessToken();
+            const refreshToken = this.jwtProvider.signRefreshToken({
+                hello: 1,
+            });
+
+            await conn.query("COMMIT;");
+            conn.release();
+
+            return {
+                accessToken,
+                refreshToken,
+            };
         } catch (err) {
             await conn.query("ROLLBACK;");
             conn.release();
