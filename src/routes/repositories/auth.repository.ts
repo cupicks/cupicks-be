@@ -67,4 +67,13 @@ export class AuthRepository {
         const { affectedRows } = userRefreshTokenResultSetHeader;
         if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
+
+    // update
+
+    public updateUserRefreshTokenRowByUserId = async (conn: PoolConnection, userId: number, refreshToken: string) => {
+        console.log(refreshToken.length);
+        const updateQuery = `UPDATE user_refresh_token SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+        console.log(updateResult);
+    };
 }

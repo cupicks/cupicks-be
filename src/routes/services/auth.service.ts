@@ -26,7 +26,7 @@ export class AuthService {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
-            await conn.query("START TRANSACTION;");
+            await conn.beginTransaction();
             userDto.password = this.bcryptProvider.hashPassword(userDto.password);
 
             const date = new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -39,8 +39,7 @@ export class AuthService {
             await this.authRepository.createUserDetailByUserId(conn, createdUserId, date);
             await this.authRepository.createUserRefreshTokenRowByUserId(conn, createdUserId);
 
-            await conn.query("COMMIT;");
-            conn.release();
+            await conn.commit();
 
             return new UserDto({
                 userId: createdUserId,
@@ -49,9 +48,10 @@ export class AuthService {
                 ...userDto,
             });
         } catch (err) {
-            await conn.query("ROLLBACK;");
-            conn.release();
+            await conn.rollback();
             throw err;
+        } finally {
+            conn.release();
         }
     };
 
@@ -64,7 +64,7 @@ export class AuthService {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
-            await conn.query("START TRANSACTION;");
+            await conn.beginTransaction();
 
             const findedUser = await this.authRepository.findUserByEmail(conn, userDto.email);
             if (findedUser === null) throw new NotFoundException(`${userDto.email} 은 존재하지 않는 이메일입니다.`);
@@ -74,21 +74,20 @@ export class AuthService {
                 throw new ForBiddenException(`${userDto.password} 와 일치하지 않는 비밀번호 입니다.`);
 
             const accessToken = this.jwtProvider.signAccessToken();
-            const refreshToken = this.jwtProvider.signRefreshToken({
-                hello: 1,
-            });
+            const refreshToken = this.jwtProvider.signRefreshToken({});
 
-            await conn.query("COMMIT;");
-            conn.release();
+            await this.authRepository.updateUserRefreshTokenRowByUserId(conn, findedUser.userId, refreshToken);
 
+            await conn.commit();
             return {
                 accessToken,
                 refreshToken,
             };
         } catch (err) {
-            await conn.query("ROLLBACK;");
-            conn.release();
+            await conn.rollback();
             throw err;
+        } finally {
+            conn.release();
         }
     };
 }
