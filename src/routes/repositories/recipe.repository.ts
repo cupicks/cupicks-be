@@ -9,23 +9,21 @@ export class RecipeRepository {
             VALUES
                 ("${recipeDto.cupSize}", "${recipeDto.title}", "${recipeDto.content}", ${recipeDto.isIced}, ${recipeDto.isPublic});
         `;
+
         const result = await conn.query(query, recipeDto);
+
         return result;
     };
 
-    public createRecipeIngredient = async (
-        conn: any,
-        recipeId: number,
-        ingredientName: string,
-        ingredientColor: string,
-        ingredientAmount: number,
-    ): Promise<void> => {
+    public createRecipeIngredient = async (conn: any, ingredientList: any): Promise<number> => {
         const query = `
-            INSERT INTO recipe_ingredient
-                (recipe_id, ingredient_name, ingredient_color, ingredient_amount)
-            VALUES
-                (${recipeId}, "${ingredientName}", "${ingredientColor}", ${ingredientAmount});
+            INSERT INTO recipe_ingredient SET ?
         `;
-        const result = await conn.query(query);
+
+        for (let i = 0; i < ingredientList.length; i++) {
+            await conn.query(query, ingredientList[i]);
+        }
+
+        return ingredientList[0].recipe_id;
     };
 }

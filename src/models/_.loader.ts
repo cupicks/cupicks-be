@@ -1,5 +1,4 @@
-import { Env, IJwtEnv, IMysqlEnv } from "./env/env";
-import { IS3ConfigEnv } from "./env/env";
+import { Env, IJwtEnv, IMysqlEnv, IS3ConfigEnv } from "./env/env";
 import {
     CustomException,
     ValidationException,

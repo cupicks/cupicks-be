@@ -19,15 +19,20 @@ export class RecipeService {
             const createRecipe = await this.recipeRepository.createRecipe(conn, recipeDto);
             const recipeId = parseInt(JSON.stringify(createRecipe[0].insertId));
 
-            const createRecipeIngredient = await this.recipeRepository.createRecipeIngredient(
-                conn,
-                recipeId,
-                recipeDto.ingredientList[0].ingredientName,
-                recipeDto.ingredientList[0].ingredientColor,
-                recipeDto.ingredientList[0].ingredientAmount,
-            );
+            const result = recipeDto.ingredientList.map((e) => {
+                return {
+                    recipe_id: recipeId,
+                    ingredient_name: e.ingredientName,
+                    ingredient_color: e.ingredientColor,
+                    ingredient_amount: e.ingredientAmount,
+                };
+            });
+
+            const createRecipeIngredient = await this.recipeRepository.createRecipeIngredient(conn, result);
 
             await conn.commit();
+
+            return createRecipeIngredient;
         } catch (err) {
             await conn.rollback();
             throw err;
