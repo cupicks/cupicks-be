@@ -1,7 +1,7 @@
 ---
 name: 기능 리포트
 about: 프로젝트 제안 사항
-title: 'Bug : 버그 주요 키워드'
+title: 'Reqeust : 기능 요청 사항'
 labels: 'feature'
 assignees: ['unchaptered', 'axisotherwise']
 ---

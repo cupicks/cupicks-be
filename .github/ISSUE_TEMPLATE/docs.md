@@ -13,7 +13,7 @@ assignees: ['unchaptered', 'axisotherwise']
 ### 환경 설정
 
 ```cmd
-OS:
-Node: 16.15.1(unchpatered) 16.16.0(sumin-dev, subeom-lee)
-npm : 8.1.1(all)
+OS: Windows 10
+Node:  v16.15.1 (@unchaptered), v16.13.1(@axisotherwise)
+npm : v8.11.0 (@unchaptered), v8.2.2 (@axisotherwise)
 ```
