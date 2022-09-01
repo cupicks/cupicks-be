@@ -2,6 +2,18 @@ import * as jwtLib from "jsonwebtoken";
 import { CustomException, IJwtEnv, JwtAuthorizationException, UnkownTypeError } from "../../models/_.loader";
 import { TALGORITHM } from "../../constants/_.loader";
 
+declare module "jsonwebtoken" {
+    export interface IAccessTokenPayload extends jwtLib.JwtPayload {
+        userId: number;
+    }
+
+    export interface IRefreshTokenPayload extends jwtLib.JwtPayload {
+        userId: number;
+        email: string;
+        nickname: string;
+    }
+}
+
 export class JwtProvider {
     static isInit = false;
     static ACCESS_EXPIRED_IN: string;
@@ -30,11 +42,11 @@ export class JwtProvider {
         this.isInit = true;
     }
 
-    public signAccessToken(): string {
+    public sign<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(payload: T): string {
         this.validateIsInit();
 
         return jwtLib.sign(
-            {},
+            payload,
             {
                 key: JwtProvider.HASH_PRIVATE_PEM_KEY,
                 passphrase: JwtProvider.HASH_PASSPHRASE,
@@ -46,39 +58,23 @@ export class JwtProvider {
         );
     }
 
-    public signRefreshToken(payload: object): string {
-        this.validateIsInit();
-
-        return jwtLib.sign(
-            payload,
-            {
-                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
-                passphrase: JwtProvider.HASH_PASSPHRASE,
-            },
-            {
-                expiresIn: JwtProvider.REFRESH_EXPIRED_IN,
-                algorithm: JwtProvider.HASH_ALGOIRHTM,
-            },
-        );
-    }
-
     /** @throws { CustomException } */
-    public decodeToken(token: string) {
+    public decodeToken<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(token: string): T {
         this.validateIsInit();
 
         try {
-            return jwtLib.decode(token);
+            return <T>jwtLib.decode(token);
         } catch (err) {
             throw this.errorHandler(err);
         }
     }
 
     /** @throws { CustomException } */
-    public verifyToken(token: string) {
+    public verifyToken<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(token: string): T {
         this.validateIsInit();
 
         try {
-            return jwtLib.verify(token, JwtProvider.HASH_PUBLIC_PEM_KEY, {
+            return <T>jwtLib.verify(token, JwtProvider.HASH_PUBLIC_PEM_KEY, {
                 algorithms: ["RS256"],
             });
         } catch (err) {
