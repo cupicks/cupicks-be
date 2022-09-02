@@ -14,15 +14,17 @@ export default class RecipeController {
 
     public createRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const validator = await new JoiValidator().validateAsync<CreateRecipeDto>(new CreateRecipeDto(req.body));
+            // const validator = await new JoiValidator().validateAsync<CreateRecipeDto>(new CreateRecipeDto(req.body));
 
-            const createRecipe = await this.recipeService.createRecipe(validator);
+            // const createRecipe = await this.recipeService.createRecipe(validator);
 
-            return res.status(201).json({
-                isSuccess: true,
-                message: "레시피 등록에 성공했어요.",
-                recipeId: createRecipe,
-            });
+            // return res.status(201).json({
+            //     isSuccess: true,
+            //     message: "레시피 등록에 성공했어요.",
+            //     recipeId: createRecipe,
+            // });
+            console.log("실행됩니다.");
+            return res.end();
         } catch (err) {
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
