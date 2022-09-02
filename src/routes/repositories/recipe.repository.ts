@@ -1,8 +1,8 @@
 import { CreateRecipeDto } from "../../models/_.loader";
-import { PoolConnection } from "mysql2/promise";
+import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 
 export class RecipeRepository {
-    public createRecipe = async (conn: any, recipeDto: CreateRecipeDto): Promise<any> => {
+    public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
         const query = `
             INSERT INTO recipe
                 (cup_size, title, content, is_iced, is_public)
@@ -10,9 +10,14 @@ export class RecipeRepository {
                 ("${recipeDto.cupSize}", "${recipeDto.title}", "${recipeDto.content}", ${recipeDto.isIced}, ${recipeDto.isPublic});
         `;
 
-        const result = await conn.query(query, recipeDto);
+        const result = await conn.query<ResultSetHeader>(query);
+        const resultSetHeader = result[0];
 
-        return result;
+        const { affectedRows, insertId } = resultSetHeader;
+
+        console.log(result[0]);
+
+        return insertId;
     };
 
     public createRecipeIngredient = async (conn: any, ingredientList: any): Promise<number> => {
