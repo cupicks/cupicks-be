@@ -1,9 +1,16 @@
+import e from "cors";
 import { RequestHandler, Request, Response, NextFunction } from "express";
 
 export const formDataFilter: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-    const type = req.headers["content-type"]!.split(";")[0];
+    // /api/auth/signin?search=user
+    const originUrl: string = req.originalUrl;
 
-    if (type === "multipart/form-data") return next();
+    // /api/auth/signin
+    const originUrlExceptQuery: string = originUrl.split("?")[0];
 
-    return res.status(500).json(`content-type은 multipart/form-data 형식이어야 해요.`);
+    if (req.headers["content-type"] === "application/x-www-form-urlencoded") return next();
+    else
+        return res
+            .status(500)
+            .json(`${originUrlExceptQuery} 도메인의 content-type 은 multipart/form-data 와 일치해야 합니다.`);
 };
