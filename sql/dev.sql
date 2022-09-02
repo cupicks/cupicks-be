@@ -137,7 +137,9 @@ CREATE TABLE IF NOT EXISTS user_disfavor_recipe (
 CREATE TABLE IF NOT EXISTS comment (
     comment_id  INT                 NOT NULL    PRIMARY KEY,
     comment     VARCHAR(150)        NOT NULL,
-    image_url   VARCHAR(255)             NULL
+    image_url   VARCHAR(255)             NULL,
+    created_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS recipe_comment (
