@@ -38,4 +38,22 @@ export class RecipeRepository {
 
         return ingredientList[0].recipe_id;
     };
+
+    public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
+        const query = `
+            INSERT INTO user_recipe
+                (user_id, recipe_id)
+            VALUES
+                (?, ?);
+        `;
+
+        const result = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+
+        const resultSetHeader = result[0];
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows > 1) throw new Error("protected");
+
+        return JSON.stringify(result[0].insertId);
+    };
 }

@@ -11,7 +11,7 @@ export class RecipeService {
         this.mysqlProvider = new MysqlProvider();
     }
 
-    createRecipe = async (recipeDto: CreateRecipeDto): Promise<any> => {
+    createRecipe = async (recipeDto: CreateRecipeDto, userId: number): Promise<any> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
@@ -27,11 +27,15 @@ export class RecipeService {
                 };
             });
 
-            const createRecipeIngredient = await this.recipeRepository.createRecipeIngredient(conn, result);
+            const createRecipeIngredient = Promise.resolve(this.recipeRepository.createRecipeIngredient(conn, result));
+            const createUserRecipe = Promise.resolve(
+                this.recipeRepository.createUserRecipe(conn, userId, createRecipe),
+            );
+
+            const value = await Promise.all([createRecipeIngredient, createRecipe]);
 
             await conn.commit();
-
-            return createRecipeIngredient;
+            return value[0];
         } catch (err) {
             await conn.rollback();
             throw err;
