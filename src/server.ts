@@ -22,5 +22,5 @@ import * as jwt from "jsonwebtoken";
     MysqlProvider.init(env.MYSQL);
     MulterProvider.init(env.S3);
 
-    new App(MODE, env.PORT);
+    new App(MODE, env.PORT, env.CORS_ORIGIN_LIST);
 })();

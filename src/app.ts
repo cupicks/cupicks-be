@@ -5,32 +5,38 @@ import { TNODE_ENV } from "constants/_.loader";
 
 import { authRouter, recipeRouter } from "./routes/routers/_.exporter";
 
+import { getCorsMiddleware } from "./middlewares/guards/_.exporter";
+
 /**
  * `Singleton`
  */
 export default class App {
     app: express.Application;
 
-    constructor(MODE: TNODE_ENV, PORT: number) {
+    constructor(MODE: TNODE_ENV, PORT: number, CORS_ORIGIN_LIST: string[]) {
         this.app = express();
 
-        this.setMiddleware(MODE);
+        this.setMiddleware(MODE, CORS_ORIGIN_LIST);
         this.setRouter();
         this.runServer(MODE, PORT);
     }
 
-    setMiddleware(MODE: TNODE_ENV) {
+    setMiddleware(MODE: TNODE_ENV, CORS_ORIGIN_LIST: string[]) {
         if (MODE === "dev") {
             this.app;
             this.app.use(cors());
             this.app.use(morgan("dev"));
         } else if (MODE === "prod") {
-            this.app.use(cors());
+            this.app.use(
+                cors({
+                    origin: "CLIENT_DOMAIN",
+                }),
+            );
             this.app.use(morgan("combined"));
         } else {
             this.app.use(cors());
         }
-
+        this.app.use(getCorsMiddleware(CORS_ORIGIN_LIST));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
 
