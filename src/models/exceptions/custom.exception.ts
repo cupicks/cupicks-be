@@ -12,6 +12,18 @@ export class CustomException implements TCustomException {
     }
 }
 
+export class ValidationException extends CustomException {
+    name: string;
+    statusCode: number;
+
+    constructor(message: string) {
+        super(message);
+
+        this.name = "ValidationException";
+        this.statusCode = 400;
+    }
+}
+
 export class ConflictException extends CustomException {
     name: string;
     statusCode: number;
@@ -20,17 +32,6 @@ export class ConflictException extends CustomException {
 
         this.name = "ConflictException";
         this.statusCode = 409;
-    }
-}
-
-export class NotFoundException extends CustomException {
-    name: string;
-    statusCode: number;
-    constructor(message: string) {
-        super(message);
-
-        this.name = "NotFoundException";
-        this.statusCode = 404;
     }
 }
 
@@ -52,6 +53,17 @@ export class ForBiddenException extends CustomException {
 
         this.name = "ForBiddenException";
         this.statusCode = 403;
+    }
+}
+
+export class NotFoundException extends CustomException {
+    name: string;
+    statusCode: number;
+    constructor(message: string) {
+        super(message);
+
+        this.name = "NotFoundException";
+        this.statusCode = 404;
     }
 }
 

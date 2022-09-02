@@ -2,6 +2,7 @@ import * as multer from "multer";
 import * as multerS3 from "multer-s3";
 import { S3Client } from "@aws-sdk/client-s3";
 import path from "path";
+import { RequestHandler, NextFunction } from "express";
 
 import { IS3ConfigEnv } from "models/_.loader";
 import { CustomException, UnkownTypeError } from "../../models/_.loader";
@@ -23,7 +24,11 @@ export class MulterProvider {
         this.isInit = true;
     };
 
-    public uploadSingle() {
+    static uploadSingle: RequestHandler = (req, res, next) => {
+        return this.test().single("img")(req, res, next);
+    };
+
+    static test = () => {
         const s3 = new S3Client({
             credentials: {
                 accessKeyId: MulterProvider.S3_ACCESS_KEY,
@@ -31,13 +36,13 @@ export class MulterProvider {
             },
             region: MulterProvider.REGION,
         });
+
         return multer({
             storage: multerS3({
                 s3,
                 bucket: MulterProvider.BUCKET,
-                contentType: multerS3.AUTO_CONTENT_TYPE,
                 key(req, file, done) {
-                    done(null, `profile/${Date.now()}${path.basename(file.originalname)}`);
+                    done(null, `profile/${Date.now()}${file.originalname}`);
                 },
             }),
             fileFilter(req, file, done) {
@@ -50,5 +55,5 @@ export class MulterProvider {
             },
             limits: { fileSize: 5 * 1024 * 1024 },
         });
-    }
+    };
 }

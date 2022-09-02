@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import * as path from "path";
 import { TALGORITHM, TNODE_ENV } from "../../../constants/_.loader";
 
 function getNodeEnvValue(KEY: string): TNODE_ENV {
@@ -27,6 +29,10 @@ function getEnvNumberValue(KEY: string): number {
     return NUMBER_VALUE;
 }
 
+function getPemKey(KEY: "private" | "public"): string {
+    return fs.readFileSync(path.join(process.cwd(), `${KEY}.pem`), "utf8");
+}
+
 function getEnvLiteralTypeValue<T extends TALGORITHM>(KEY: string) {
     const VALUE = process.env[KEY];
     if (VALUE === undefined) throw new Error(`${KEY} 는 undefined 일 수 없습니다.`);
@@ -51,4 +57,4 @@ function getEnvLiteralTypeValue<T extends TALGORITHM>(KEY: string) {
     return TYPED_VALUE;
 }
 
-export { getNodeEnvValue, getEnvStringValue, getEnvNumberValue, getEnvLiteralTypeValue };
+export { getNodeEnvValue, getEnvStringValue, getEnvNumberValue, getEnvLiteralTypeValue, getPemKey };

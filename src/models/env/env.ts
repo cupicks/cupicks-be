@@ -1,11 +1,14 @@
-import { getEnvStringValue, getEnvNumberValue, getEnvLiteralTypeValue } from "./private/env.private";
+import { getEnvStringValue, getEnvNumberValue, getEnvLiteralTypeValue, getPemKey } from "./private/env.private";
 import { TALGORITHM } from "../../constants/_.loader";
 
 export interface IJwtEnv {
     ACCESS_EXPIRED_IN: string;
     REFRESH_EXPIRED_IN: string;
     HASH_ALGOIRHTM: TALGORITHM;
-    SECRET_KEY: string;
+
+    HASH_PRIVATE_PEM_KEY: string;
+    HASH_PUBLIC_PEM_KEY: string;
+    HASH_PASSPHRASE: string;
 }
 
 export interface IMysqlEnv {
@@ -25,7 +28,10 @@ export interface IS3ConfigEnv {
 
 export class Env {
     PORT;
+
     SALT;
+
+    CORS_ORIGIN_LIST: string[];
 
     JWT: IJwtEnv;
     MYSQL: IMysqlEnv;
@@ -33,13 +39,20 @@ export class Env {
 
     constructor() {
         this.PORT = this.getEnvNumberValue("PORT");
+
         this.SALT = this.getEnvNumberValue("SALT");
+
+        this.CORS_ORIGIN_LIST = [this.getEnvStringValue("CORS_ORIGIN_ONE")];
+
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
             REFRESH_EXPIRED_IN: this.getEnvStringValue("JWT_REFRESH_EXPIRED_IN"),
             HASH_ALGOIRHTM: this.getEnvLiteralTypeValue("JWT_HASH_ALGOIRHTM"),
-            SECRET_KEY: this.getEnvStringValue("SECRET_KEY"),
+            HASH_PRIVATE_PEM_KEY: this.getPemKey("private"),
+            HASH_PUBLIC_PEM_KEY: this.getPemKey("public"),
+            HASH_PASSPHRASE: this.getEnvStringValue("HASH_PASSPHRASE"),
         };
+
         this.MYSQL = {
             HOST: this.getEnvStringValue("MYSQL_HOST"),
             USER: this.getEnvStringValue("MYSQL_USER"),
@@ -47,6 +60,7 @@ export class Env {
             PASSWORD: this.getEnvStringValue("MYSQL_PASSWORD"),
             CONNECTION_LIMIT: this.getEnvNumberValue("MYSQL_CONNECTION_LIMIT"),
         };
+
         this.S3 = {
             S3_ACCESS_KEY: this.getEnvStringValue("S3_ACCESS_KEY"),
             S3_SECRET_KEY: this.getEnvStringValue("S3_SECRET_KEY"),
@@ -58,4 +72,5 @@ export class Env {
     private getEnvStringValue = getEnvStringValue;
     private getEnvNumberValue = getEnvNumberValue;
     private getEnvLiteralTypeValue = getEnvLiteralTypeValue;
+    private getPemKey = getPemKey;
 }
