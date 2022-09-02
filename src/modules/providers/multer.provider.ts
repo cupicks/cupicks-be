@@ -25,7 +25,7 @@ export class MulterProvider {
     };
 
     static uploadSingle: RequestHandler = (req, res, next) => {
-        return this.test().single("img")(req, res, next);
+        return this.test().single("imageValue")(req, res, next);
     };
 
     static test = () => {
