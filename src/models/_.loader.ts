@@ -11,10 +11,11 @@ import {
     DatabaseConnectionError,
 } from "./exceptions/custom.exception";
 
-import { IUserPacket } from "./packets/i.user.packet";
+import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
 
 import { IBaseDto } from "./dtos/i.base.dto";
 import { UserDto, IUserDto } from "./dtos/user/user.dto";
+import { PublishTokenDto, IPublishTokenDto } from "./dtos/user/publish.token.dto";
 import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
 import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
 
@@ -27,12 +28,15 @@ export {
     IMysqlEnv,
     IBaseDto,
     IUserPacket,
+    IUserRefresthTokenPacket,
     UserDto,
     IUserDto,
     SignupUserDto,
     ISignupUserDto,
     SigninUserDto,
     ISigninUserDto,
+    PublishTokenDto,
+    IPublishTokenDto,
     CreateRecipeDto,
     ICreateRecipeDto,
     IngredientDto,

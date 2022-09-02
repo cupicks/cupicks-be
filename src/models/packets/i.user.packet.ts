@@ -7,3 +7,8 @@ export interface IUserPacket extends RowDataPacket {
     password: string;
     imageUrl?: string;
 }
+
+export interface IUserRefresthTokenPacket extends RowDataPacket {
+    userId: number;
+    refreshToken?: string;
+}
