@@ -32,6 +32,16 @@ export class AuthRepository {
         return rowDataPacket?.length === 1;
     };
 
+    public findUserById = async (conn: PoolConnection, userId: number): Promise<IUserPacket | null> => {
+        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE user_id = ${userId} LIMIT 1;`;
+        const findResult = await conn.query<IUserPacket[]>(findQuery);
+
+        const userDataPacket = findResult[0];
+        const user = userDataPacket[0];
+
+        return userDataPacket.length !== 1 ? null : user;
+    };
+
     public findUserByEmail = async (conn: PoolConnection, email: string): Promise<IUserPacket | null> => {
         const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE email = "${email}" LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);

@@ -23,7 +23,7 @@ export class PublishTokenDto implements IBaseDto, IPublishTokenDto {
 
     getJoiInstance(): ObjectSchema<PublishTokenDto> {
         return joi.object<PublishTokenDto>({
-            refreshToken: joi.string().trim().required().message("리프레쉬 토큰은 반드시 포함되어야 합니다."),
+            refreshToken: joi.string().required().trim().message("리프레쉬 토큰은 반드시 포함되어야 합니다."),
         });
     }
 }
