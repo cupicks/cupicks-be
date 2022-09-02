@@ -1,7 +1,5 @@
-import {} from "models/dtos/user/user.dto";
-import { IUserPacket } from "models/packets/i.user.packet";
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { SignupUserDto } from "../../models/_.loader";
+import { SignupUserDto, IUserPacket, IUserRefresthTokenPacket } from "../../models/_.loader";
 
 export class AuthRepository {
     // 있는 지만 확인하는 것 : boolean = isExists
@@ -24,6 +22,16 @@ export class AuthRepository {
         return rowDataPacket?.length === 1;
     };
 
+    public isExistsById = async (conn: PoolConnection, userId: number): Promise<boolean> => {
+        // 쿼리문 추가하면 끝
+        const isExistsQuery = `SELECT user_id FROM user WHERE user_id = ${userId};`;
+        const isExistsResult = await conn.query<RowDataPacket[][]>(isExistsQuery);
+
+        const rowDataPacket = isExistsResult[0];
+
+        return rowDataPacket?.length === 1;
+    };
+
     public findUserByEmail = async (conn: PoolConnection, email: string): Promise<IUserPacket | null> => {
         const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE email = "${email}" LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
@@ -32,6 +40,19 @@ export class AuthRepository {
         const user = userDataPacket[0];
 
         return userDataPacket.length !== 1 ? null : user;
+    };
+
+    public findUserRefreshTokenById = async (
+        conn: PoolConnection,
+        userId: number,
+    ): Promise<IUserRefresthTokenPacket | null> => {
+        const findQuery = `SELECT user_id as userId, refresh_token as refreshToken FROM user_refresh_token WHERE user_id = ${userId};`;
+        const findResult = await conn.query<IUserRefresthTokenPacket[]>(findQuery);
+
+        const userTokenPacket = findResult[0];
+        const userToken = userTokenPacket[0];
+
+        return userTokenPacket?.length !== 1 ? null : userToken;
     };
 
     public createUser = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {

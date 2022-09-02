@@ -8,6 +8,7 @@ import {
     SigninUserDto,
     SignupUserDto,
     UserDto,
+    PublishTokenDto,
 } from "../../models/_.loader";
 
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
         this.authRepository = new AuthRepository();
     }
 
-    signup = async (userDto: SignupUserDto): Promise<UserDto> => {
+    public signup = async (userDto: SignupUserDto): Promise<UserDto> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -56,7 +57,7 @@ export class AuthService {
         }
     };
 
-    signin = async (
+    public signin = async (
         userDto: SigninUserDto,
     ): Promise<{
         accessToken: string;
@@ -90,6 +91,36 @@ export class AuthService {
                 accessToken,
                 refreshToken,
             };
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public publishToken = async (tokenDto: PublishTokenDto): Promise<string> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const payload = this.jwtProvider.decodeToken<jwtLib.IRefreshTokenPayload>(tokenDto.refreshToken);
+            const isExists = await this.authRepository.isExistsById(conn, payload.userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+
+            const userToken = await this.authRepository.findUserRefreshTokenById(conn, payload.userId);
+            if (userToken === null) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+
+            const serverToken = userToken.refreshToken;
+            if (serverToken === undefined) throw new NotFoundException(`로그인 기록이 없는 사용자입니다.`);
+            if (tokenDto.refreshToken !== serverToken)
+                throw new NotFoundException(`등록되지 않은 RefreshToken 입니다.`);
+
+            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({ userId: payload.userId });
+            await conn.commit();
+
+            return accessToken;
         } catch (err) {
             await conn.rollback();
             throw err;
