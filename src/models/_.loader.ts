@@ -1,10 +1,11 @@
-import { Env, IJwtEnv, IMysqlEnv } from "./env/env";
+import { Env, IJwtEnv, IMysqlEnv, IS3ConfigEnv } from "./env/env";
 import {
     CustomException,
+    ValidationException,
+    ConflictException,
     JwtAuthorizationException,
     ForBiddenException,
     NotFoundException,
-    ConflictException,
     UnkownTypeError,
     UnkownError,
     UnOverrideDtoError,
@@ -25,6 +26,7 @@ export {
     Env,
     IJwtEnv,
     IMysqlEnv,
+    IS3ConfigEnv,
     IBaseDto,
     IUserPacket,
     UserDto,
@@ -38,6 +40,7 @@ export {
     IngredientDto,
     IIngredientDto,
     CustomException, // 500
+    ValidationException, // 400
     JwtAuthorizationException, // 401
     ForBiddenException, // 403
     NotFoundException, // 404

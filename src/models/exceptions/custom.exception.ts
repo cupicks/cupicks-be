@@ -12,6 +12,18 @@ export class CustomException implements TCustomException {
     }
 }
 
+export class ValidationException extends CustomException {
+    name: string;
+    statusCode: number;
+
+    constructor(message: string) {
+        super(message);
+
+        this.name = "ValidationException";
+        this.statusCode = 400;
+    }
+}
+
 export class ConflictException extends CustomException {
     name: string;
     statusCode: number;

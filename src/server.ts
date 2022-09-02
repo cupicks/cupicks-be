@@ -1,9 +1,11 @@
 import App from "./app";
-import { getNodeEnvValue } from "./models/env/private/env.private";
 
+import { getNodeEnvValue } from "./models/env/private/env.private";
 import { Env } from "./models/_.loader";
 import { TNODE_ENV } from "./constants/_.loader";
-import { BcryptProvider, EnvProvider, JwtProvider, MysqlProvider } from "./modules/_.loader";
+import { BcryptProvider, EnvProvider, JwtProvider, MysqlProvider, MulterProvider } from "./modules/_.loader";
+
+import * as jwt from "jsonwebtoken";
 
 /**
  * `IIFE`
@@ -18,6 +20,7 @@ import { BcryptProvider, EnvProvider, JwtProvider, MysqlProvider } from "./modul
     JwtProvider.init(env.JWT);
     BcryptProvider.init(env.SALT);
     MysqlProvider.init(env.MYSQL);
+    MulterProvider.init(env.S3);
 
     new App(MODE, env.PORT);
 })();
