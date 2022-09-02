@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { SignupUserDto, CustomException, UnkownTypeError, UnkownError, SigninUserDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
@@ -12,7 +12,7 @@ export default class AuthController {
         this.joiValidator = new JoiValidator();
     }
 
-    public signup: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public signup: RequestHandler = async (req: Request, res: Response) => {
         try {
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
@@ -24,8 +24,8 @@ export default class AuthController {
             const result = await this.authService.signup(signupUserDto);
 
             return res.json({
-                message: "성공의 경우",
-                result,
+                isSuccess: true,
+                message: "회원가입에 성공하셨습니다.",
             });
         } catch (err) {
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
@@ -37,7 +37,7 @@ export default class AuthController {
         }
     };
 
-    public signin: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public signin: RequestHandler = async (req: Request, res: Response) => {
         try {
             const singInUserDto: SigninUserDto = await this.joiValidator.validateAsync<SigninUserDto>(
                 new SigninUserDto({
@@ -45,10 +45,16 @@ export default class AuthController {
                 }),
             );
 
+            const { accessToken, refreshToken } = await this.authService.signin(singInUserDto);
+
             return res.json({
-                message: "성공의 경우",
+                isSuccess: true,
+                message: "로그인에 성공하셨습니다.",
+                accessToken,
+                refreshToken,
             });
         } catch (err) {
+            console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({

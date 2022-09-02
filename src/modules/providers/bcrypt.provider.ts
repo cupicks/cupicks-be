@@ -12,7 +12,7 @@ export class BcryptProvider {
         this.isInit = true;
     }
 
-    public hashPassword(inputPassword: string) {
+    public hashPassword(inputPassword: string): string {
         this.validateIsInit();
 
         try {
@@ -22,17 +22,19 @@ export class BcryptProvider {
         }
     }
 
-    public comparedPassword(inputPassword: string, existPassword: string) {
+    public async comparedPassword(inputPassword: string, existPassword: string): Promise<boolean> {
         this.validateIsInit();
 
+        console.log(inputPassword, existPassword);
+
         try {
-            return bcrypt.compare(inputPassword, existPassword);
+            return await bcrypt.compare(inputPassword, existPassword);
         } catch (err) {
             throw this.errorHandler(err);
         }
     }
 
-    private validateIsInit = () => {
+    private validateIsInit = (): void => {
         if (BcryptProvider.isInit === false) throw new Error("BcryptProvider는 init 전 사용할 수 없어요.");
     };
 

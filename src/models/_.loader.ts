@@ -12,6 +12,8 @@ import {
     DatabaseConnectionError,
 } from "./exceptions/custom.exception";
 
+import { IUserPacket } from "./packets/i.user.packet";
+
 import { IBaseDto } from "./dtos/i.base.dto";
 import { UserDto, IUserDto } from "./dtos/user/user.dto";
 import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
@@ -26,6 +28,7 @@ export {
     IMysqlEnv,
     IS3ConfigEnv,
     IBaseDto,
+    IUserPacket,
     UserDto,
     IUserDto,
     SignupUserDto,

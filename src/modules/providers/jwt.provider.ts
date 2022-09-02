@@ -2,72 +2,88 @@ import * as jwtLib from "jsonwebtoken";
 import { CustomException, IJwtEnv, JwtAuthorizationException, UnkownTypeError } from "../../models/_.loader";
 import { TALGORITHM } from "../../constants/_.loader";
 
+declare module "jsonwebtoken" {
+    export interface IAccessTokenPayload extends jwtLib.JwtPayload {
+        userId: number;
+    }
+
+    export interface IRefreshTokenPayload extends jwtLib.JwtPayload {
+        userId: number;
+        email: string;
+        nickname: string;
+    }
+}
+
 export class JwtProvider {
     static isInit = false;
     static ACCESS_EXPIRED_IN: string;
     static REFRESH_EXPIRED_IN: string;
     static HASH_ALGOIRHTM: TALGORITHM;
-    static SECRET_KEY: string;
+    static HASH_PRIVATE_PEM_KEY: string;
+    static HASH_PUBLIC_PEM_KEY: string;
+    static HASH_PASSPHRASE: string;
 
-    static init({ ACCESS_EXPIRED_IN, REFRESH_EXPIRED_IN, HASH_ALGOIRHTM, SECRET_KEY }: IJwtEnv) {
+    static init({
+        ACCESS_EXPIRED_IN,
+        REFRESH_EXPIRED_IN,
+        HASH_ALGOIRHTM,
+        HASH_PRIVATE_PEM_KEY,
+        HASH_PUBLIC_PEM_KEY,
+        HASH_PASSPHRASE,
+    }: IJwtEnv) {
         if (this.isInit === true) return;
 
         this.ACCESS_EXPIRED_IN = ACCESS_EXPIRED_IN;
         this.REFRESH_EXPIRED_IN = REFRESH_EXPIRED_IN;
         this.HASH_ALGOIRHTM = HASH_ALGOIRHTM;
-        this.SECRET_KEY = SECRET_KEY;
+        this.HASH_PRIVATE_PEM_KEY = HASH_PRIVATE_PEM_KEY;
+        this.HASH_PUBLIC_PEM_KEY = HASH_PUBLIC_PEM_KEY;
+        this.HASH_PASSPHRASE = HASH_PASSPHRASE;
         this.isInit = true;
     }
 
-    public signAccessToken() {
-        // this.validateIsInit();
-        const result = jwtLib.sign(
+    public sign<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(payload: T): string {
+        this.validateIsInit();
+
+        return jwtLib.sign(
+            payload,
             {
-                name: "axisotherwise",
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
             },
-            JwtProvider.SECRET_KEY,
             {
                 expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
-                issuer: "axisotherwise",
-                algorithm: "HS512",
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
             },
         );
-        console.log(result);
-        // jwtLib.sign({}, JwtProvider.SECRET_KEY, {
-        //     expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
-        //     algorithm: JwtProvider.HASH_ALGOIRHTM,
-        // });
-    }
-
-    public signRefreshToken(payload: object) {
-        this.validateIsInit();
-
-        jwtLib.sign(payload, JwtProvider.SECRET_KEY, {
-            expiresIn: JwtProvider.REFRESH_EXPIRED_IN,
-            algorithm: JwtProvider.HASH_ALGOIRHTM,
-        });
     }
 
     /** @throws { CustomException } */
-    public decodeToken(token: string) {
+    public decodeToken<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(token: string): T {
         this.validateIsInit();
 
         try {
-            jwtLib.decode(token);
+            return <T>jwtLib.decode(token);
         } catch (err) {
             throw this.errorHandler(err);
         }
     }
 
     /** @throws { CustomException } */
-    public verifyToken(token: string) {
+    public verifyToken<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(token: string): T {
         this.validateIsInit();
 
         try {
-            jwtLib.verify(token, JwtProvider.SECRET_KEY);
+            return <T>jwtLib.verify(token, JwtProvider.HASH_PUBLIC_PEM_KEY, {
+                algorithms: ["RS256"],
+            });
         } catch (err) {
             throw this.errorHandler(err);
         }
+    }
+
+    public extractToken(bearerToken: string): string {
+        return bearerToken.substring(7);
     }
 
     private validateIsInit = () => {
