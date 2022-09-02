@@ -12,21 +12,28 @@ export class RecipeRepository {
 
         const result = await conn.query<ResultSetHeader>(query);
         const resultSetHeader = result[0];
-
         const { affectedRows, insertId } = resultSetHeader;
 
-        console.log(result[0]);
+        if (affectedRows > 1) throw new Error("protected");
 
         return insertId;
     };
 
-    public createRecipeIngredient = async (conn: any, ingredientList: any): Promise<number> => {
+    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: any): Promise<number> => {
         const query = `
             INSERT INTO recipe_ingredient SET ?
         `;
 
+        let total: number = 0;
+
         for (let i = 0; i < ingredientList.length; i++) {
-            await conn.query(query, ingredientList[i]);
+            const result = await conn.query<ResultSetHeader>(query, ingredientList[i]);
+
+            const resultSetHeader = result[0];
+            const { affectedRows } = resultSetHeader;
+            total += affectedRows;
+
+            if (total > 20) throw new Error("protected");
         }
 
         return ingredientList[0].recipe_id;

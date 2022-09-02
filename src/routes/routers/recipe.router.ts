@@ -1,10 +1,10 @@
 import { Router } from "express";
 
 import RecipeController from "../controllers/recipe.controller";
-import { formDataFilter } from "../../middlewares/filters/_.exporter";
+import { MulterProvider } from "../../modules/_.loader";
 
 const recipeRouter: Router = Router();
 
-recipeRouter.post("/", new RecipeController().createRecipe);
+recipeRouter.post("/", MulterProvider.uploadSingle, new RecipeController().createRecipe);
 
 export default recipeRouter;

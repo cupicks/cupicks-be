@@ -17,11 +17,10 @@ export class RecipeService {
             await conn.beginTransaction();
 
             const createRecipe = await this.recipeRepository.createRecipe(conn, recipeDto);
-            // const recipeId = parseInt(JSON.stringify(createRecipe[0].insertId));
 
             const result = recipeDto.ingredientList.map((e) => {
                 return {
-                    // recipe_id: recipeId,
+                    recipe_id: createRecipe,
                     ingredient_name: e.ingredientName,
                     ingredient_color: e.ingredientColor,
                     ingredient_amount: e.ingredientAmount,
