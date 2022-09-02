@@ -31,6 +31,8 @@ export class Env {
 
     SALT;
 
+    CORS_ORIGIN_LIST: string[];
+
     JWT: IJwtEnv;
     MYSQL: IMysqlEnv;
     S3: IS3ConfigEnv;
@@ -39,6 +41,8 @@ export class Env {
         this.PORT = this.getEnvNumberValue("PORT");
 
         this.SALT = this.getEnvNumberValue("SALT");
+
+        this.CORS_ORIGIN_LIST = [this.getEnvStringValue("CORS_ORIGIN_ONE")];
 
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
