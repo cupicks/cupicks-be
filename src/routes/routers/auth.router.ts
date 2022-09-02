@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { preventLoginUserGuard } from "../../middlewares/guards/_.exporter";
 import { applicationXWwwFormUrlencodedFilter, formDataFilter } from "../../middlewares/filters/_.exporter";
-import { MulterProvider } from "../../modules/providers/multer.provider";
 import { AuthController } from "../controllers/_.exporter";
+import { MulterProvider } from "../../modules/_.loader";
 
 const authRouter: Router = Router();
 authRouter.post(
