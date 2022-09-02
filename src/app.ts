@@ -27,16 +27,12 @@ export default class App {
             this.app.use(cors());
             this.app.use(morgan("dev"));
         } else if (MODE === "prod") {
-            this.app.use(
-                cors({
-                    origin: "CLIENT_DOMAIN",
-                }),
-            );
             this.app.use(morgan("combined"));
         } else {
             this.app.use(cors());
         }
-        this.app.use(getCorsMiddleware(CORS_ORIGIN_LIST));
+
+        // this.app.use(getCorsMiddleware(CORS_ORIGIN_LIST));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
 
