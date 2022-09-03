@@ -5,6 +5,7 @@ import { TALGORITHM } from "../../constants/_.loader";
 declare module "jsonwebtoken" {
     export interface IAccessTokenPayload extends jwtLib.JwtPayload {
         userId: number;
+        nickname: string;
     }
 
     export interface IRefreshTokenPayload extends jwtLib.JwtPayload {
@@ -69,7 +70,26 @@ export class JwtProvider {
         }
     }
 
-    /** @throws { CustomException } */
+    /**
+     * 1주차 기술 피드백 - https://github.com/cupicks/cupicks-be/issues/51
+     *
+     * - 이슈 [Bug : JwtProvider.prototype.decoe 및 verify 사용 불가](https://github.com/cupicks/cupicks-be/issues/28)
+     *
+     * 위 이슈 때문에 아래와 같이 코드를 개선을 했는데, return jwtLib.verify 로 쓰면 에러가 발생합니다.
+     * 그런데 <T> 라는 것을 그 앞에 써주면 에러가 사라지는데 <T> 는 무슨 역할을 하는 걸까요?
+     *
+     *
+     * 현재 이 메서드는 ***지네릭 타입*** 을 이용해서 2 가지 타입의 리턴을 보내고 있습니다.
+     * 따라서, 구체적으로 어떤 친구를 리턴하는지 명시해줘야 하며 그것이 return <T> jwt.verify 의 형태입니다.
+     *
+     * 단,
+     *
+     * 이렇게 ***지네릭 메서드*** 는 가독성을 해칠 수 있기 때문에 다른 개발자들이 읽기 힘들 수 있습니다.
+     * Token 과 같이 모든 팀원이 이해하는 부분에서는 좋은 방법이지만, Dto 같은 곳에서는 안티 패턴이 될 수 있습니다.
+     *
+     * 메서드 숫자가 늘어나는 것정 될 수는 있으나, 그것보다는 같은 팀원이 쉽게 읽을 수 있는 방향이 좋은 것 같습니다.
+     * @throws { CustomException }
+     */
     public verifyToken<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(token: string): T {
         this.validateIsInit();
 

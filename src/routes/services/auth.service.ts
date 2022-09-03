@@ -9,6 +9,7 @@ import {
     SignupUserDto,
     UserDto,
     PublishTokenDto,
+    ConfirmPasswordDto,
 } from "../../models/_.loader";
 
 export class AuthService {
@@ -77,6 +78,7 @@ export class AuthService {
 
             const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
                 userId: findedUser.userId,
+                nickname: findedUser.nickname,
             });
             const refreshToken = this.jwtProvider.sign<jwtLib.IRefreshTokenPayload>({
                 userId: findedUser.userId,
@@ -117,10 +119,34 @@ export class AuthService {
             if (tokenDto.refreshToken !== serverToken)
                 throw new NotFoundException(`등록되지 않은 RefreshToken 입니다.`);
 
-            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({ userId: payload.userId });
+            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
+                userId: payload.userId,
+                nickname: payload.nickname,
+            });
             await conn.commit();
 
             return accessToken;
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public confirmPassword = async (confirmDto: ConfirmPasswordDto): Promise<void> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const findedUser = await this.authRepository.findUserById(conn, confirmDto.userId);
+            if (findedUser === null) throw new NotFoundException(`존재하지 않는 사용자의 토큰을 제출하셨습니다.`);
+
+            const isSamePassword = await this.bcryptProvider.comparedPassword(confirmDto.password, findedUser.password);
+            if (isSamePassword === false) throw new ForBiddenException(`사용자와 일치하지 않는 비밀번호 입니다.`);
+
+            await conn.commit();
         } catch (err) {
             await conn.rollback();
             throw err;

@@ -7,6 +7,7 @@ import {
     UnkownError,
     SigninUserDto,
     PublishTokenDto,
+    ConfirmPasswordDto,
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
@@ -24,6 +25,11 @@ export default class AuthController {
         try {
             const file = req.file as Express.MulterS3.File;
 
+            /**
+             * 1주차 기술 피드백 - https://github.com/cupicks/cupicks-be/issues/51
+             *
+             * TypeScript 와 Dto 을 사용하고 있다면 class-validator 를 사용하고 미들웨어처럼 만드는 것은 어떨까요?
+             */
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
                     ...req.body,
@@ -87,6 +93,32 @@ export default class AuthController {
                 isSuccess: true,
                 message: "엑세스 토큰 발행에 성공하셨습니다.",
                 accessToken,
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public confirmPassword: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const confirmDto = await this.joiValidator.validateAsync<ConfirmPasswordDto>(
+                new ConfirmPasswordDto({
+                    password: req?.query["password"],
+                    userId: res.locals.userId,
+                }),
+            );
+
+            await this.authService.confirmPassword(confirmDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "본인 확인에 성공하셨습니다.",
             });
         } catch (err) {
             console.log(err);

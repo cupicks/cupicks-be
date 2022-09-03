@@ -19,24 +19,23 @@ export class RecipeRepository {
         return insertId;
     };
 
-    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: any): Promise<number> => {
+    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: Array<object>) => {
         const query = `
             INSERT INTO recipe_ingredient SET ?
         `;
 
-        let total: number = 0;
+        let total = 0;
 
         for (let i = 0; i < ingredientList.length; i++) {
             const result = await conn.query<ResultSetHeader>(query, ingredientList[i]);
 
             const resultSetHeader = result[0];
             const { affectedRows } = resultSetHeader;
+
             total += affectedRows;
 
             if (total > 20) throw new Error("protected");
         }
-
-        return ingredientList[0].recipe_id;
     };
 
     public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
@@ -55,5 +54,28 @@ export class RecipeRepository {
         if (affectedRows > 1) throw new Error("protected");
 
         return JSON.stringify(result[0].insertId);
+    };
+
+    public getRecipes = async (conn: PoolConnection, page?: number, count?: number): Promise<any> => {
+        const query = `
+            SELECT 
+                R.recipe_id, R.title, R.content,
+                I.ingredient_name, I.ingredient_color, I.ingredient_amount
+            FROM
+                (
+                SELECT R.recipe_id, R.title, R.content, R.cup_size, R.is_iced, R.is_public, R.created_at, R.updated_at
+                FROM recipe R
+                ) R
+            RIGHT JOIN
+                (
+                SELECT I.recipe_id, I.ingredient_name, I.ingredient_color, I.ingredient_amount
+                FROM recipe_ingredient I
+                ) I
+            ON R.recipe_id = I.recipe_id; 
+        `;
+
+        const [result] = await conn.query(query);
+
+        return result;
     };
 }
