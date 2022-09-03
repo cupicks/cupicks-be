@@ -62,7 +62,6 @@ export class MulterProvider {
                 if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
                     done(null, true);
                 } else {
-                    // 에러 처리 미들웨어!
                     return done(new Error("error"));
                 }
             },
