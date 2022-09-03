@@ -78,6 +78,7 @@ export class AuthService {
 
             const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
                 userId: findedUser.userId,
+                nickname: findedUser.nickname,
             });
             const refreshToken = this.jwtProvider.sign<jwtLib.IRefreshTokenPayload>({
                 userId: findedUser.userId,
@@ -118,7 +119,10 @@ export class AuthService {
             if (tokenDto.refreshToken !== serverToken)
                 throw new NotFoundException(`등록되지 않은 RefreshToken 입니다.`);
 
-            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({ userId: payload.userId });
+            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
+                userId: payload.userId,
+                nickname: payload.nickname,
+            });
             await conn.commit();
 
             return accessToken;
