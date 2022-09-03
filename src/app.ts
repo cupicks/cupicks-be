@@ -3,7 +3,7 @@ import * as morgan from "morgan";
 import * as express from "express";
 import { TNODE_ENV } from "constants/_.loader";
 
-import { authRouter, profileRotuer, recipeRouter } from "./routes/routers/_.exporter";
+import { authRouter, profileRouter, recipeRouter, commentRouter } from "./routes/routers/_.exporter";
 
 import { getCorsMiddleware } from "./middlewares/guards/_.exporter";
 
@@ -36,8 +36,9 @@ export default class App {
 
     setRouter() {
         this.app.use("/api/auth", authRouter);
-        this.app.use("/api/profile", profileRotuer);
+        this.app.use("/api/profile", profileRouter);
         this.app.use("/api/recipes", recipeRouter);
+        this.app.use("/api/comments", commentRouter);
     }
 
     runServer(MODE: TNODE_ENV, PORT: number) {

@@ -26,6 +26,7 @@ import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
 
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
+import { CreateCommentDto } from "./dtos/comment/comment.dto";
 
 export {
     Env,
@@ -51,6 +52,7 @@ export {
     ICreateRecipeDto,
     IngredientDto,
     IIngredientDto,
+    CreateCommentDto,
     CustomException, // 500
     BadRequestException, // 400
     ValidationException, // 400

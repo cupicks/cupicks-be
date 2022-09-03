@@ -37,6 +37,10 @@ export class MulterProvider {
         return this.test().single("imageValue")(req, res, next);
     };
 
+    static uploadNone: RequestHandler = (req, res, next) => {
+        return this.test().none()(req, res, next);
+    };
+
     static test = () => {
         const s3 = new S3Client({
             credentials: {
