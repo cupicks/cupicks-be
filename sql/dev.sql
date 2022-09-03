@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS comment (
 );
 
 CREATE TABLE IF NOT EXISTS recipe_comment (
-    user_recipe_id      INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    recipe_comment_id      INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     user_id             INT         NOT NULL,
     recipe_id            INT         NOT NULL,
     comment_id          INT         NOT NULL,
