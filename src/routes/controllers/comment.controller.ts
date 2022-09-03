@@ -21,8 +21,8 @@ export default class CommentController {
 
             const userId: number = res.locals.userId;
             const nickname: string = res.locals.nickname;
-            const recipeId: number = Number(req.query.recipeId);
-            const comment: string = req.query.comment as string;
+            const recipeId: number = Number(req.query!.recipeId);
+            const comment: string = req.query!.comment as string;
 
             const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
                 new CreateCommentDto(comment),
