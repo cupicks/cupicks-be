@@ -11,9 +11,9 @@ import * as jwt from "jsonwebtoken";
  * `IIFE`
  */
 (async () => {
-    EnvProvider.init();
-
     const MODE: TNODE_ENV = getNodeEnvValue("NODE_ENV");
+    EnvProvider.init(MODE);
+
     const envProvider: EnvProvider = new EnvProvider();
     const env: Env = envProvider.getEnvInstance();
 
