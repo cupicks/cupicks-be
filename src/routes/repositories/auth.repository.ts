@@ -72,6 +72,19 @@ export class AuthRepository {
         return userTokenPacket?.length !== 1 ? null : userToken;
     };
 
+    /**
+     * @deprecated
+     */
+    public findAllUser = async (conn: PoolConnection) => {
+        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user LIMIT 30;`;
+        const findResult = await conn.query<IUserPacket[]>(findQuery);
+        const userDataPacket = findResult[0];
+
+        return userDataPacket;
+    };
+
+    // create
+
     public createUser = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {
         const createUserQuery = userDto.imageUrl
             ? `INSERT INTO user (email, nickname, password, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}");`

@@ -13,6 +13,26 @@ export default class ProfileController {
         this.profileService = new ProfileService();
     }
 
+    /**
+     * @deprecated
+     */
+    public getAllProfilesTemp: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const result = await this.profileService.getAllProfile();
+            return res.status(200).json({
+                result,
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
     public editProfile: RequestHandler = async (req: Request, res: Response) => {
         try {
             const file = req.file as Express.MulterS3.File;
