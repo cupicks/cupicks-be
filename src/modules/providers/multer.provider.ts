@@ -1,8 +1,9 @@
+import { RequestHandler, NextFunction } from "express";
+import path from "path";
+
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import * as multer from "multer";
 import * as multerS3 from "multer-s3";
-import { S3Client } from "@aws-sdk/client-s3";
-import path from "path";
-import { RequestHandler, NextFunction } from "express";
 
 import { IS3ConfigEnv } from "models/_.loader";
 import { CustomException, UnkownTypeError } from "../../models/_.loader";
@@ -67,5 +68,23 @@ export class MulterProvider {
             },
             limits: { fileSize: 5 * 1024 * 1024 },
         });
+    };
+
+    static deleteImage = async (targetImageValue: string) => {
+        // test 메서드 코드와 중복 객체!
+        const s3 = new S3Client({
+            credentials: {
+                accessKeyId: MulterProvider.S3_ACCESS_KEY,
+                secretAccessKey: MulterProvider.S3_SECRET_KEY,
+            },
+            region: MulterProvider.REGION,
+        });
+
+        return await s3.send(
+            new DeleteObjectCommand({
+                Bucket: MulterProvider.BUCKET,
+                Key: `profile/${targetImageValue}`,
+            }),
+        );
     };
 }

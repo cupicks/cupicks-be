@@ -46,4 +46,13 @@ export class CommentService {
             console.error(err);
         }
     };
+
+    public deleteComment = async (commentId: number) => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            return await this.commentRepository.deleteComment(conn, commentId);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 }

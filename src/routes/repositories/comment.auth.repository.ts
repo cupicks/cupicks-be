@@ -45,4 +45,18 @@ export class CommentRepository {
 
         return result;
     };
+
+    public deleteComment = async (conn: PoolConnection, commentId: number): Promise<any> => {
+        const query = `
+            DELETE FROM comment
+            WHERE comment_id = ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [commentId]);
+        const resultSetHeader = result.affectedRows;
+
+        if (resultSetHeader > 1) throw new Error("protected");
+
+        return result;
+    };
 }
