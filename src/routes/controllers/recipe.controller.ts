@@ -34,6 +34,32 @@ export default class RecipeController {
         }
     };
 
+    public getRecipes: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            if (!req.query.page && !req.query.count) throw new Error("페이지 번호나 개수를 확인해 주세요.");
+
+            const page = Number(req.query.page);
+            const count = Number(req.query.count);
+
+            const results = await this.recipeService.getRecipes(page, count);
+
+            const give = {};
+
+            if (Array.isArray(results)) {
+                console.log(results);
+            }
+
+            return res.end();
+        } catch (err) {
+            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
     public errorHandler = (err: unknown): CustomException => {
         if (err instanceof CustomException) return err;
         else if (err instanceof Error) return new ValidationException(err.message);

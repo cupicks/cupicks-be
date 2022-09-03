@@ -32,13 +32,29 @@ export class RecipeService {
                 this.recipeRepository.createUserRecipe(conn, userId, createRecipe),
             );
 
-            const value = await Promise.all([createRecipeIngredient, createRecipe]);
+            await Promise.all([createRecipeIngredient, createUserRecipe]);
 
             await conn.commit();
-            return value[0];
+            return createRecipe;
         } catch (err) {
             await conn.rollback();
             throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    getRecipes = async (page: number, count: number): Promise<any> => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            const getRecipesOne = await this.recipeRepository.getRecipes(conn, count);
+
+            await conn.commit();
+            return getRecipesOne;
+        } catch (err) {
+            conn.rollback();
         } finally {
             conn.release();
         }
