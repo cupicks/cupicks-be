@@ -35,9 +35,6 @@ export default class CommentController {
                 imageLocation,
             );
 
-            console.log(createComment);
-
-            // 응답 데이터
             // IResponseDto??
             const responseStringify = JSON.stringify(createComment);
             const responseParse = JSON.parse(responseStringify);
