@@ -25,6 +25,11 @@ export default class AuthController {
         try {
             const file = req.file as Express.MulterS3.File;
 
+            /**
+             * 1주차 기술 피드백 - https://github.com/cupicks/cupicks-be/issues/51
+             *
+             * TypeScript 와 Dto 을 사용하고 있다면 class-validator 를 사용하고 미들웨어처럼 만드는 것은 어떨까요?
+             */
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
                     ...req.body,
