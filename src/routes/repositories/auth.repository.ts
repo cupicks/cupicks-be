@@ -1,5 +1,12 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { SignupUserDto, IUserPacket, IUserRefresthTokenPacket } from "../../models/_.loader";
+import {
+    SignupUserDto,
+    IUserPacket,
+    IUserRefresthTokenPacket,
+    EditProfileDto,
+    BadRequestException,
+    UnkownError,
+} from "../../models/_.loader";
 
 export class AuthRepository {
     // 있는 지만 확인하는 것 : boolean = isExists
@@ -74,7 +81,7 @@ export class AuthRepository {
         const userResultSetHeader = createdUserResult[0];
 
         const { affectedRows, insertId } = userResultSetHeader;
-        if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
 
         const userId = insertId;
 
@@ -96,15 +103,42 @@ export class AuthRepository {
 
         const userRefreshTokenResultSetHeader = createdUserRefreshTokenResutl[0];
         const { affectedRows } = userRefreshTokenResultSetHeader;
-        if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
 
     // update
+
+    private getUpdateUserQuery = (editDto: EditProfileDto): string => {
+        const { userId, nickname, password, imageUrl } = editDto;
+        if (!nickname && !password && !imageUrl)
+            throw new BadRequestException(`회원 정보 수정을 위한 값이 하나도 들어있지 않습니다.`);
+
+        let queryString = `UPDATE user SET`;
+        if (nickname) queryString += ` nickname =  "${nickname}",`;
+        if (password) queryString += ` password = "${password}",`;
+        if (imageUrl) queryString += ` image_url = "${imageUrl}",`;
+
+        queryString = queryString.slice(0, queryString.length - 1);
+        queryString += ` WHERE user_id = ${userId};`;
+
+        return queryString;
+    };
+    public updateUserProfile = async (conn: PoolConnection, editDto: EditProfileDto): Promise<void> => {
+        const updateQuery = this.getUpdateUserQuery(editDto);
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [ResultSetHeader, _] = updateResult;
+        const { affectedRows } = ResultSetHeader;
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
 
     public updateUserRefreshTokenRowByUserId = async (conn: PoolConnection, userId: number, refreshToken: string) => {
         console.log(refreshToken.length);
         const updateQuery = `UPDATE user_refresh_token SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
-        console.log(updateResult);
+
+        const [ResultSetHeader, _] = updateResult;
+        const { affectedRows } = ResultSetHeader;
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
 }
