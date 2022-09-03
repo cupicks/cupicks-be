@@ -56,30 +56,53 @@ export default class CommentController {
                 responseParse,
             });
         } catch (err) {
-            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
         }
     };
 
     public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const userId: number = Number(res.locals.userId);
             const commentId: number = Number(req.params.commentId);
 
             if (!commentId) throw new Error("protected");
 
-            await this.commentService.deleteComment(commentId);
+            const deleteComment = await this.commentService.deleteComment(userId, commentId);
 
-            const target = "1662229682052html.jpg";
+            if (deleteComment === "undefined") {
+                throw new Error("here");
+            }
 
-            const result = await MulterProvider.deleteImage(target);
+            // if (userId !== isAuthenticated) {
+            //     console.log(`유저 아이디 ${userId} 댓글 아이디 ${isAuthenticated}`);
+            //     throw new Error("내가 작성한 댓글이 아닙니다.")
+            // };
 
-            console.log(`결과 ${result}`);
+            // target = 이미지값
+            // const target = "1662229682052html.jpg";
+            // const result = await MulterProvider.deleteImage(target);
 
             return res.status(200).json({
                 isSuccess: true,
                 message: "댓글 삭제에 성공하였습니다.",
             });
         } catch (err) {
-            console.log(err);
+            console.log("캐치가 실행됩니다.");
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
         }
+    };
+
+    public errorHandler = (err: unknown): CustomException => {
+        if (err instanceof CustomException) return err;
+        else if (err instanceof Error) return new ValidationException(err.message);
+        else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
     };
 }
