@@ -24,7 +24,7 @@ export default class RecipeController {
 
             return res.status(201).json({
                 isSuccess: true,
-                message: "레시피 등록에 성공했어요.",
+                message: "레시피 작성에 성공하였습니다.",
                 recipeId: createRecipe,
             });
         } catch (err) {

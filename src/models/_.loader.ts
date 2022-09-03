@@ -10,6 +10,7 @@ import {
     UnkownError,
     UnOverrideDtoError,
     DatabaseConnectionError,
+    BadRequestException,
 } from "./exceptions/custom.exception";
 
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
@@ -21,9 +22,11 @@ import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
 import { PublishTokenDto, IPublishTokenDto } from "./dtos/user/publish.token.dto";
 import { ConfirmPasswordDto, IConfirmPasswordDto } from "./dtos/user/confirm.password.dto";
 
+import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
+
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
-import { CreateCommentDto, ICommentDto } from "./dtos/comment/comment.dto";
+import { CreateCommentDto } from "./dtos/comment/comment.dto";
 
 export {
     Env,
@@ -43,13 +46,15 @@ export {
     IPublishTokenDto,
     ConfirmPasswordDto,
     IConfirmPasswordDto,
+    EditProfileDto,
+    IEditProfileDto,
     CreateRecipeDto,
     ICreateRecipeDto,
     IngredientDto,
     IIngredientDto,
     CreateCommentDto,
-    ICommentDto,
     CustomException, // 500
+    BadRequestException, // 400
     ValidationException, // 400
     JwtAuthorizationException, // 401
     ForBiddenException, // 403

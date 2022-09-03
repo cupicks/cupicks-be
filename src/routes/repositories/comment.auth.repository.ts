@@ -2,15 +2,25 @@ import { CreateCommentDto } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 
 export class CommentRepository {
-    public createComment = async (conn: PoolConnection, commentDto: CreateCommentDto): Promise<any> => {
+    public createComment = async (
+        conn: PoolConnection,
+        commentDto: CreateCommentDto,
+        imageLocation: string | null,
+    ): Promise<object> => {
         const query = `
             INSERT INTO comment
                 (comment, image_url)
             VALUES
-                ("${commentDto.comment}", "${commentDto.imageValue === undefined ? "이미지" : null}");
+                (?, ?);
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query);
+        const [result] = await conn.query<ResultSetHeader>(query, [
+            commentDto.comment,
+            imageLocation === null ? null : imageLocation,
+        ]);
+        const resultSetHeader = result.affectedRows;
+
+        if (resultSetHeader > 1) throw new Error("protected");
 
         return result;
     };
@@ -20,15 +30,18 @@ export class CommentRepository {
         userId: number,
         recipeId: number,
         commentId: number,
-    ): Promise<any> => {
+    ): Promise<object> => {
         const query = `
             INSERT INTO recipe_comment
                 (user_id, recipe_id, comment_id)
             VALUES
-                (${userId}, ${recipeId}, ${commentId});
+                (?, ?, ?);
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query);
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId, commentId]);
+        const resultSetHeader = result.affectedRows;
+
+        if (resultSetHeader > 1) throw new Error("protected");
 
         return result;
     };

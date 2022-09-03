@@ -8,11 +8,17 @@ import {
 import { AuthController } from "../controllers/_.exporter";
 import { MulterProvider } from "../../modules/_.loader";
 
+const multer = {};
 const authRouter: Router = Router();
 authRouter.post(
     "/signup",
     formDataFilter,
     preventLoginUserGuard,
+    /**
+     * 1주차 기술 피드백 - https://github.com/cupicks/cupicks-be/issues/51
+     *
+     * 이 자리에 유저가 존재하는지 확인하는 미들웨어를 만들어 봅시다.
+     */
     MulterProvider.uploadSingle,
     new AuthController().signup,
 );

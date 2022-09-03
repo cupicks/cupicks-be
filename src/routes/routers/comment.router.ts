@@ -11,7 +11,7 @@ commentRouter.post(
     "/",
     formDataFilter,
     preventUnLoginUserGuard,
-    MulterProvider.uploadNone,
+    MulterProvider.uploadSingle,
     new CommentController().createComment,
 );
 

@@ -11,12 +11,19 @@ export class CommentService {
         this.mysqlProvider = new MysqlProvider();
     }
 
-    public createComment = async (commentDto: CreateCommentDto, userId: number, recipeId: number): Promise<any> => {
+    public createComment = async (
+        commentDto: CreateCommentDto,
+        userId: number,
+        recipeId: number,
+        imageLocation: string | null,
+    ): Promise<any> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
+            const date = new Date().toISOString().slice(0, 19).replace("T", " ");
+
             await conn.beginTransaction();
 
-            const createComment = await this.commentRepository.createComment(conn, commentDto);
+            const createComment = await this.commentRepository.createComment(conn, commentDto, imageLocation);
 
             const createCommentResult = JSON.stringify(createComment);
             const commentId = JSON.parse(createCommentResult).insertId;
@@ -28,10 +35,12 @@ export class CommentService {
                 commentId,
             );
 
-            console.log(`comment dto ${JSON.stringify(commentDto)}`);
-
             await conn.commit();
-            return createRecipeComment;
+            return {
+                commentId,
+                createdAt: date,
+                updatedAt: date,
+            };
         } catch (err) {
             await conn.rollback();
             console.error(err);
