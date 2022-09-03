@@ -20,6 +20,8 @@ export default class RecipeController {
 
             const createRecipe = await this.recipeService.createRecipe(validator, userId);
 
+            // console.log(validator);
+
             return res.status(201).json({
                 isSuccess: true,
                 message: "레시피 등록에 성공했어요.",

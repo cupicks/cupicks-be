@@ -23,6 +23,7 @@ import { ConfirmPasswordDto, IConfirmPasswordDto } from "./dtos/user/confirm.pas
 
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
+import { CreateCommentDto, ICommentDto } from "./dtos/comment/comment.dto";
 
 export {
     Env,
@@ -46,6 +47,8 @@ export {
     ICreateRecipeDto,
     IngredientDto,
     IIngredientDto,
+    CreateCommentDto,
+    ICommentDto,
     CustomException, // 500
     ValidationException, // 400
     JwtAuthorizationException, // 401
