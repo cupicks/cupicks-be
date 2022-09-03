@@ -10,6 +10,7 @@ import {
     UnkownError,
     UnOverrideDtoError,
     DatabaseConnectionError,
+    BadRequestException,
 } from "./exceptions/custom.exception";
 
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
@@ -51,6 +52,7 @@ export {
     IngredientDto,
     IIngredientDto,
     CustomException, // 500
+    BadRequestException, // 400
     ValidationException, // 400
     JwtAuthorizationException, // 401
     ForBiddenException, // 403
