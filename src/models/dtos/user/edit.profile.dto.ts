@@ -3,29 +3,29 @@ import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
 
-export interface ISignupUserDto {
-    nickname: string;
-    email: string;
-    password: string;
-    imageUrl: string | undefined;
+export interface IEditProfileDto {
+    userId: number;
+    nickname?: string;
+    password?: string;
+    imageUrl?: string;
 }
 
-export class SignupUserDto implements IBaseDto, ISignupUserDto {
-    nickname: string;
-    email: string;
-    password: string;
-    imageUrl: string | undefined;
+export class EditProfileDto implements IBaseDto, IEditProfileDto {
+    userId: number;
+    nickname?: string | undefined;
+    password?: string | undefined;
+    imageUrl?: string | undefined;
 
-    constructor({ nickname, email, password, imageUrl }: ISignupUserDto) {
+    constructor({ userId, nickname, password, imageUrl }: IEditProfileDto) {
+        this.userId = userId;
         this.nickname = nickname;
-        this.email = email;
         this.password = password;
         this.imageUrl = imageUrl;
     }
 
-    getJoiInstance(): ObjectSchema<SignupUserDto> {
-        return joi.object<SignupUserDto>({
-            email: joi.string().required().trim().max(20).email().message("email 은 20자 이하여야 합니다."),
+    getJoiInstance(): ObjectSchema<EditProfileDto> {
+        return joi.object<EditProfileDto>({
+            userId: joi.number().required().min(1).message("userId 는 1 이상의 숫자 여야 합니다."),
             nickname: joi
                 .string()
                 .required()
@@ -38,7 +38,6 @@ export class SignupUserDto implements IBaseDto, ISignupUserDto {
                 ),
             password: joi
                 .string()
-                .required()
                 .trim()
                 .regex(/[!@#]{1,}/)
                 .regex(/[^[!@#]|[^\w\d]]|[ㄱ-ㅎㅏ-ㅣ가-힣]/)
@@ -47,7 +46,7 @@ export class SignupUserDto implements IBaseDto, ISignupUserDto {
                 .message(
                     "password 는 8자 이상 15자 이하의 영문, 숫자 조합입니다. (특수문자 !@# 는 1개 가 반드시 포함되어야 합니다.)",
                 ),
-            imageUrl: joi.string().required().max(255).message("imageUrl 은 255 자 이하여야 합니다."),
+            imageUrl: joi.string().max(255).message("imageUrl 은 255 자 이하여야 합니다."),
         });
     }
 }

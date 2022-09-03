@@ -21,6 +21,8 @@ import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
 import { PublishTokenDto, IPublishTokenDto } from "./dtos/user/publish.token.dto";
 import { ConfirmPasswordDto, IConfirmPasswordDto } from "./dtos/user/confirm.password.dto";
 
+import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
+
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
 
@@ -42,6 +44,8 @@ export {
     IPublishTokenDto,
     ConfirmPasswordDto,
     IConfirmPasswordDto,
+    EditProfileDto,
+    IEditProfileDto,
     CreateRecipeDto,
     ICreateRecipeDto,
     IngredientDto,
