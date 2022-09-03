@@ -5,6 +5,7 @@ import { TALGORITHM } from "../../constants/_.loader";
 declare module "jsonwebtoken" {
     export interface IAccessTokenPayload extends jwtLib.JwtPayload {
         userId: number;
+        nickname: string;
     }
 
     export interface IRefreshTokenPayload extends jwtLib.JwtPayload {
