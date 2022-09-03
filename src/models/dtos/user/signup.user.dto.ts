@@ -30,7 +30,7 @@ export class SignupUserDto implements IBaseDto, ISignupUserDto {
                 .string()
                 .required()
                 .trim()
-                .regex(/[[ㄱ-ㅎㅏ-ㅣ]|[^\w\d]]/)
+                // .regex(/[[ㄱ-ㅎㅏ-ㅣ]|[^\w\d]]/)
                 .min(2)
                 .max(10)
                 .message(
