@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS user_disfavor_recipe (
 -- comment 관련
 
 CREATE TABLE IF NOT EXISTS comment (
-    comment_id  INT                 NOT NULL    PRIMARY KEY,
+    comment_id  INT                 NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     comment     VARCHAR(150)        NOT NULL,
     image_url   VARCHAR(255)             NULL,
     created_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
