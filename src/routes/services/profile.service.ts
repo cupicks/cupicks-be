@@ -1,6 +1,6 @@
 import { AuthRepository } from "../repositories/auth.repository";
 import { BcryptProvider, MysqlProvider } from "../../modules/_.loader";
-import { EditProfileDto, NotFoundException } from "../../models/_.loader";
+import { EditProfileDto, IUserPacket, NotFoundException } from "../../models/_.loader";
 
 export class ProfileService {
     private mysqlProvider: MysqlProvider;
@@ -13,7 +13,13 @@ export class ProfileService {
         this.mysqlProvider = new MysqlProvider();
     }
 
-    public editProfile = async (editDto: EditProfileDto) => {
+    public getAllProfile = async (): Promise<IUserPacket[]> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        return await this.authRepository.findAllUser(conn);
+    };
+
+    public editProfile = async (editDto: EditProfileDto): Promise<void> => {
         // 유저 있는 지 확인
         const conn = await this.mysqlProvider.getConnection();
 
