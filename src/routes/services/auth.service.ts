@@ -32,15 +32,11 @@ export class AuthService {
             await conn.beginTransaction();
             userDto.password = this.bcryptProvider.hashPassword(userDto.password);
 
-            const date = new Date().toISOString().slice(0, 19).replace("T", " ");
-
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, userDto.email);
             if (isExistsUser) throw new ConflictException(`${userDto.email} 은 사용 중입니다.`);
 
-            const createdUserId = await this.authRepository.createUser(conn, userDto);
-
-            await this.authRepository.createUserDetailByUserId(conn, createdUserId, date);
-            await this.authRepository.createUserRefreshTokenRowByUserId(conn, createdUserId);
+            const date = new Date().toISOString().slice(0, 19).replace("T", " ");
+            const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
             await conn.commit();
 
