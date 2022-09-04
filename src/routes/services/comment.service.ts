@@ -36,6 +36,7 @@ export class CommentService {
             );
 
             await conn.commit();
+
             return {
                 commentId,
                 createdAt: date,
@@ -44,12 +45,16 @@ export class CommentService {
         } catch (err) {
             await conn.rollback();
             console.error(err);
+        } finally {
+            await conn.release();
         }
     };
 
-    public deleteComment = async (userId: number, commentId: number) => {
+    public deleteComment = async (userId: number, commentId: number): Promise<any> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
+            await conn.beginTransaction();
+
             const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
 
             if (result.length <= 0) throw new Error("존재하지 않는 댓글입니다.");
@@ -58,9 +63,35 @@ export class CommentService {
 
             if (userId !== isAuthenticated) throw new Error("내가 작성한 댓글이 아닙니다.");
 
+            await conn.commit();
+
             return await this.commentRepository.deleteComment(conn, commentId);
         } catch (err) {
+            await conn.rollback();
             console.error(err);
+        } finally {
+            await conn.release();
+        }
+    };
+
+    public updateComment = async (
+        userId: number,
+        comment: string,
+        imageLocation: string | null,
+        commentId: number,
+    ): Promise<any> => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
+
+            console.log(result);
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            await conn.release();
         }
     };
 }

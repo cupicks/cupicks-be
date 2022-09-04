@@ -2,7 +2,6 @@ import { Router } from "express";
 
 import { CommentController } from "../controllers/_.exporter";
 import { formDataFilter, applicationJsonFilter } from "../../middlewares/filters/_.exporter";
-import { MulterProvider } from "../../modules/_.loader";
 import { preventUnLoginUserGuard } from "../../middlewares/guards/_.exporter";
 import { multerMiddleware } from "../../middlewares/multer.middleware";
 
@@ -22,5 +21,7 @@ commentRouter.delete(
     preventUnLoginUserGuard,
     new CommentController().deleteComment,
 );
+
+commentRouter.put("/:commentId", formDataFilter, new CommentController().updateComment);
 
 export default commentRouter;

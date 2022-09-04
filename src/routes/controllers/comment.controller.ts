@@ -13,7 +13,7 @@ export default class CommentController {
         this.commentService = new CommentService();
     }
 
-    public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
         try {
             const file = req.file as Express.MulterS3.File;
 
@@ -63,7 +63,7 @@ export default class CommentController {
         }
     };
 
-    public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
         try {
             const userId: number = Number(res.locals.userId);
             const commentId: number = Number(req.params.commentId);
@@ -89,6 +89,24 @@ export default class CommentController {
                 isSuccess: true,
                 message: "댓글 삭제에 성공하였습니다.",
             });
+        } catch (err) {
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public updateComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // const userId: number = Number(res.locals.userId);
+            const commentId: number = parseInt(req.params.commentId);
+            const comment: string = req.query.comment as string;
+
+            if (!commentId) throw new Error("protected");
+
+            const result = await this.commentService.updateComment(1, "comment", null, commentId);
         } catch (err) {
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
