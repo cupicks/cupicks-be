@@ -39,9 +39,10 @@ export default class ProfileController {
 
             const editDto = await this.joiValidator.validateAsync<EditProfileDto>(
                 new EditProfileDto({
-                    ...req.body,
                     imageUrl: file.location,
                     userId: res.locals.userId,
+                    nickname: req.query.nickname,
+                    password: req.query.password,
                 }),
             );
             await this.profileService.editProfile(editDto);
