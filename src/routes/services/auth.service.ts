@@ -85,7 +85,7 @@ export class AuthService {
                 imageUrl: findedUser.imageUrl,
             });
 
-            await this.authRepository.updateUserRefreshTokenRowByUserId(conn, findedUser.userId, refreshToken);
+            await this.authRepository.updateUserRefreshToken(conn, findedUser.userId, refreshToken);
 
             await conn.commit();
             return {
