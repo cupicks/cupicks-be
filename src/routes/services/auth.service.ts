@@ -77,13 +77,16 @@ export class AuthService {
                 throw new ForBiddenException(`${userDto.password} 와 일치하지 않는 비밀번호 입니다.`);
 
             const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
+                type: "AccessToken",
                 userId: findedUser.userId,
                 nickname: findedUser.nickname,
             });
             const refreshToken = this.jwtProvider.sign<jwtLib.IRefreshTokenPayload>({
+                type: "RefreshToken",
                 userId: findedUser.userId,
                 nickname: findedUser.nickname,
                 email: findedUser.email,
+                imageUrl: findedUser.imageUrl,
             });
 
             await this.authRepository.updateUserRefreshTokenRowByUserId(conn, findedUser.userId, refreshToken);
@@ -120,6 +123,7 @@ export class AuthService {
                 throw new NotFoundException(`등록되지 않은 RefreshToken 입니다.`);
 
             const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
+                type: "AccessToken",
                 userId: payload.userId,
                 nickname: payload.nickname,
             });
