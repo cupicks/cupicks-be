@@ -71,6 +71,20 @@ export class AuthRepository {
         conn: PoolConnection,
         userId: number,
     ): Promise<IUserRefresthTokenPacket | null> => {
+        const findQuery = `SELECT user_id as userId, refresh_token as refreshToken FROM user WHERE user_id = ${userId};`;
+        const findResult = await conn.query<IUserRefresthTokenPacket[]>(findQuery);
+
+        const userTokenPacket = findResult[0];
+        const userToken = userTokenPacket[0];
+
+        return userTokenPacket?.length !== 1 ? null : userToken;
+    };
+
+    /** @deprecated */
+    public findUserRefreshTokenByIdLegacy = async (
+        conn: PoolConnection,
+        userId: number,
+    ): Promise<IUserRefresthTokenPacket | null> => {
         const findQuery = `SELECT user_id as userId, refresh_token as refreshToken FROM user_refresh_token WHERE user_id = ${userId};`;
         const findResult = await conn.query<IUserRefresthTokenPacket[]>(findQuery);
 
