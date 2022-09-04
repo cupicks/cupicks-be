@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS user (
     image_url       VARCHAR(255)    NULL,
     refresh_token   VARCHAR(1000)   NULL,
     created_at      DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS recipe (
