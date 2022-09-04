@@ -1,4 +1,5 @@
 import * as joi from "joi";
+import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
@@ -16,11 +17,27 @@ export class EditProfileDto implements IBaseDto, IEditProfileDto {
     password?: string | undefined;
     imageUrl?: string | undefined;
 
-    constructor({ userId, nickname, password, imageUrl }: IEditProfileDto) {
+    constructor({
+        userId,
+        nickname,
+        password,
+        imageUrl,
+    }: {
+        userId: number;
+        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        imageUrl: string;
+    }) {
         this.userId = userId;
-        this.nickname = nickname;
-        this.password = password;
+        this.nickname = this.validateType(nickname);
+        this.password = this.validateType(password);
         this.imageUrl = imageUrl;
+    }
+
+    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
+        if (value === undefined) throw new Error("값 누락");
+        else if (typeof value === "string") return value;
+        else throw new Error("값 오류");
     }
 
     getJoiInstance(): ObjectSchema<EditProfileDto> {

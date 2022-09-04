@@ -1,4 +1,5 @@
 import * as joi from "joi";
+import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
@@ -16,11 +17,27 @@ export class SignupUserDto implements IBaseDto, ISignupUserDto {
     password: string;
     imageUrl: string | undefined;
 
-    constructor({ nickname, email, password, imageUrl }: ISignupUserDto) {
-        this.nickname = nickname;
-        this.email = email;
-        this.password = password;
-        this.imageUrl = imageUrl;
+    constructor({
+        nickname,
+        email,
+        password,
+        imageUrl,
+    }: {
+        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        imageUrl: string;
+    }) {
+        this.email = this.validateType(email);
+        this.nickname = this.validateType(nickname);
+        this.password = this.validateType(password);
+        this.imageUrl = this.validateType(imageUrl);
+    }
+
+    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
+        if (value === undefined) throw new Error("값 누락");
+        else if (typeof value === "string") return value;
+        else throw new Error("값 오류");
     }
 
     getJoiInstance(): ObjectSchema<SignupUserDto> {
