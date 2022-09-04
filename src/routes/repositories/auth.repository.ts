@@ -19,6 +19,14 @@ export class AuthRepository {
     // findUserByUserId
     // findUserByEmail
 
+    public isExistsByEmailOrNickname = async (conn: PoolConnection, email: string, nickname: string) => {
+        const isExistsQuery = `SELECT user_id FROM user WHERE email = "${email}" OR nickname = "${nickname}";`;
+        const isExistsResult = await conn.query<RowDataPacket[][]>(isExistsQuery);
+
+        const [rowDataPacket, _] = isExistsResult;
+        return rowDataPacket?.length === 1;
+    };
+
     public isExistsByEmail = async (conn: PoolConnection, email: string): Promise<boolean> => {
         // 쿼리문 추가하면 끝
         const isExistsQuery = `SELECT user_id FROM user WHERE email = "${email}";`;
@@ -72,9 +80,6 @@ export class AuthRepository {
         return userTokenPacket?.length !== 1 ? null : userToken;
     };
 
-    /**
-     * @deprecated
-     */
     public findAllUser = async (conn: PoolConnection) => {
         const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user LIMIT 30;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
@@ -86,6 +91,20 @@ export class AuthRepository {
     // create
 
     public createUser = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {
+        const createUserQuery = userDto.imageUrl
+            ? `INSERT INTO user (email, nickname, password, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}");`
+            : `INSERT INTO user (email, nickname, password) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}");`;
+        const createdUserResult = await conn.query<ResultSetHeader>(createUserQuery);
+
+        const [resultSetHeader, _] = createdUserResult;
+        const { affectedRows, insertId } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        return insertId;
+    };
+
+    /** @deprecated */
+    public createUserLegacy = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {
         const createUserQuery = userDto.imageUrl
             ? `INSERT INTO user (email, nickname, password, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}");`
             : `INSERT INTO user (email, nickname, password) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}");`;
@@ -101,6 +120,7 @@ export class AuthRepository {
         return userId;
     };
 
+    /** @deprecated */
     public createUserDetailByUserId = async (conn: PoolConnection, userId: number, date: string): Promise<void> => {
         const createQuery = `INSERT INTO user_detail (user_id, created_at, updated_at) VALUES (${userId}, "${date}", "${date}");`;
         const createdResult = await conn.query<ResultSetHeader>(createQuery);
@@ -110,6 +130,7 @@ export class AuthRepository {
         if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
 
+    /** @deprecated */
     public createUserRefreshTokenRowByUserId = async (conn: PoolConnection, userId: number): Promise<void> => {
         const craeteUserRefreshTokenQuery = `INSERT INTO user_refresh_token (user_id) VALUES (${userId});`;
         const createdUserRefreshTokenResutl = await conn.query<ResultSetHeader>(craeteUserRefreshTokenQuery);
@@ -136,6 +157,7 @@ export class AuthRepository {
 
         return queryString;
     };
+
     public updateUserProfile = async (conn: PoolConnection, editDto: EditProfileDto): Promise<void> => {
         const updateQuery = this.getUpdateUserQuery(editDto);
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
@@ -145,6 +167,7 @@ export class AuthRepository {
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
 
+    /** @deprecated */
     public updateUserRefreshTokenRowByUserId = async (conn: PoolConnection, userId: number, refreshToken: string) => {
         console.log(refreshToken.length);
         const updateQuery = `UPDATE user_refresh_token SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
