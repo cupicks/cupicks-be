@@ -46,4 +46,21 @@ export class CommentService {
             console.error(err);
         }
     };
+
+    public deleteComment = async (userId: number, commentId: number) => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
+
+            if (result.length <= 0) throw new Error("존재하지 않는 댓글입니다.");
+
+            const isAuthenticated: number = result[0]!.userId as number;
+
+            if (userId !== isAuthenticated) throw new Error("내가 작성한 댓글이 아닙니다.");
+
+            return await this.commentRepository.deleteComment(conn, commentId);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 }
