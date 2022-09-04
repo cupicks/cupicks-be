@@ -1,5 +1,4 @@
 import { RequestHandler, Request, Response, NextFunction } from "express";
-import multerS3 from "multer-s3";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
 import { CreateCommentDto } from "../../models/_.loader";
@@ -91,7 +90,6 @@ export default class CommentController {
                 message: "댓글 삭제에 성공하였습니다.",
             });
         } catch (err) {
-            console.log("캐치가 실행됩니다.");
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
