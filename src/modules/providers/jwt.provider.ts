@@ -3,15 +3,32 @@ import { CustomException, IJwtEnv, JwtAuthorizationException, UnkownTypeError } 
 import { TALGORITHM } from "../../constants/_.loader";
 
 declare module "jsonwebtoken" {
-    export interface IAccessTokenPayload extends jwtLib.JwtPayload {
+    export type CustomTokenType = "AccessToken" | "RefreshToken" | "EmailVerifyToken" | "NicknameVerifyToken";
+
+    export interface ICustomPayload extends jwtLib.JwtPayload {
+        type: CustomTokenType;
+    }
+
+    export interface IAccessTokenPayload extends ICustomPayload {
+        type: "AccessToken";
         userId: number;
         nickname: string;
     }
 
-    export interface IRefreshTokenPayload extends jwtLib.JwtPayload {
+    export interface IRefreshTokenPayload extends ICustomPayload {
+        type: "RefreshToken";
         userId: number;
         email: string;
         nickname: string;
+        imageUrl?: string;
+    }
+
+    export interface IEmailVerifyToken extends ICustomPayload {
+        type: "EmailVerifyToken";
+    }
+
+    export interface INicknameVerifyToken extends ICustomPayload {
+        type: "NicknameVerifyToken";
     }
 }
 
@@ -43,7 +60,7 @@ export class JwtProvider {
         this.isInit = true;
     }
 
-    public sign<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(payload: T): string {
+    public sign<T extends jwtLib.ICustomPayload>(payload: T): string {
         this.validateIsInit();
 
         return jwtLib.sign(
@@ -60,7 +77,7 @@ export class JwtProvider {
     }
 
     /** @throws { CustomException } */
-    public decodeToken<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(token: string): T {
+    public decodeToken<T extends jwtLib.ICustomPayload>(token: string): T {
         this.validateIsInit();
 
         try {
@@ -90,7 +107,7 @@ export class JwtProvider {
      * 메서드 숫자가 늘어나는 것정 될 수는 있으나, 그것보다는 같은 팀원이 쉽게 읽을 수 있는 방향이 좋은 것 같습니다.
      * @throws { CustomException }
      */
-    public verifyToken<T extends jwtLib.IAccessTokenPayload | jwtLib.IRefreshTokenPayload>(token: string): T {
+    public verifyToken<T extends jwtLib.ICustomPayload>(token: string): T {
         this.validateIsInit();
 
         try {
