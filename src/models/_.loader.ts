@@ -26,6 +26,7 @@ import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
 
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
+import { UpdateRecipeDto } from "./dtos/recipe/update.recipe.dto";
 import { CreateCommentDto } from "./dtos/comment/comment.dto";
 
 export {
@@ -50,6 +51,7 @@ export {
     IEditProfileDto,
     CreateRecipeDto,
     ICreateRecipeDto,
+    UpdateRecipeDto,
     IngredientDto,
     IIngredientDto,
     CreateCommentDto,
