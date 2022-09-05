@@ -58,7 +58,7 @@ export class CommentService {
 
             const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
 
-            const isAuthenticated: number = result[0]!.userId as number;
+            const isAuthenticated: number = result[0].userId as number;
 
             if (userId !== isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
 

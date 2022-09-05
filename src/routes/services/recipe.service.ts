@@ -1,4 +1,4 @@
-import { CreateRecipeDto } from "../../models/_.loader";
+import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
 import { RecipeRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
 
@@ -55,6 +55,7 @@ export class RecipeService {
             return getRecipesOne;
         } catch (err) {
             await conn.rollback();
+            throw err;
         } finally {
             await conn.release();
         }
@@ -74,6 +75,25 @@ export class RecipeService {
             await conn.commit();
         } catch (err) {
             await conn.rollback();
+            throw err;
+        } finally {
+            await conn.release();
+        }
+    };
+
+    updateRecipe = async (updateRecipeDto: UpdateRecipeDto, recipeId: number, userId: number): Promise<any> => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            const isAuthenticated = await this.recipeRepository.isAuthenticated(conn, recipeId, userId);
+
+            if (isAuthenticated.length <= 0) return false;
+
+            // const updateRecipe = await this.recipeRepository.updateRecipe
+        } catch (err) {
+            await conn.rollback();
+            throw err;
         } finally {
             await conn.release();
         }

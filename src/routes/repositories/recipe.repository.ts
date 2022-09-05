@@ -1,4 +1,4 @@
-import { CreateRecipeDto } from "../../models/_.loader";
+import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 
 export class RecipeRepository {
@@ -111,5 +111,16 @@ export class RecipeRepository {
         const [result] = await conn.query(query, recipeId);
 
         return result;
+    };
+
+    public updateRecipe = async (
+        conn: PoolConnection,
+        updateRecipeDto: UpdateRecipeDto,
+        recipeId: number,
+        userId: number,
+    ): Promise<any> => {
+        const query = `
+            
+        `;
     };
 }
