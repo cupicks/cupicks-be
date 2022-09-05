@@ -14,8 +14,7 @@ export default class RecipeController {
 
     public createRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // const userId = res.locals.userId;
-            const userId = 1;
+            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
 
             const validator = await new JoiValidator().validateAsync<CreateRecipeDto>(new CreateRecipeDto(req.body));
 
@@ -53,6 +52,31 @@ export default class RecipeController {
             }
 
             return res.end();
+        } catch (err) {
+            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public deleteRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            if (!req.params.recipeId) throw new Error("존재하지 않는 레시피 번호입니다.");
+
+            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const recipeId: number = Number(req.params.recipeId) as number;
+
+            const result: boolean | undefined = await this.recipeService.deleteRecipe(recipeId, userId);
+
+            if (result === false) throw new Error("내가 작성한 레시피가 아닙니다.");
+
+            return res.status(200).json({
+                isSuccess: true,
+                message: "레시피 삭제에 성공하셨습니다.",
+            });
         } catch (err) {
             console.log(err);
             const exception = this.errorHandler(err);

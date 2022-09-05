@@ -2,6 +2,29 @@ import { CreateRecipeDto } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 
 export class RecipeRepository {
+    public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<any> => {
+        const query = `
+            SELECT 
+            *
+            FROM
+                (
+                SELECT R.recipe_id
+                FROM recipe R
+                ) R
+            LEFT JOIN 
+                (
+                SELECT U.recipe_id, U.user_id
+                FROM user_recipe U
+                ) U
+            ON R.recipe_id = U.recipe_id AND R.recipe_id = ?
+            WHERE U.user_id = ?
+        `;
+
+        const [result] = await conn.query(query, [recipeId, userId]);
+
+        return result;
+    };
+
     public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
         const query = `
             INSERT INTO recipe
@@ -75,6 +98,17 @@ export class RecipeRepository {
         `;
 
         const [result] = await conn.query(query);
+
+        return result;
+    };
+
+    public deleteRecipe = async (conn: PoolConnection, recipeId: number): Promise<any> => {
+        const query = `
+            DELETE FROM recipe
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
 
         return result;
     };
