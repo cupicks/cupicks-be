@@ -67,7 +67,7 @@ export default class CommentController {
 
     public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
         try {
-            const userId: number = res.locals.userId !== "undefined" ? "1" : res.locals.userId;
+            const userId: number = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
             const commentId: number = Number(req.params.commentId) as number;
 
             if (!commentId) throw new Error("protected");

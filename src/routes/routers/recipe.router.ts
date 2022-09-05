@@ -6,6 +6,8 @@ import { preventUnLoginUserGuard } from "../../middlewares/guards/_.exporter";
 
 const recipeRouter: Router = Router();
 
+recipeRouter.get("/", applicationJsonFilter, new RecipeController().getRecipes);
+
 recipeRouter.post(
     "/",
     applicationJsonFilter,
@@ -13,7 +15,12 @@ recipeRouter.post(
     new RecipeController().createRecipe,
 );
 
-recipeRouter.get("/", applicationJsonFilter, new RecipeController().getRecipes);
+recipeRouter.put(
+    "/:recipeId",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().updatedRecipe,
+);
 
 recipeRouter.delete(
     "/:recipeId",

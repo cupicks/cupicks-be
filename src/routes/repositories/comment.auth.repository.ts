@@ -5,7 +5,7 @@ export class CommentRepository {
     public isAuthenticated = async (conn: PoolConnection, userId: number, commentId: number): Promise<any> => {
         const query = `
         SELECT 
-            R.user_id AS userId
+        R.user_id AS userId
         FROM 
             (
             SELECT C.comment_id
@@ -17,11 +17,10 @@ export class CommentRepository {
             FROM recipe_comment R
             ) R
         ON C.comment_id = R.comment_id
-        WHERE R.comment_id = ?
-        AND R.user_id = ?
+        WHERE R.user_id = ? AND C.comment_id = ? 
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [commentId, userId]);
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, commentId]);
         const resultSetHeader = result.affectedRows;
 
         if (resultSetHeader > 1) throw new Error("protected");
