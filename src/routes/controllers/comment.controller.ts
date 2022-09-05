@@ -13,13 +13,14 @@ export default class CommentController {
         this.commentService = new CommentService();
     }
 
-    public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
         try {
             const file = req.file as Express.MulterS3.File;
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
 
-            const userId: number = res.locals.userId;
+            // const userId: number = res.locals.userId;
+            const userId: number = 1;
             const nickname: string = res.locals.nickname;
 
             const recipeId: number = Number(req.query!.recipeId);
@@ -63,9 +64,10 @@ export default class CommentController {
         }
     };
 
-    public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
         try {
-            const userId: number = Number(res.locals.userId);
+            const userId: number = 1;
+            // const userId: number = Number(res.locals.userId);
             const commentId: number = Number(req.params.commentId);
 
             if (!commentId) throw new Error("protected");
@@ -89,6 +91,24 @@ export default class CommentController {
                 isSuccess: true,
                 message: "댓글 삭제에 성공하였습니다.",
             });
+        } catch (err) {
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public updateComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // const userId: number = Number(res.locals.userId);
+            const commentId: number = parseInt(req.params.commentId);
+            const comment: string = req.query.comment as string;
+
+            if (!commentId) throw new Error("protected");
+
+            const result = await this.commentService.updateComment(1, "comment", null, commentId);
         } catch (err) {
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
