@@ -109,7 +109,7 @@ export class CommentRepository {
             WHERE comment_id = ?;
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [comment, imageLocation]);
+        const [result] = await conn.query<ResultSetHeader>(query, [comment, imageLocation, commentId]);
 
         return result;
     };

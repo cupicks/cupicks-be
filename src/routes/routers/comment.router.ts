@@ -22,6 +22,12 @@ commentRouter.delete(
     new CommentController().deleteComment,
 );
 
-commentRouter.put("/:commentId", formDataFilter, new CommentController().updateComment);
+commentRouter.put(
+    "/:commentId",
+    formDataFilter,
+    // preventUnLoginUserGuard,
+    multerMiddleware,
+    new CommentController().updateComment,
+);
 
 export default commentRouter;

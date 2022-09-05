@@ -78,15 +78,6 @@ export default class CommentController {
                 throw new Error("here");
             }
 
-            // if (userId !== isAuthenticated) {
-            //     console.log(`유저 아이디 ${userId} 댓글 아이디 ${isAuthenticated}`);
-            //     throw new Error("내가 작성한 댓글이 아닙니다.")
-            // };
-
-            // target = 이미지값
-            // const target = "1662229682052html.jpg";
-            // const result = await MulterProvider.deleteImage(target);
-
             return res.status(200).json({
                 isSuccess: true,
                 message: "댓글 삭제에 성공하였습니다.",
@@ -102,13 +93,18 @@ export default class CommentController {
 
     public updateComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const file = req.file as Express.MulterS3.File;
+
+            const imageLocation = file?.location.length > 0 ? file.location : null;
+
             // const userId: number = Number(res.locals.userId);
+            const userId: number = 1;
             const commentId: number = parseInt(req.params.commentId);
             const comment: string = req.query.comment as string;
 
             if (!commentId) throw new Error("protected");
 
-            const result = await this.commentService.updateComment(1, "comment", null, commentId);
+            const result = await this.commentService.updateComment(1, "comment", imageLocation, commentId);
         } catch (err) {
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
