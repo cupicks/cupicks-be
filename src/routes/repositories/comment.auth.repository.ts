@@ -101,7 +101,7 @@ export class CommentRepository {
         comment: string,
         imageLocation: string | null,
         commentId: number,
-    ) => {
+    ): Promise<object> => {
         const query = `
             UPDATE comment
             SET 
@@ -110,6 +110,28 @@ export class CommentRepository {
         `;
 
         const [result] = await conn.query<ResultSetHeader>(query, [comment, imageLocation, commentId]);
+
+        return result;
+    };
+
+    public getComments = async (
+        conn: PoolConnection,
+        recipeId: number,
+        page: number,
+        count: number,
+    ): Promise<object> => {
+        const query = `
+            SELECT 
+                R.user_id AS userId, R.recipe_id AS recipeId,
+                C.comment_id AS commentId, C.comment, C.image_url AS imageUrl , C.created_at AS createdAt, C.updated_at AS updatedAt
+            FROM recipe_comment R
+            JOIN comment C
+            ON R.comment_id = C.comment_id
+            WHERE R.recipe_id = ?
+            LIMIT ?, ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [recipeId, page, count]);
 
         return result;
     };
