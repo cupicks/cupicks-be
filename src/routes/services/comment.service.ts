@@ -1,6 +1,7 @@
 import { CreateCommentDto } from "../../models/_.loader";
 import { CommentRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
+import { MulterProvider } from "../../modules/_.loader";
 
 export class CommentService {
     private commentRepository: CommentRepository;
@@ -57,15 +58,22 @@ export class CommentService {
 
             const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
 
-            if (result.length <= 0) throw new Error("존재하지 않는 댓글입니다.");
-
             const isAuthenticated: number = result[0]!.userId as number;
 
-            if (userId !== isAuthenticated) throw new Error("내가 작성한 댓글이 아닙니다.");
+            if (userId !== isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
 
-            await conn.commit();
+            const findCommentById = await this.commentRepository.findCommentById(conn, commentId);
 
-            return await this.commentRepository.deleteComment(conn, commentId);
+            const image = JSON.stringify(findCommentById);
+            const imageValue = JSON.parse(image)[0].image_url;
+
+            const imageResult = imageValue !== null ? (imageValue.split("/")[4] as string) : null;
+
+            if (imageResult !== null) MulterProvider.deleteImage(imageResult);
+
+            await this.commentRepository.deleteComment(conn, commentId);
+
+            return await conn.commit();
         } catch (err) {
             await conn.rollback();
             console.error(err);

@@ -14,7 +14,8 @@ export default class RecipeController {
 
     public createRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = res.locals.userId;
+            // const userId = res.locals.userId;
+            const userId = 1;
 
             const validator = await new JoiValidator().validateAsync<CreateRecipeDto>(new CreateRecipeDto(req.body));
 

@@ -29,6 +29,18 @@ export class CommentRepository {
         return result;
     };
 
+    public findCommentById = async (conn: PoolConnection, commentId: number): Promise<any> => {
+        const query = `
+            SELECT image_url
+            FROM comment
+            WHERE comment_id = ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, commentId);
+
+        return result;
+    };
+
     public createComment = async (
         conn: PoolConnection,
         commentDto: CreateCommentDto,

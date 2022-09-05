@@ -19,7 +19,8 @@ export default class CommentController {
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
 
-            const userId: number = res.locals.userId;
+            // const userId: number = res.locals.userId;
+            const userId: number = 1;
             const nickname: string = res.locals.nickname;
 
             const recipeId: number = Number(req.query!.recipeId);
@@ -65,7 +66,8 @@ export default class CommentController {
 
     public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
         try {
-            const userId: number = Number(res.locals.userId);
+            const userId: number = 1;
+            // const userId: number = Number(res.locals.userId);
             const commentId: number = Number(req.params.commentId);
 
             if (!commentId) throw new Error("protected");
