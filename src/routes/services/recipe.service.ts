@@ -81,7 +81,7 @@ export class RecipeService {
         }
     };
 
-    updateRecipe = async (updateRecipeDto: UpdateRecipeDto, recipeId: number, userId: number): Promise<any> => {
+    updateRecipe = async (updateRecipeDto: UpdateRecipeDto, recipeId: number, userId: number): Promise<boolean> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
@@ -90,7 +90,26 @@ export class RecipeService {
 
             if (isAuthenticated.length <= 0) return false;
 
-            // const updateRecipe = await this.recipeRepository.updateRecipe
+            const updateRecipe = Promise.resolve(this.recipeRepository.updateRecipe(conn, updateRecipeDto, recipeId));
+            const deleteRecipeIngredient = Promise.resolve(
+                this.recipeRepository.deleteRecipeIngredient(conn, recipeId),
+            );
+
+            await Promise.all([updateRecipe, deleteRecipeIngredient]);
+
+            const result = updateRecipeDto.ingredientList.map((e) => {
+                return {
+                    recipe_id: recipeId,
+                    ingredient_name: e.ingredientName,
+                    ingredient_color: e.ingredientColor,
+                    ingredient_amount: e.ingredientAmount,
+                };
+            });
+
+            const updateRecipeIngredient = await this.recipeRepository.createRecipeIngredient(conn, result);
+
+            await conn.commit();
+            return true;
         } catch (err) {
             await conn.rollback();
             throw err;
