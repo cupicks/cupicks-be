@@ -7,6 +7,8 @@ import { multerMiddleware } from "../../middlewares/multer.middleware";
 
 const commentRouter: Router = Router();
 
+commentRouter.get("/", applicationJsonFilter, new CommentController().getComments);
+
 commentRouter.post(
     "/",
     formDataFilter,

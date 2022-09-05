@@ -90,6 +90,8 @@ export class CommentService {
     ): Promise<any> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
+            const date = new Date().toISOString().slice(0, 19).replace("T", " ");
+
             await conn.beginTransaction();
 
             const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
@@ -105,13 +107,34 @@ export class CommentService {
 
             const imageResult = imageValue !== null ? (imageValue.split("/")[4] as string) : null;
 
-            console.log(imageResult);
-
             if (imageResult !== null) MulterProvider.deleteImage(imageResult);
 
             await this.commentRepository.updateComment(conn, comment, imageLocation, commentId);
 
-            return await conn.commit();
+            await conn.commit();
+
+            return {
+                userId,
+                comment,
+                commentId,
+                imageUrl: imageLocation,
+                createdAt: date,
+                updatedAt: date,
+            };
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            await conn.release();
+        }
+    };
+
+    public getComments = async (recipeId: number, page: number, count: number): Promise<any> => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            const getComments = await this.commentRepository.getComments(conn, recipeId, page, count);
+
+            return getComments;
         } catch (err) {
             await conn.rollback();
             throw err;

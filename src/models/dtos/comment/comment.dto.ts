@@ -3,6 +3,10 @@ import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
 
+interface ICreateCommentDto {
+    comment: string;
+}
+
 export class CreateCommentDto implements IBaseDto {
     comment: string;
 
