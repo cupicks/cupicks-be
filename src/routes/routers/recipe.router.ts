@@ -13,10 +13,13 @@ recipeRouter.post(
     new RecipeController().createRecipe,
 );
 
-recipeRouter.get(
-    "/",
-    // applicationJsonFilter,
-    new RecipeController().getRecipes,
+recipeRouter.get("/", applicationJsonFilter, new RecipeController().getRecipes);
+
+recipeRouter.delete(
+    "/:recipeId",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().deleteRecipe,
 );
 
 export default recipeRouter;

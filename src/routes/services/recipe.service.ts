@@ -40,7 +40,7 @@ export class RecipeService {
             await conn.rollback();
             throw err;
         } finally {
-            conn.release();
+            await conn.release();
         }
     };
 
@@ -54,9 +54,28 @@ export class RecipeService {
             await conn.commit();
             return getRecipesOne;
         } catch (err) {
-            conn.rollback();
+            await conn.rollback();
         } finally {
-            conn.release();
+            await conn.release();
+        }
+    };
+
+    deleteRecipe = async (recipeId: number, userId: number): Promise<boolean | undefined> => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            const isAuthenticated = await this.recipeRepository.isAuthenticated(conn, recipeId, userId);
+
+            if (isAuthenticated.length <= 0) return false;
+
+            const deleteRecipe = await this.recipeRepository.deleteRecipe(conn, recipeId);
+
+            await conn.commit();
+        } catch (err) {
+            await conn.rollback();
+        } finally {
+            await conn.release();
         }
     };
 }

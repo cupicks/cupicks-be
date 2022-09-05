@@ -62,7 +62,7 @@ export class CommentService {
 
             if (userId !== isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
 
-            const findCommentById = await this.commentRepository.findCommentById(conn, commentId);
+            const findCommentById = await this.commentRepository.findCommentByCommentId(conn, commentId);
 
             const image = JSON.stringify(findCommentById);
             const imageValue = JSON.parse(image)[0].image_url;
@@ -100,7 +100,7 @@ export class CommentService {
 
             if (userId !== isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
 
-            const findCommentById = await this.commentRepository.findCommentById(conn, commentId);
+            const findCommentById = await this.commentRepository.findCommentByCommentId(conn, commentId);
 
             const image = JSON.stringify(findCommentById);
             const imageValue = JSON.parse(image)[0].image_url;
