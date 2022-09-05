@@ -94,7 +94,24 @@ export class CommentService {
 
             const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
 
-            console.log(result);
+            const isAuthenticated: number = result[0]!.userId as number;
+
+            if (userId !== isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
+
+            const findCommentById = await this.commentRepository.findCommentById(conn, commentId);
+
+            const image = JSON.stringify(findCommentById);
+            const imageValue = JSON.parse(image)[0].image_url;
+
+            const imageResult = imageValue !== null ? (imageValue.split("/")[4] as string) : null;
+
+            console.log(imageResult);
+
+            if (imageResult !== null) MulterProvider.deleteImage(imageResult);
+
+            await this.commentRepository.updateComment(conn, comment, imageLocation, commentId);
+
+            return await conn.commit();
         } catch (err) {
             await conn.rollback();
             throw err;
