@@ -35,10 +35,12 @@ export default class AuthController {
              */
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
-                    email: req.query.email,
-                    nickname: req.query.nickname,
-                    password: req.query.password,
                     imageUrl: file.location,
+                    email: req?.query["email"],
+                    nickname: req?.query["nickname"],
+                    password: req?.query["password"],
+                    emailVerifyToken: req?.query["emailVerifyToken"],
+                    nicknameVerifyToken: req?.query["nicknameVerifyToken"],
                 }),
             );
 
