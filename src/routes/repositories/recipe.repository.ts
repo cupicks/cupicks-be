@@ -191,4 +191,17 @@ export class RecipeRepository {
 
         return true;
     };
+
+    public disRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+        const query = `
+            DELETE FROM user_like_recipe
+            WHERE user_id = ? AND recipe_id = ?
+        `;
+
+        console.log(userId, recipeId);
+
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+
+        return true;
+    };
 }
