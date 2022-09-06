@@ -146,7 +146,7 @@ export class AuthService {
         }
     };
 
-    public sendEmail = async (sendEmailDto: SendEmailDto) => {
+    public sendEmail = async (sendEmailDto: SendEmailDto): Promise<{ date: string }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -184,6 +184,9 @@ export class AuthService {
             this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode);
 
             await conn.commit();
+            return {
+                date: this.dateProvider.getNowDatetime(),
+            };
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -192,7 +195,11 @@ export class AuthService {
         }
     };
 
-    public confirmEmailCode = async (confirmEmailDto: ConfirmEmailDto) => {
+    public confirmEmailCode = async (
+        confirmEmailDto: ConfirmEmailDto,
+    ): Promise<{
+        emailVerifyToken: string;
+    }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -239,7 +246,11 @@ export class AuthService {
         }
     };
 
-    public confirmNickname = async (confirmNicknameDto: ConfirmNicknameDto) => {
+    public confirmNickname = async (
+        confirmNicknameDto: ConfirmNicknameDto,
+    ): Promise<{
+        nicknameVerifyToken: string;
+    }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
