@@ -19,7 +19,7 @@ export class SigninUserDto implements IBaseDto, ISigninUserDto {
 
     getJoiInstance(): ObjectSchema<SigninUserDto> {
         return joi.object<SigninUserDto>({
-            email: joi.string().required().trim().max(20).message("email 은 20자 이하여야 합니다."),
+            email: joi.string().required().trim().max(100).email().message("email 은 20자 이하여야 합니다."),
             password: joi
                 .string()
                 .required()

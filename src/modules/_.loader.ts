@@ -6,4 +6,15 @@ import { MysqlProvider } from "./providers/mysql.provider";
 import { MulterProvider } from "./providers/multer.provider";
 import { AwsSesProvider } from "./providers/aws.ses.provider";
 
-export { EnvProvider, JoiValidator, BcryptProvider, MysqlProvider, AwsSesProvider, JwtProvider, MulterProvider };
+import { DateProvider } from "./providers/date.provider";
+
+export {
+    EnvProvider,
+    JoiValidator,
+    BcryptProvider,
+    MysqlProvider,
+    AwsSesProvider,
+    JwtProvider,
+    MulterProvider,
+    DateProvider,
+};

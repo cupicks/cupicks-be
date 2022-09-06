@@ -166,7 +166,8 @@ export default class AuthController {
         try {
             const confirmEailDto = await this.joiValidator.validateAsync<ConfirmEmailDto>(
                 new ConfirmEmailDto({
-                    emailVerifyCode: req?.query["emailVerifyCode"],
+                    email: req?.query["email"],
+                    emailVerifyCode: req?.query["email-verify-code"],
                 }),
             );
 

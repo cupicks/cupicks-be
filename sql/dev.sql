@@ -34,10 +34,10 @@ DROP TABLE IF EXISTS user_verify_list;
 
 CREATE TABLE IF NOT EXISTS user_verify_list (
     user_verify_list_id     INT              NOT NULL    PRIMARY KEY AUTO_INCREMENT,
-    email                   VARCHAR(20)      NOT NULL    UNIQUE,
+    email                   VARCHAR(100)     NOT NULL    UNIQUE,
     email_verified_date     DATETIME         NULL,
     email_verified_token    VARCHAR(1000)    NULL,
-    email_verified_code     INT              NULL,
+    email_verified_code     VARCHAR(6)       NULL,
     is_verified_email       BOOLEAN          DEFAULT 0,
     nickname                VARCHAR(20)      NULL,
     nickname_verified_date  DATETIME         NULL,
@@ -45,11 +45,10 @@ CREATE TABLE IF NOT EXISTS user_verify_list (
     is_verified_nickname    BOOLEAN          DEFAULT 0
 );
 
-
 CREATE TABLE IF NOT EXISTS user (
     user_id             INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     user_verify_list_id INT             NOT NULL,
-    email               VARCHAR(20)     NOT NULL    UNIQUE,
+    email               VARCHAR(100)     NOT NULL    UNIQUE,
     nickname            VARCHAR(10)     NOT NULL    UNIQUE,
     password            VARCHAR(255)    NOT NULL,
     image_url           VARCHAR(255)    NULL,

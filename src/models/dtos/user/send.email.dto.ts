@@ -23,7 +23,7 @@ export class SendEmailDto implements IBaseDto, ISendEmailDto {
 
     getJoiInstance(): ObjectSchema<SendEmailDto> {
         return joi.object<SendEmailDto>({
-            email: joi.string().required().trim().max(20).email().message("email 은 20자 이하여야 합니다."),
+            email: joi.string().required().trim().max(100).email().message("email 은 20자 이하여야 합니다."),
         });
     }
 }

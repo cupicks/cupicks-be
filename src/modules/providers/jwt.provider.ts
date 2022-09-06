@@ -25,10 +25,12 @@ declare module "jsonwebtoken" {
 
     export interface IEmailVerifyToken extends ICustomPayload {
         type: "EmailVerifyToken";
+        email: string;
     }
 
     export interface INicknameVerifyToken extends ICustomPayload {
         type: "NicknameVerifyToken";
+        nickname: string;
     }
 }
 
