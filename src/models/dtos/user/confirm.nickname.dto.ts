@@ -5,13 +5,22 @@ import { ObjectSchema } from "joi";
 import { IBaseDto } from "../i.base.dto";
 
 export interface IConfirmNicknameDto {
+    email: string;
     nickname: string;
 }
 
 export class ConfirmNicknameDto implements IBaseDto, IConfirmNicknameDto {
+    email: string;
     nickname: string;
 
-    constructor({ nickname }: { nickname: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
+    constructor({
+        email,
+        nickname,
+    }: {
+        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
+    }) {
+        this.email = this.validateType(email);
         this.nickname = this.validateType(nickname);
     }
 
@@ -23,6 +32,7 @@ export class ConfirmNicknameDto implements IBaseDto, IConfirmNicknameDto {
 
     getJoiInstance(): ObjectSchema<ConfirmNicknameDto> {
         return joi.object<ConfirmNicknameDto>({
+            email: joi.string().required().trim().max(100).email().message("email 은 20자 이하여야 합니다."),
             nickname: joi
                 .string()
                 .required()

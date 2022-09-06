@@ -12,6 +12,15 @@ export class AuthVerifyListRepository {
         return rowDataPacket?.length === 1;
     };
 
+    public isExistsByNicknameExceptEmail = async (conn: PoolConnection, email: string, nickname: string) => {
+        const isExistsQuery = `SELECT user_verify_list_id FROM user_verify_list WHERE nickname = "${nickname}" AND email != "${email}";`;
+        const isExistsResult = await conn.query<RowDataPacket[][]>(isExistsQuery);
+
+        const rowDataPacket = isExistsResult[0];
+
+        return rowDataPacket?.length === 1;
+    };
+
     public findVerifyListByEmail = async (
         conn: PoolConnection,
         email: string,
@@ -86,5 +95,23 @@ export class AuthVerifyListRepository {
         const { affectedRows } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
+
+    public updateVerifyListByNickname = async (
+        conn: PoolConnection,
+        email: string,
+        nickname: string,
+        nicknameVerifiedDate: string,
+        nicknameVerifedToken: string,
+    ): Promise<void> => {
+        const updateQuery = `UPDATE user_verify_list
+                SET nickname = "${nickname}", nickname_verified_date = "${nicknameVerifiedDate}", nickname_verified_token = "${nicknameVerifedToken}", is_verified_nickname = ${true}
+            WHERE email = "${email}";`;
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [resultSetHeader, _] = updateResult;
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
     };
 }
