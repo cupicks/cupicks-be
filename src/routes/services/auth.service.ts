@@ -57,6 +57,13 @@ export class AuthService {
                 throw new NotFoundException(
                     `해당 이메일과 닉네임의 요청은 이미 만료되었습니다. 회원가입 절차를 다시 실행해주세요.`,
                 );
+            else if (
+                finededVerifyList.emailVerifiedToken !== userDto.emailVerifyToken ||
+                finededVerifyList.nicknameVerifiedToken !== userDto.nicknameVerifyToken
+            )
+                throw new BadRequestException(
+                    `서버에 등록되어 있지 않은 EmailVerifyToken 혹은 NicknameVerifyToken 을 제출하였습니다.`,
+                );
 
             const date = this.dateProvider.getNowDatetime();
             await this.authRepository.createUser(conn, userDto, date, finededVerifyList.userVerifyListId);
