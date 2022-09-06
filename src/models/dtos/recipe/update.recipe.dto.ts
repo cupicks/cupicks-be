@@ -27,7 +27,7 @@ export class UpdateRecipeDto implements IBaseDto {
     getJoiInstance(): ObjectSchema<UpdateRecipeDto> {
         return joi.object<UpdateRecipeDto>({
             title: joi.string().trim().min(2).max(20).required(),
-            content: joi.string().trim().max(255).required(),
+            content: joi.string().trim().min(2).max(255).required(),
             isIced: joi.boolean().required(),
             isPublic: joi.boolean().required(),
             ingredientList: joi.array().items(

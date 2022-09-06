@@ -102,9 +102,20 @@ export class RecipeRepository {
         return result;
     };
 
-    public deleteRecipe = async (conn: PoolConnection, recipeId: number): Promise<any> => {
+    public deleteRecipe = async (conn: PoolConnection, recipeId: number): Promise<object> => {
         const query = `
             DELETE FROM recipe
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
+
+        return result;
+    };
+
+    public deleteRecipeIngredient = async (conn: PoolConnection, recipeId: number) => {
+        const query = `
+            DELETE FROM recipe_ingredient
             WHERE recipe_id = ?;
         `;
 
@@ -117,10 +128,22 @@ export class RecipeRepository {
         conn: PoolConnection,
         updateRecipeDto: UpdateRecipeDto,
         recipeId: number,
-        userId: number,
-    ): Promise<any> => {
+    ): Promise<object> => {
         const query = `
-            
+            UPDATE recipe
+            SET
+                title = ?, content = ?, is_iced = ?, is_public = ?
+            WHERE recipe_id = ?
         `;
+
+        const [result] = await conn.query(query, [
+            updateRecipeDto.title,
+            updateRecipeDto.content,
+            updateRecipeDto.isIced,
+            updateRecipeDto.isPublic,
+            recipeId,
+        ]);
+
+        return result;
     };
 }

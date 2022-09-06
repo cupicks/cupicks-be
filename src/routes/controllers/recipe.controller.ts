@@ -41,13 +41,12 @@ export default class RecipeController {
             const page = Number(req.query.page);
             const count = Number(req.query.count);
 
-            const results = await this.recipeService.getRecipes(page, count);
+            const result: any[] = await this.recipeService.getRecipes(page, count);
 
-            const give = {};
+            const title: any = {};
+            const array: any[] = [];
 
-            if (Array.isArray(results)) {
-                console.log(results);
-            }
+            console.log(result);
 
             return res.end();
         } catch (err) {
@@ -96,11 +95,13 @@ export default class RecipeController {
                 new UpdateRecipeDto(req.body),
             );
 
-            const updateRecipe = await this.recipeService.updateRecipe(validator, recipeId, userId);
+            const updateRecipe: boolean = await this.recipeService.updateRecipe(validator, recipeId, userId);
 
-            console.log(updateRecipe);
-
-            return res.end();
+            return res.status(200).json({
+                isSuccess: true,
+                message: "레시피 수정에 성공하셨습니다.",
+                recipeId,
+            });
         } catch (err) {
             console.log(err);
             const exception = this.errorHandler(err);
