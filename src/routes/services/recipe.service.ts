@@ -1,6 +1,7 @@
 import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
 import { RecipeRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
+import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeService {
     private recipeRepository: RecipeRepository;
@@ -110,6 +111,37 @@ export class RecipeService {
 
             await conn.commit();
             return true;
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            await conn.release();
+        }
+    };
+
+    likeRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            const findRecipeById = (await this.recipeRepository.findRecipeById(conn, recipeId)) as Array<object>;
+
+            if (findRecipeById.length <= 0) throw new Error("존재하지 않는 레시피입니다.");
+
+            const existLikeRecipe = (await this.recipeRepository.existLikeRecipeById(
+                conn,
+                userId,
+                recipeId,
+            )) as Array<object>;
+
+            // 서비스에서 에러를 던지자
+            if (existLikeRecipe.length >= 1) throw new Error("이미 좋아요 누른 레시피입니다.");
+
+            const likeRecipe = await this.recipeRepository.likeRecipe(conn, userId, recipeId);
+
+            await conn.commit();
+
+            return likeRecipe;
         } catch (err) {
             await conn.rollback();
             throw err;
