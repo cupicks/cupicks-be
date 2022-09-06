@@ -9,6 +9,8 @@ export interface ISignupUserDto {
     email: string;
     password: string;
     imageUrl: string | undefined;
+    nicknameVerifyToken: string;
+    emailVerifyToken: string;
 }
 
 export class SignupUserDto implements IBaseDto, ISignupUserDto {
@@ -16,22 +18,31 @@ export class SignupUserDto implements IBaseDto, ISignupUserDto {
     email: string;
     password: string;
     imageUrl: string | undefined;
+    nicknameVerifyToken: string;
+    emailVerifyToken: string;
 
     constructor({
         nickname,
         email,
         password,
         imageUrl,
+        nicknameVerifyToken,
+        emailVerifyToken,
     }: {
         nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
         email: string | string[] | ParsedQs | ParsedQs[] | undefined;
         password: string | string[] | ParsedQs | ParsedQs[] | undefined;
         imageUrl: string;
+        nicknameVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
+        console.log(nickname, email, password, imageUrl, nicknameVerifyToken, emailVerifyToken);
         this.email = this.validateType(email);
         this.nickname = this.validateType(nickname);
         this.password = this.validateType(password);
-        this.imageUrl = this.validateType(imageUrl);
+        this.imageUrl = imageUrl;
+        this.nicknameVerifyToken = this.validateType(nicknameVerifyToken);
+        this.emailVerifyToken = this.validateType(emailVerifyToken);
     }
 
     private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
@@ -65,6 +76,16 @@ export class SignupUserDto implements IBaseDto, ISignupUserDto {
                     "password 는 8자 이상 15자 이하의 영문, 숫자 조합입니다. (특수문자 !@# 는 1개 가 반드시 포함되어야 합니다.)",
                 ),
             imageUrl: joi.string().required().max(255).message("imageUrl 은 255 자 이하여야 합니다."),
+            nicknameVerifyToken: joi
+                .string()
+                .required()
+                .max(1000)
+                .message("NicknameVerifyToken 은 반드시 포함하여야 합니다."),
+            emailVerifyToken: joi
+                .string()
+                .required()
+                .max(1000)
+                .message("NicknameVerifyToken 은 반드시 포함하여야 합니다."),
         });
     }
 }

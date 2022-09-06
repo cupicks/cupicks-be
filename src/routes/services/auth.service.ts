@@ -44,16 +44,36 @@ export class AuthService {
             await conn.beginTransaction();
             userDto.password = this.bcryptProvider.hashPassword(userDto.password);
 
+            const emailVerifyToken = this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(userDto.emailVerifyToken);
+            const nicknameVerifyToken = this.jwtProvider.verifyToken<jwtLib.INicknameVerifyToken>(
+                userDto.nicknameVerifyToken,
+            );
+
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, userDto.email);
-            if (isExistsUser) throw new ConflictException(`${userDto.email} 은 사용 중입니다.`);
+            if (isExistsUser === true) throw new ConflictException(`${userDto.email} 은 사용 중입니다.`);
+
+            const finededVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, userDto.email);
+            if (finededVerifyList === null)
+                throw new NotFoundException(
+                    `해당 이메일과 닉네임의 요청은 이미 만료되었습니다. 회원가입 절차를 다시 실행해주세요.`,
+                );
+            else if (
+                finededVerifyList.emailVerifiedToken !== userDto.emailVerifyToken ||
+                finededVerifyList.nicknameVerifiedToken !== userDto.nicknameVerifyToken
+            )
+                throw new BadRequestException(
+                    `서버에 등록되어 있지 않은 EmailVerifyToken 혹은 NicknameVerifyToken 을 제출하였습니다.`,
+                );
 
             const date = this.dateProvider.getNowDatetime();
-            const createdUserId = await this.authRepository.createUser(conn, userDto, date);
+            await this.authRepository.createUser(conn, userDto, date, finededVerifyList.userVerifyListId);
+
+            // const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
             await conn.commit();
 
             return new UserDto({
-                userId: createdUserId,
+                userId: 1,
                 createdAt: date,
                 updatedAt: date,
                 ...userDto,
@@ -146,7 +166,7 @@ export class AuthService {
         }
     };
 
-    public sendEmail = async (sendEmailDto: SendEmailDto) => {
+    public sendEmail = async (sendEmailDto: SendEmailDto): Promise<{ date: string }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -181,9 +201,13 @@ export class AuthService {
                 );
             }
 
-            this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode);
+            const email = await this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode);
+            console.log(email);
 
             await conn.commit();
+            return {
+                date: this.dateProvider.getNowDatetime(),
+            };
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -192,7 +216,11 @@ export class AuthService {
         }
     };
 
-    public confirmEmailCode = async (confirmEmailDto: ConfirmEmailDto) => {
+    public confirmEmailCode = async (
+        confirmEmailDto: ConfirmEmailDto,
+    ): Promise<{
+        emailVerifyToken: string;
+    }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -204,7 +232,7 @@ export class AuthService {
             );
 
             if (findedVerifyList === null) {
-                throw new NotFoundException(`${confirmEmailDto.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
+                throw new BadRequestException(`${confirmEmailDto.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
             } else {
                 if (findedVerifyList.isVerifiedEmail === 1)
                     throw new BadRequestException(
@@ -239,7 +267,11 @@ export class AuthService {
         }
     };
 
-    public confirmNickname = async (confirmNicknameDto: ConfirmNicknameDto) => {
+    public confirmNickname = async (
+        confirmNicknameDto: ConfirmNicknameDto,
+    ): Promise<{
+        nicknameVerifyToken: string;
+    }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {

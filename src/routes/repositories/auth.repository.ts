@@ -126,12 +126,17 @@ export class AuthRepository {
 
     // create
 
-    public createUser = async (conn: PoolConnection, userDto: SignupUserDto, date: string): Promise<number> => {
+    public createUser = async (
+        conn: PoolConnection,
+        userDto: SignupUserDto,
+        date: string,
+        userVerifyListId: number,
+    ): Promise<number> => {
         const createUserQuery = userDto.imageUrl
-            ? `INSERT INTO user (email, nickname, password, image_url, created_at, updated_at)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}", "${date}", "${date}");`
-            : `INSERT INTO user (email, nickname, password, created_at, updated_at)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${date}", "${date}");`;
+            ? `INSERT INTO user (email, nickname, password, image_url, created_at, updated_at, user_verify_list_id)
+                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}", "${date}", "${date}", ${userVerifyListId});`
+            : `INSERT INTO user (email, nickname, password, created_at, updated_at, user_verify_list_id)
+                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${date}", "${date}", ${userVerifyListId});`;
         const createdUserResult = await conn.query<ResultSetHeader>(createUserQuery);
 
         const [resultSetHeader, _] = createdUserResult;
