@@ -1,4 +1,4 @@
-import { SES } from "@aws-sdk/client-ses";
+import { SendEmailCommandOutput, SES } from "@aws-sdk/client-ses";
 import { ISesConfigEnv } from "../../models/_.loader";
 
 /**
@@ -42,9 +42,9 @@ export class AwsSesProvider {
         return emailVerifyCode;
     }
 
-    public sendVerifyCode(toEmail: string, emailVerifyCode: string) {
+    public async sendVerifyCode(toEmail: string, emailVerifyCode: string): Promise<SendEmailCommandOutput> {
         const ses = this.getSesInstance();
-        ses.sendEmail({
+        return await ses.sendEmail({
             Source: "workstation19961002@gmail.com",
             Destination: {
                 ToAddresses: [toEmail],

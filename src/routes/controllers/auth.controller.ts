@@ -35,10 +35,12 @@ export default class AuthController {
              */
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
-                    email: req.query.email,
-                    nickname: req.query.nickname,
-                    password: req.query.password,
                     imageUrl: file.location,
+                    email: req?.query["email"],
+                    nickname: req?.query["nickname"],
+                    password: req?.query["password"],
+                    emailVerifyToken: req?.query["emailVerifyToken"],
+                    nicknameVerifyToken: req?.query["nicknameVerifyToken"],
                 }),
             );
 
@@ -149,7 +151,7 @@ export default class AuthController {
             return res.json({
                 isSuccess: true,
                 message: "사용자 이메일로 6자리 숫자가 발송되었습니다.",
-                date: new Date(),
+                date: result.date,
             });
         } catch (err) {
             console.log(err);
