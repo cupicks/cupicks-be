@@ -149,7 +149,7 @@ export default class AuthController {
             return res.json({
                 isSuccess: true,
                 message: "사용자 이메일로 6자리 숫자가 발송되었습니다.",
-                date: new Date(),
+                date: result.date,
             });
         } catch (err) {
             console.log(err);
