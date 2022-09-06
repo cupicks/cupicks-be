@@ -173,7 +173,7 @@ export class AuthService {
                 );
             }
 
-            this.sesProvider.sendVerifyCode("workstation19961002@gmail.com", emailVerifyCode);
+            this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode);
 
             await conn.commit();
         } catch (err) {
@@ -183,9 +183,8 @@ export class AuthService {
             conn.release();
         }
     };
-    public confirmEmailCode = async (confirmemailDto: ConfirmEmailDto) => {
-        console.log(confirmemailDto);
 
+    public confirmEmailCode = async (confirmEmailDto: ConfirmEmailDto) => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
