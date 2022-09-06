@@ -31,7 +31,7 @@ export class RecipeRepository {
         recipeId: number,
     ): Promise<IRecipeResponseCustom | ResultSetHeader> => {
         const query = `
-            SELECT recipe_id
+            SELECT *
             FROM recipe
             WHERE recipe_id = ?
         `;
@@ -109,6 +109,30 @@ export class RecipeRepository {
         if (affectedRows > 1) throw new Error("protected");
 
         return JSON.stringify(result[0].insertId);
+    };
+
+    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<any> => {
+        const query = `
+        SELECT 
+            R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
+            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount"
+        FROM 
+            (
+                SELECT *
+                FROM recipe R
+            ) R
+        RIGHT JOIN
+            (
+                SELECT *
+                FROM recipe_ingredient I
+            ) I
+        ON R.recipe_id = I.recipe_id
+        WHERE R.recipe_id = ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, recipeId);
+
+        return result;
     };
 
     public getRecipes = async (conn: PoolConnection, page?: number, count?: number): Promise<any> => {

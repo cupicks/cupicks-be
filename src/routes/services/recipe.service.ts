@@ -44,6 +44,27 @@ export class RecipeService {
         }
     };
 
+    getRecipe = async (recipeId: number): Promise<any> => {
+        const conn = await this.mysqlProvider.getConnection();
+        try {
+            await conn.beginTransaction();
+            const findRecipeById = (await this.recipeRepository.findRecipeById(conn, recipeId)) as Array<object>;
+
+            if (findRecipeById.length <= 0) throw new Error("존재하지 않는 레시피입니다.");
+
+            const getRecipe = await this.recipeRepository.getRecipe(conn, recipeId);
+
+            await conn.commit();
+
+            return getRecipe;
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            await conn.release();
+        }
+    };
+
     getRecipes = async (page: number, count: number): Promise<any> => {
         const conn = await this.mysqlProvider.getConnection();
         try {

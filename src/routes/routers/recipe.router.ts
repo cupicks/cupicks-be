@@ -8,6 +8,8 @@ const recipeRouter: Router = Router();
 
 recipeRouter.get("/", applicationJsonFilter, new RecipeController().getRecipes);
 
+recipeRouter.get("/:recipeId", applicationJsonFilter, new RecipeController().getRecipe);
+
 recipeRouter.post(
     "/",
     applicationJsonFilter,
