@@ -61,8 +61,6 @@ export default class RecipeController {
 
     public deleteRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            if (!req.params.recipeId) throw new Error("레시피 번호를 확인해주세요.");
-
             const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
             const recipeId: number = Number(req.params.recipeId) as number;
 
@@ -86,8 +84,6 @@ export default class RecipeController {
 
     public updatedRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            if (!req.params.recipeId) throw new Error("레시피 번호를 확인해주세요.");
-
             const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
             const recipeId: number = Number(req.params.recipeId) as number;
 
@@ -101,6 +97,27 @@ export default class RecipeController {
                 isSuccess: true,
                 message: "레시피 수정에 성공하셨습니다.",
                 recipeId,
+            });
+        } catch (err) {
+            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public likeRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const recipeId: number = Number(req.params.recipeId) as number;
+
+            const result = await this.recipeService.likeRecipe(userId, recipeId);
+
+            return res.status(201).json({
+                isSuccess: false,
+                message: `${recipeId}번 레시피 좋아요에 성공하였습니다.`,
             });
         } catch (err) {
             console.log(err);

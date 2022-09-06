@@ -1,5 +1,6 @@
 import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
-import { PoolConnection, ResultSetHeader } from "mysql2/promise";
+import { PoolConnection, ResultSetHeader, FieldPacket } from "mysql2/promise";
+import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeRepository {
     public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<any> => {
@@ -21,6 +22,37 @@ export class RecipeRepository {
         `;
 
         const [result] = await conn.query(query, [recipeId, userId]);
+
+        return result;
+    };
+
+    public findRecipeById = async (
+        conn: PoolConnection,
+        recipeId: number,
+    ): Promise<IRecipeResponseCustom | ResultSetHeader> => {
+        const query = `
+            SELECT recipe_id
+            FROM recipe
+            WHERE recipe_id = ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, recipeId);
+
+        return result;
+    };
+
+    public existLikeRecipeById = async (
+        conn: PoolConnection,
+        userId: number,
+        recipeId: number,
+    ): Promise<IRecipeResponseCustom | ResultSetHeader> => {
+        const query = `
+            SELECT *
+            FROM user_like_recipe
+            WHERE user_id = ? AND recipe_id = ?;
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
 
         return result;
     };
@@ -145,5 +177,18 @@ export class RecipeRepository {
         ]);
 
         return result;
+    };
+
+    public likeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+        const query = `
+            INSERT INTO user_like_recipe
+                (user_id, recipe_id)
+            VALUES
+                (?, ?);
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+
+        return true;
     };
 }

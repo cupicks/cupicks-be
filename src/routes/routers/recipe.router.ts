@@ -29,4 +29,11 @@ recipeRouter.delete(
     new RecipeController().deleteRecipe,
 );
 
+recipeRouter.patch(
+    "/:recipeId/like",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().likeRecipe,
+);
+
 export default recipeRouter;
