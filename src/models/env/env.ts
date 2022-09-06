@@ -31,6 +31,7 @@ export interface ISesConfigEnv {
     SES_API_REGION: string;
     SES_ACCESS_KEY: string;
     SES_SECRET_KEY: string;
+    SES_SENDER_EMAIL: string;
 }
 
 export class Env {
@@ -81,6 +82,7 @@ export class Env {
             SES_API_REGION: this.getEnvStringValue("SES_API_REGION"),
             SES_ACCESS_KEY: this.getEnvStringValue("SES_ACCESS_KEY"),
             SES_SECRET_KEY: this.getEnvStringValue("SES_SECRET_KEY"),
+            SES_SENDER_EMAIL: this.getEnvStringValue("SES_SENDER_EMAIL"),
         };
     }
 

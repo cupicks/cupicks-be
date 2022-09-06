@@ -15,8 +15,9 @@ import { ISesConfigEnv } from "../../models/_.loader";
 export class AwsSesProvider {
     static isInit = false;
     static ses: SES;
+    static SES_SENDER_EMAIL: string;
 
-    static init({ SES_API_VERSION, SES_API_REGION, SES_ACCESS_KEY, SES_SECRET_KEY }: ISesConfigEnv) {
+    static init({ SES_API_VERSION, SES_API_REGION, SES_ACCESS_KEY, SES_SECRET_KEY, SES_SENDER_EMAIL }: ISesConfigEnv) {
         if (this.isInit === true) return;
 
         this.ses = new SES({
@@ -27,6 +28,8 @@ export class AwsSesProvider {
                 secretAccessKey: SES_SECRET_KEY,
             },
         });
+        this.SES_SENDER_EMAIL = SES_SENDER_EMAIL;
+
         return;
     }
 
@@ -45,7 +48,7 @@ export class AwsSesProvider {
     public async sendVerifyCode(toEmail: string, emailVerifyCode: string): Promise<SendEmailCommandOutput> {
         const ses = this.getSesInstance();
         return await ses.sendEmail({
-            Source: "workstation19961002@gmail.com",
+            Source: AwsSesProvider.SES_SENDER_EMAIL,
             Destination: {
                 ToAddresses: [toEmail],
             },
