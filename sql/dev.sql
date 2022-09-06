@@ -32,14 +32,9 @@ DROP TABLE IF EXISTS recipe;
 
 DROP TABLE IF EXISTS user_verify_list;
 
-
--- 이메일 인증 A
--- 닉네임 인증 B
-
-
 CREATE TABLE IF NOT EXISTS user_verify_list (
     user_verify_list_id     INT              NOT NULL    PRIMARY KEY AUTO_INCREMENT,
-    email                   VARCHAR(20)      NULL,
+    email                   VARCHAR(20)      NOT NULL    UNIQUE,
     email_verified_date     DATETIME         NULL,
     email_verified_token    VARCHAR(1000)    NULL,
     email_verified_code     INT              NULL,
@@ -49,6 +44,7 @@ CREATE TABLE IF NOT EXISTS user_verify_list (
     nickname_verified_token VARCHAR(1000)    NULL,
     is_verified_nickname    BOOLEAN          DEFAULT 0
 );
+
 
 CREATE TABLE IF NOT EXISTS user (
     user_id             INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,

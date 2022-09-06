@@ -1,6 +1,6 @@
 import * as jwtLib from "jsonwebtoken";
-import { AuthRepository } from "../repositories/_.exporter";
-import { BcryptProvider, JwtProvider, MysqlProvider } from "../../modules/_.loader";
+import { AuthRepository, AuthVerifyListRepository } from "../repositories/_.exporter";
+import { AwsSesProvider, BcryptProvider, JwtProvider, MysqlProvider } from "../../modules/_.loader";
 import {
     ConflictException,
     ForBiddenException,
@@ -10,19 +10,26 @@ import {
     UserDto,
     PublishTokenDto,
     ConfirmPasswordDto,
+    SendEmailDto,
+    ConfirmEmailDto,
+    ConfirmNicknameDto,
 } from "../../models/_.loader";
 
 export class AuthService {
     private jwtProvider: JwtProvider;
     private mysqlProvider: MysqlProvider;
+    private sesProvider: AwsSesProvider;
     private bcryptProvider: BcryptProvider;
     private authRepository: AuthRepository;
+    private authVerifyListRepository: AuthVerifyListRepository;
 
     constructor() {
         this.jwtProvider = new JwtProvider();
         this.mysqlProvider = new MysqlProvider();
+        this.sesProvider = new AwsSesProvider();
         this.bcryptProvider = new BcryptProvider();
         this.authRepository = new AuthRepository();
+        this.authVerifyListRepository = new AuthVerifyListRepository();
     }
 
     public signup = async (userDto: SignupUserDto): Promise<UserDto> => {
@@ -126,6 +133,85 @@ export class AuthService {
             await conn.commit();
 
             return accessToken;
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public sendEmail = async (sendEmailDto: SendEmailDto) => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const isExistsUser = await this.authRepository.isExistsByEmail(conn, sendEmailDto.email);
+            if (isExistsUser) throw new ConflictException(`${sendEmailDto.email} 은 이미 가입한 이메일입니다.`);
+
+            let emailVerifyCode = "";
+            for (let i = 0; i < 6; i++) {
+                emailVerifyCode += Math.floor(Math.random() * 10);
+            }
+
+            const findedUserVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
+                conn,
+                sendEmailDto.email,
+            );
+            if (findedUserVerifyList === null) {
+                await this.authVerifyListRepository.createVerifyListByEmailAndCode(
+                    conn,
+                    sendEmailDto.email,
+                    emailVerifyCode,
+                );
+            } else {
+                await this.authVerifyListRepository.updateVerifyListByIdAndCode(
+                    conn,
+                    findedUserVerifyList.userVerifyListId,
+                    emailVerifyCode,
+                );
+            }
+
+            this.sesProvider.sendVerifyCode("workstation19961002@gmail.com", emailVerifyCode);
+
+            await conn.commit();
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+    public confirmEmailCode = async (confirmemailDto: ConfirmEmailDto) => {
+        console.log(confirmemailDto);
+
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+            await conn.commit();
+            return {
+                emailVerifyToken: "토큰",
+            };
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+    public confirmNickname = async (confirmNicknameDto: ConfirmNicknameDto) => {
+        console.log(confirmNicknameDto);
+
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+            await conn.commit();
+            return {
+                nicknameVerifyToken: "토큰",
+            };
         } catch (err) {
             await conn.rollback();
             throw err;

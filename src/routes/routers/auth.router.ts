@@ -23,7 +23,15 @@ authRouter.post(
     new AuthController().signup,
 );
 authRouter.post("/signin", applicationXWwwFormUrlencodedFilter, preventLoginUserGuard, new AuthController().signin);
+
 authRouter.get("/token", applicationXWwwFormUrlencodedFilter, new AuthController().publishToken);
+
+authRouter.get("/send-email", applicationXWwwFormUrlencodedFilter, new AuthController().sendEmail);
+
+authRouter.get("/confirm-email", applicationXWwwFormUrlencodedFilter, new AuthController().confirmEmailCode);
+
+authRouter.get("/confirm-nickname", applicationXWwwFormUrlencodedFilter, new AuthController().confirmNickname);
+
 authRouter.get(
     "/confirm-password",
     applicationJsonFilter,

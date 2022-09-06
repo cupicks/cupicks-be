@@ -8,6 +8,9 @@ import {
     SigninUserDto,
     PublishTokenDto,
     ConfirmPasswordDto,
+    SendEmailDto,
+    ConfirmEmailDto,
+    ConfirmNicknameDto,
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
@@ -121,6 +124,84 @@ export default class AuthController {
             return res.json({
                 isSuccess: true,
                 message: "본인 확인에 성공하셨습니다.",
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public sendEmail: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const sendEmailDto = await this.joiValidator.validateAsync<SendEmailDto>(
+                new SendEmailDto({
+                    email: req?.query["email"],
+                }),
+            );
+
+            const result = await this.authService.sendEmail(sendEmailDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "사용자 이메일로 6자리 숫자가 발송되었습니다.",
+                date: new Date(),
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public confirmEmailCode: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const confirmEailDto = await this.joiValidator.validateAsync<ConfirmEmailDto>(
+                new ConfirmEmailDto({
+                    emailVerifyCode: req?.query["emailVerifyCode"],
+                }),
+            );
+
+            const { emailVerifyToken } = await this.authService.confirmEmailCode(confirmEailDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "사용자 이메일 인증이 완료되었습니다.",
+                emailVerifyToken: emailVerifyToken,
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public confirmNickname: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const confirmNicknameDto = await this.joiValidator.validateAsync<ConfirmNicknameDto>(
+                new ConfirmNicknameDto({
+                    nickname: req?.query["nickname"],
+                }),
+            );
+
+            const { nicknameVerifyToken } = await this.authService.confirmNickname(confirmNicknameDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "사용자 이메일 인증이 완료되었습니다.",
+                nicknameVerifyToken: nicknameVerifyToken,
             });
         } catch (err) {
             console.log(err);

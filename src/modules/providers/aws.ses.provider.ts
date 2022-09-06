@@ -34,7 +34,7 @@ export class AwsSesProvider {
         return AwsSesProvider.ses;
     }
 
-    public sendEmail(toEmail: string, message: string) {
+    public sendVerifyCode(toEmail: string, emailVerifyCode: string) {
         const ses = this.getSesInstance();
         ses.sendEmail({
             Source: "workstation19961002@gmail.com",
@@ -46,12 +46,12 @@ export class AwsSesProvider {
                 Body: {
                     Html: {
                         Charset: "UTF-8",
-                        Data: "This is the body of my email" + message,
+                        Data: `다음의 인증번호 [${emailVerifyCode}] 를 입력해주세요.`,
                     },
                 },
                 Subject: {
                     Charset: "UTF-8",
-                    Data: `Hello this is subject`,
+                    Data: `Cupicks! 에서 이메일 중복확인이 실행되었습니다.`,
                 },
             },
         });
