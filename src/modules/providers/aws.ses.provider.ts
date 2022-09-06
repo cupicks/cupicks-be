@@ -34,6 +34,14 @@ export class AwsSesProvider {
         return AwsSesProvider.ses;
     }
 
+    public getRandomSixDigitsVerifiedCode(): string {
+        let emailVerifyCode = "";
+        for (let i = 0; i < 6; i++) {
+            emailVerifyCode += Math.floor(Math.random() * 10);
+        }
+        return emailVerifyCode;
+    }
+
     public sendVerifyCode(toEmail: string, emailVerifyCode: string) {
         const ses = this.getSesInstance();
         ses.sendEmail({
