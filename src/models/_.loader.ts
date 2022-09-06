@@ -20,7 +20,12 @@ import { UserDto, IUserDto } from "./dtos/user/user.dto";
 import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
 import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
 import { PublishTokenDto, IPublishTokenDto } from "./dtos/user/publish.token.dto";
+
+import { ConfirmEmailDto, IConfirmEmailDto } from "./dtos/user/confirm.email.dto";
+import { ConfirmNicknameDto, IConfirmNicknameDto } from "./dtos/user/confirm.nickname.dto";
 import { ConfirmPasswordDto, IConfirmPasswordDto } from "./dtos/user/confirm.password.dto";
+
+import { SendEmailDto, ISendEmailDto } from "./dtos/user/send.email.dto";
 
 import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
 
@@ -46,8 +51,14 @@ export {
     ISigninUserDto,
     PublishTokenDto,
     IPublishTokenDto,
+    ConfirmEmailDto,
+    IConfirmEmailDto,
+    ConfirmNicknameDto,
+    IConfirmNicknameDto,
     ConfirmPasswordDto,
     IConfirmPasswordDto,
+    SendEmailDto,
+    ISendEmailDto,
     EditProfileDto,
     IEditProfileDto,
     CreateRecipeDto,
