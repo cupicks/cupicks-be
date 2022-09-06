@@ -11,8 +11,8 @@ export interface IConfirmEmailDto {
 export class ConfirmEmailDto implements IBaseDto, IConfirmEmailDto {
     emailVerifyCode: number;
 
-    constructor({ email }: { email: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
-        this.emailVerifyCode = +this.validateType(email);
+    constructor({ emailVerifyCode }: { emailVerifyCode: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
+        this.emailVerifyCode = +this.validateType(emailVerifyCode);
     }
 
     private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {

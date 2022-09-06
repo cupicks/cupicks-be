@@ -11,8 +11,8 @@ export interface IConfirmNicknameDto {
 export class ConfirmNicknameDto implements IBaseDto, IConfirmNicknameDto {
     nickname: string;
 
-    constructor({ email }: { email: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
-        this.nickname = this.validateType(email);
+    constructor({ nickname }: { nickname: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
+        this.nickname = this.validateType(nickname);
     }
 
     private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
