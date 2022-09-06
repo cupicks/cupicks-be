@@ -6,12 +6,12 @@ import { IBaseDto } from "../i.base.dto";
 
 export interface IConfirmEmailDto {
     email: string;
-    emailVerifyCode: number;
+    emailVerifyCode: string;
 }
 
 export class ConfirmEmailDto implements IBaseDto, IConfirmEmailDto {
     email: string;
-    emailVerifyCode: number;
+    emailVerifyCode: string;
 
     constructor({
         email,
@@ -21,7 +21,7 @@ export class ConfirmEmailDto implements IBaseDto, IConfirmEmailDto {
         emailVerifyCode: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
         this.email = this.validateType(email);
-        this.emailVerifyCode = +this.validateType(emailVerifyCode);
+        this.emailVerifyCode = this.validateType(emailVerifyCode);
     }
 
     private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
@@ -33,7 +33,7 @@ export class ConfirmEmailDto implements IBaseDto, IConfirmEmailDto {
     getJoiInstance(): ObjectSchema<ConfirmEmailDto> {
         return joi.object<ConfirmEmailDto>({
             email: joi.string().required().trim().max(100).email().message("email 은 20자 이하여야 합니다."),
-            emailVerifyCode: joi.number().required().max(999999).message("email 은 20자 이하여야 합니다."),
+            emailVerifyCode: joi.string().required().min(6).max(6).message("Verify Code 는 6자리 이여야 합니다."),
         });
     }
 }

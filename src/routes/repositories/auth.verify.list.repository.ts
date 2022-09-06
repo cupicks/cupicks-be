@@ -68,4 +68,23 @@ export class AuthVerifyListRepository {
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
+
+    public updateVerifyListByEmailAndEmailVerifyToken = async (
+        conn: PoolConnection,
+        email: string,
+        emailVerifiedDate: string,
+        emailVerifiedToken: string,
+    ): Promise<void> => {
+        const updateQuery = `UPDATE user_verify_list SET 
+                email_verified_date = "${emailVerifiedDate}", email_verified_token = "${emailVerifiedToken}", is_verified_email = ${true}
+            WHERE email = "${email}";`;
+
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [resultSetHeader, _] = updateResult;
+
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
 }

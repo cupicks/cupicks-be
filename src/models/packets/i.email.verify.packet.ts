@@ -7,10 +7,10 @@ export interface IUserVerifyListPacket extends RowDataPacket {
     emailVerifiedDate: string;
     emailVerifiedToken: string;
     emailVerifiedCode: string;
-    isVerifiedEmail: boolean;
+    isVerifiedEmail: 0 | 1;
 
     nickname: string;
     nicknameVerifiedDate: string;
     nicknameVerifiedToken: string;
-    isVerifiedNickname: boolean;
+    isVerifiedNickname: 0 | 1;
 }

@@ -1,6 +1,6 @@
 import * as jwtLib from "jsonwebtoken";
 import { AuthRepository, AuthVerifyListRepository } from "../repositories/_.exporter";
-import { AwsSesProvider, BcryptProvider, JwtProvider, MysqlProvider } from "../../modules/_.loader";
+import { AwsSesProvider, BcryptProvider, DateProvider, JwtProvider, MysqlProvider } from "../../modules/_.loader";
 import {
     ConflictException,
     ForBiddenException,
@@ -13,6 +13,7 @@ import {
     SendEmailDto,
     ConfirmEmailDto,
     ConfirmNicknameDto,
+    BadRequestException,
 } from "../../models/_.loader";
 
 export class AuthService {
@@ -20,6 +21,8 @@ export class AuthService {
     private mysqlProvider: MysqlProvider;
     private sesProvider: AwsSesProvider;
     private bcryptProvider: BcryptProvider;
+    private dateProvider: DateProvider;
+
     private authRepository: AuthRepository;
     private authVerifyListRepository: AuthVerifyListRepository;
 
@@ -28,6 +31,8 @@ export class AuthService {
         this.mysqlProvider = new MysqlProvider();
         this.sesProvider = new AwsSesProvider();
         this.bcryptProvider = new BcryptProvider();
+        this.dateProvider = new DateProvider();
+
         this.authRepository = new AuthRepository();
         this.authVerifyListRepository = new AuthVerifyListRepository();
     }
@@ -42,7 +47,7 @@ export class AuthService {
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, userDto.email);
             if (isExistsUser) throw new ConflictException(`${userDto.email} 은 사용 중입니다.`);
 
-            const date = new Date().toISOString().slice(0, 19).replace("T", " ");
+            const date = this.dateProvider.getNowDatetime();
             const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
             await conn.commit();
@@ -150,15 +155,13 @@ export class AuthService {
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, sendEmailDto.email);
             if (isExistsUser) throw new ConflictException(`${sendEmailDto.email} 은 이미 가입한 이메일입니다.`);
 
-            let emailVerifyCode = "";
-            for (let i = 0; i < 6; i++) {
-                emailVerifyCode += Math.floor(Math.random() * 10);
-            }
+            const emailVerifyCode = this.sesProvider.getRandomSixDigitsVerifiedCode();
 
             const findedUserVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
                 conn,
                 sendEmailDto.email,
             );
+
             if (findedUserVerifyList === null) {
                 await this.authVerifyListRepository.createVerifyListByEmailAndCode(
                     conn,
@@ -166,6 +169,11 @@ export class AuthService {
                     emailVerifyCode,
                 );
             } else {
+                if (findedUserVerifyList.isVerifiedEmail === 1)
+                    throw new BadRequestException(
+                        `${sendEmailDto.email} 은 ${findedUserVerifyList.emailVerifiedDate} 에 이미 인증이 완료된 사용자입니다.`,
+                    );
+
                 await this.authVerifyListRepository.updateVerifyListByIdAndCode(
                     conn,
                     findedUserVerifyList.userVerifyListId,
@@ -189,10 +197,40 @@ export class AuthService {
 
         try {
             await conn.beginTransaction();
-            await conn.commit();
-            return {
-                emailVerifyToken: "토큰",
-            };
+
+            const findedVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
+                conn,
+                confirmEmailDto.email,
+            );
+
+            if (findedVerifyList === null) {
+                throw new NotFoundException(`${confirmEmailDto.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
+            } else {
+                if (findedVerifyList.isVerifiedEmail === 1)
+                    throw new BadRequestException(
+                        `${findedVerifyList.email} 은 ${findedVerifyList.emailVerifiedDate} 에 이미 인증이 완료된 사용자입니다.`,
+                    );
+                if (findedVerifyList.emailVerifiedCode !== confirmEmailDto.emailVerifyCode)
+                    throw new BadRequestException(`인증 번호가 틀렸습니다.`);
+
+                const emailVerifyToken = this.jwtProvider.sign<jwtLib.IEmailVerifyToken>({
+                    type: "EmailVerifyToken",
+                    email: findedVerifyList.email,
+                });
+
+                const date = this.dateProvider.getNowDatetime();
+                await this.authVerifyListRepository.updateVerifyListByEmailAndEmailVerifyToken(
+                    conn,
+                    findedVerifyList.email,
+                    date,
+                    emailVerifyToken,
+                );
+
+                await conn.commit();
+                return {
+                    emailVerifyToken: emailVerifyToken,
+                };
+            }
         } catch (err) {
             await conn.rollback();
             throw err;
