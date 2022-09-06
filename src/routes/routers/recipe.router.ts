@@ -36,4 +36,11 @@ recipeRouter.patch(
     new RecipeController().likeRecipe,
 );
 
+recipeRouter.patch(
+    "/:recipeId/dislike",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().disRecipe,
+);
+
 export default recipeRouter;

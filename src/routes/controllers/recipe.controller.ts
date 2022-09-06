@@ -129,6 +129,27 @@ export default class RecipeController {
         }
     };
 
+    public disRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const recipeId: number = Number(req.params.recipeId) as number;
+
+            await this.recipeService.dislikeRecipe(userId, recipeId);
+
+            return res.status(201).json({
+                isSuccess: false,
+                message: `${recipeId}번 레시피 싫어요에 성공하였습니다.`,
+            });
+        } catch (err) {
+            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
     public errorHandler = (err: unknown): CustomException => {
         if (err instanceof CustomException) return err;
         else if (err instanceof Error) return new ValidationException(err.message);
