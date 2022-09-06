@@ -1,4 +1,4 @@
-import { Env, IJwtEnv, IMysqlEnv, IS3ConfigEnv } from "./env/env";
+import { Env, IJwtEnv, IMysqlEnv, IS3ConfigEnv, ISesConfigEnv } from "./env/env";
 import {
     CustomException,
     ValidationException,
@@ -34,6 +34,7 @@ export {
     IJwtEnv,
     IMysqlEnv,
     IS3ConfigEnv,
+    ISesConfigEnv,
     IBaseDto,
     IUserPacket,
     IUserRefresthTokenPacket,
