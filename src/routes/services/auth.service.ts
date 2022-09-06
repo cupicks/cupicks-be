@@ -238,16 +238,53 @@ export class AuthService {
             conn.release();
         }
     };
-    public confirmNickname = async (confirmNicknameDto: ConfirmNicknameDto) => {
-        console.log(confirmNicknameDto);
 
+    public confirmNickname = async (confirmNicknameDto: ConfirmNicknameDto) => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
             await conn.beginTransaction();
+
+            const isExists = await this.authRepository.isExistsByNickname(conn, confirmNicknameDto.nickname);
+            if (isExists) throw new ConflictException(`${confirmNicknameDto.nickname} 은 이미 가입한 닉네임입니다.`);
+
+            const isExistsOthersNickname = await this.authVerifyListRepository.isExistsByNicknameExceptEmail(
+                conn,
+                confirmNicknameDto.nickname,
+                confirmNicknameDto.email,
+            );
+            if (isExistsOthersNickname === true)
+                throw new ConflictException(
+                    `${confirmNicknameDto.nickname} 은 다른 사람이 중복 확인 중인 닉네임입니다.`,
+                );
+
+            const findedVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
+                conn,
+                confirmNicknameDto.email,
+            );
+            if (findedVerifyList === null)
+                throw new NotFoundException(`${confirmNicknameDto.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
+            if (findedVerifyList.isVerifiedEmail === 0)
+                throw new BadRequestException(
+                    `${confirmNicknameDto.email} 은 인증번호 확인 과정이 진행되지 않았습니다.`,
+                );
+
+            const date = this.dateProvider.getNowDatetime();
+            const nicknameVerifyToken = this.jwtProvider.sign<jwtLib.INicknameVerifyToken>({
+                type: "NicknameVerifyToken",
+                nickname: confirmNicknameDto.nickname,
+            });
+            await this.authVerifyListRepository.updateVerifyListByNickname(
+                conn,
+                confirmNicknameDto.email,
+                confirmNicknameDto.nickname,
+                date,
+                nicknameVerifyToken,
+            );
+
             await conn.commit();
             return {
-                nicknameVerifyToken: "토큰",
+                nicknameVerifyToken,
             };
         } catch (err) {
             await conn.rollback();

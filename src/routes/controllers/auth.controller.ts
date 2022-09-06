@@ -193,6 +193,7 @@ export default class AuthController {
         try {
             const confirmNicknameDto = await this.joiValidator.validateAsync<ConfirmNicknameDto>(
                 new ConfirmNicknameDto({
+                    email: req?.query["email"],
                     nickname: req?.query["nickname"],
                 }),
             );
