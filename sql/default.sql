@@ -4,7 +4,6 @@ DROP DATABASE IF EXISTS cupick;
 CREATE DATABASE IF NOT EXISTS cupick;
 USE cupick;
 
-
 -- 차차상위 user + recipe 엔티티 제거
 
 DROP TABLE IF EXISTS user_recipe;
@@ -30,17 +29,38 @@ DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS recipe;
 
+DROP TABLE IF EXISTS user_verify_list;
 
+
+-- 이메일 인증 A
+-- 닉네임 인증 B
+
+
+CREATE TABLE IF NOT EXISTS user_verify_list (
+    user_verify_list_id     INT              NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    email                   VARCHAR(20)      NULL,
+    email_verified_date     DATETIME         NULL,
+    email_verified_token    VARCHAR(1000)    NULL,
+    is_verified_email       BOOLEAN          DEFAULT 0,
+    nickname                VARCHAR(20)      NULL,
+    nickname_verified_date  DATETIME         NULL,
+    nickname_verified_token VARCHAR(1000)    NULL,
+    is_verified_nickname    BOOLEAN          DEFAULT 0
+);
 
 CREATE TABLE IF NOT EXISTS user (
-    user_id         INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
-    email           VARCHAR(20)     NOT NULL    UNIQUE,
-    nickname        VARCHAR(10)     NOT NULL    UNIQUE,
-    password        VARCHAR(255)    NOT NULL,
-    image_url       VARCHAR(255)    NULL,
-    refresh_token   VARCHAR(1000)   NULL,
-    created_at      DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP
+    user_id             INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    user_verify_list_id INT             NOT NULL,
+    email               VARCHAR(20)     NOT NULL    UNIQUE,
+    nickname            VARCHAR(10)     NOT NULL    UNIQUE,
+    password            VARCHAR(255)    NOT NULL,
+    image_url           VARCHAR(255)    NULL,
+    refresh_token       VARCHAR(1000)   NULL,
+    created_at          DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    updated_at          DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_verify_list_id) REFERENCES user_verify_list (user_verify_list_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS recipe (
@@ -121,7 +141,7 @@ CREATE TABLE IF NOT EXISTS user_disfavor_recipe (
 -- comment 관련
 
 CREATE TABLE IF NOT EXISTS comment (
-    comment_id  INT                 NOT NULL    PRIMARY KEY,
+    comment_id  INT                 NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     comment     VARCHAR(150)        NOT NULL,
     image_url   VARCHAR(255)             NULL,
     created_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
@@ -129,7 +149,7 @@ CREATE TABLE IF NOT EXISTS comment (
 );
 
 CREATE TABLE IF NOT EXISTS recipe_comment (
-    user_recipe_id      INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    recipe_comment_id      INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     user_id             INT         NOT NULL,
     recipe_id            INT         NOT NULL,
     comment_id          INT         NOT NULL,
