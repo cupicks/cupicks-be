@@ -17,6 +17,7 @@ export const preventUnLoginUserGuard: RequestHandler = (req: Request, res: Respo
         const payload = jwtProvider.verifyToken<jwtLib.IAccessTokenPayload>(jwtProvider.extractToken(bearerToken));
 
         res.locals.userId = payload.userId;
+        res.locals.nickname = payload.nickname;
 
         return next();
     } catch (err) {

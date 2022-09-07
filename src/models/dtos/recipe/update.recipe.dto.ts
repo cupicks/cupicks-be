@@ -2,19 +2,11 @@ import * as joi from "joi";
 import { ObjectSchema } from "joi";
 
 import { IngredientDto } from "./ingredient.dto";
+import { ICreateRecipeDto } from "./create.recipe.dto";
 
 import { IBaseDto } from "../i.base.dto";
 
-export interface ICreateRecipeDto {
-    title: string;
-    content: string;
-    isIced: boolean;
-    cupSize?: number;
-    isPublic: boolean;
-    ingredientList: IngredientDto[];
-}
-
-export class CreateRecipeDto implements IBaseDto {
+export class UpdateRecipeDto implements IBaseDto {
     title: string;
     content: string;
     isIced: boolean;
@@ -22,23 +14,21 @@ export class CreateRecipeDto implements IBaseDto {
     isPublic: boolean;
     ingredientList: IngredientDto[];
 
-    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [] }: ICreateRecipeDto) {
+    constructor({ title, content, isIced, isPublic, ingredientList = [] }: Omit<ICreateRecipeDto, "cupSize">) {
         this.title = title;
         this.content = content;
         this.isIced = isIced;
-        this.cupSize = cupSize;
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
 
         // 클래스가 아닙니다.
     }
 
-    getJoiInstance(): ObjectSchema<CreateRecipeDto> {
-        return joi.object<CreateRecipeDto>({
+    getJoiInstance(): ObjectSchema<UpdateRecipeDto> {
+        return joi.object<UpdateRecipeDto>({
             title: joi.string().trim().min(2).max(20).required(),
-            content: joi.string().trim().max(255).required(),
+            content: joi.string().trim().min(2).max(255).required(),
             isIced: joi.boolean().required(),
-            cupSize: joi.string().equal(355, 473, 591).required(),
             isPublic: joi.boolean().required(),
             ingredientList: joi.array().items(
                 joi.object({

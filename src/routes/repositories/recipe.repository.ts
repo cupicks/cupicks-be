@@ -1,7 +1,62 @@
-import { CreateRecipeDto } from "../../models/_.loader";
-import { PoolConnection, ResultSetHeader } from "mysql2/promise";
+import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
+import { PoolConnection, ResultSetHeader, FieldPacket } from "mysql2/promise";
+import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeRepository {
+    public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<any> => {
+        const query = `
+            SELECT 
+            *
+            FROM
+                (
+                SELECT R.recipe_id
+                FROM recipe R
+                ) R
+            LEFT JOIN 
+                (
+                SELECT U.recipe_id, U.user_id
+                FROM user_recipe U
+                ) U
+            ON R.recipe_id = U.recipe_id AND R.recipe_id = ?
+            WHERE U.user_id = ?
+        `;
+
+        const [result] = await conn.query(query, [recipeId, userId]);
+
+        return result;
+    };
+
+    public findRecipeById = async (
+        conn: PoolConnection,
+        recipeId: number,
+    ): Promise<IRecipeResponseCustom | ResultSetHeader> => {
+        const query = `
+            SELECT *
+            FROM recipe
+            WHERE recipe_id = ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, recipeId);
+
+        return result;
+    };
+
+    public existLikeRecipeById = async (
+        conn: PoolConnection,
+        userId: number,
+        recipeId: number,
+    ): Promise<IRecipeResponseCustom | ResultSetHeader> => {
+        const query = `
+            SELECT *
+            FROM user_like_recipe
+            WHERE user_id = ? AND recipe_id = ?;
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+
+        return result;
+    };
+
     public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
         const query = `
             INSERT INTO recipe
@@ -19,24 +74,23 @@ export class RecipeRepository {
         return insertId;
     };
 
-    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: any): Promise<number> => {
+    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: Array<object>) => {
         const query = `
             INSERT INTO recipe_ingredient SET ?
         `;
 
-        let total: number = 0;
+        let total = 0;
 
         for (let i = 0; i < ingredientList.length; i++) {
             const result = await conn.query<ResultSetHeader>(query, ingredientList[i]);
 
             const resultSetHeader = result[0];
             const { affectedRows } = resultSetHeader;
+
             total += affectedRows;
 
             if (total > 20) throw new Error("protected");
         }
-
-        return ingredientList[0].recipe_id;
     };
 
     public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
@@ -55,5 +109,123 @@ export class RecipeRepository {
         if (affectedRows > 1) throw new Error("protected");
 
         return JSON.stringify(result[0].insertId);
+    };
+
+    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<any> => {
+        const query = `
+        SELECT 
+            R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
+            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount"
+        FROM 
+            (
+                SELECT *
+                FROM recipe R
+            ) R
+        RIGHT JOIN
+            (
+                SELECT *
+                FROM recipe_ingredient I
+            ) I
+        ON R.recipe_id = I.recipe_id
+        WHERE R.recipe_id = ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, recipeId);
+
+        return result;
+    };
+
+    public getRecipes = async (conn: PoolConnection, page?: number, count?: number): Promise<any> => {
+        const query = `
+            SELECT 
+                R.recipe_id, R.title, R.content,
+                I.ingredient_name, I.ingredient_color, I.ingredient_amount
+            FROM
+                (
+                SELECT R.recipe_id, R.title, R.content, R.cup_size, R.is_iced, R.is_public, R.created_at, R.updated_at
+                FROM recipe R
+                ) R
+            RIGHT JOIN
+                (
+                SELECT I.recipe_id, I.ingredient_name, I.ingredient_color, I.ingredient_amount
+                FROM recipe_ingredient I
+                ) I
+            ON R.recipe_id = I.recipe_id; 
+        `;
+
+        const [result] = await conn.query(query);
+
+        return result;
+    };
+
+    public deleteRecipe = async (conn: PoolConnection, recipeId: number): Promise<object> => {
+        const query = `
+            DELETE FROM recipe
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
+
+        return result;
+    };
+
+    public deleteRecipeIngredient = async (conn: PoolConnection, recipeId: number) => {
+        const query = `
+            DELETE FROM recipe_ingredient
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
+
+        return result;
+    };
+
+    public updateRecipe = async (
+        conn: PoolConnection,
+        updateRecipeDto: UpdateRecipeDto,
+        recipeId: number,
+    ): Promise<object> => {
+        const query = `
+            UPDATE recipe
+            SET
+                title = ?, content = ?, is_iced = ?, is_public = ?
+            WHERE recipe_id = ?
+        `;
+
+        const [result] = await conn.query(query, [
+            updateRecipeDto.title,
+            updateRecipeDto.content,
+            updateRecipeDto.isIced,
+            updateRecipeDto.isPublic,
+            recipeId,
+        ]);
+
+        return result;
+    };
+
+    public likeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+        const query = `
+            INSERT INTO user_like_recipe
+                (user_id, recipe_id)
+            VALUES
+                (?, ?);
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+
+        return true;
+    };
+
+    public disRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+        const query = `
+            DELETE FROM user_like_recipe
+            WHERE user_id = ? AND recipe_id = ?
+        `;
+
+        console.log(userId, recipeId);
+
+        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+
+        return true;
     };
 }

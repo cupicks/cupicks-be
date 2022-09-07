@@ -26,6 +26,14 @@ export interface IS3ConfigEnv {
     BUCKET: string;
 }
 
+export interface ISesConfigEnv {
+    SES_API_VERSION: string;
+    SES_API_REGION: string;
+    SES_ACCESS_KEY: string;
+    SES_SECRET_KEY: string;
+    SES_SENDER_EMAIL: string;
+}
+
 export class Env {
     PORT;
 
@@ -36,6 +44,7 @@ export class Env {
     JWT: IJwtEnv;
     MYSQL: IMysqlEnv;
     S3: IS3ConfigEnv;
+    SES: ISesConfigEnv;
 
     constructor() {
         this.PORT = this.getEnvNumberValue("PORT");
@@ -66,6 +75,14 @@ export class Env {
             S3_SECRET_KEY: this.getEnvStringValue("S3_SECRET_KEY"),
             REGION: this.getEnvStringValue("REGION"),
             BUCKET: this.getEnvStringValue("BUCKET"),
+        };
+
+        this.SES = {
+            SES_API_VERSION: this.getEnvStringValue("SES_API_VERSION"),
+            SES_API_REGION: this.getEnvStringValue("SES_API_REGION"),
+            SES_ACCESS_KEY: this.getEnvStringValue("SES_ACCESS_KEY"),
+            SES_SECRET_KEY: this.getEnvStringValue("SES_SECRET_KEY"),
+            SES_SENDER_EMAIL: this.getEnvStringValue("SES_SENDER_EMAIL"),
         };
     }
 

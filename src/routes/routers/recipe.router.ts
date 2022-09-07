@@ -1,18 +1,48 @@
 import { Router } from "express";
 
-import RecipeController from "../controllers/recipe.controller";
+import { RecipeController } from "../controllers/_.exporter";
 import { applicationJsonFilter } from "../../middlewares/filters/_.exporter";
-import { MulterProvider } from "../../modules/_.loader";
 import { preventUnLoginUserGuard } from "../../middlewares/guards/_.exporter";
 
 const recipeRouter: Router = Router();
 
+recipeRouter.get("/", applicationJsonFilter, new RecipeController().getRecipes);
+
+recipeRouter.get("/:recipeId", applicationJsonFilter, new RecipeController().getRecipe);
+
 recipeRouter.post(
     "/",
     applicationJsonFilter,
-    preventUnLoginUserGuard,
-    MulterProvider.uploadSingle,
+    // preventUnLoginUserGuard,
     new RecipeController().createRecipe,
+);
+
+recipeRouter.put(
+    "/:recipeId",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().updatedRecipe,
+);
+
+recipeRouter.delete(
+    "/:recipeId",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().deleteRecipe,
+);
+
+recipeRouter.patch(
+    "/:recipeId/like",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().likeRecipe,
+);
+
+recipeRouter.patch(
+    "/:recipeId/dislike",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().disRecipe,
 );
 
 export default recipeRouter;
