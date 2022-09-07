@@ -8,7 +8,8 @@ export const formDataFilter: RequestHandler = (req: Request, res: Response, next
     // /api/auth/signin
     const originUrlExceptQuery: string = originUrl.split("?")[0];
 
-    const contentType = req.headers["content-type"];
+    const contentTypeList = req.headers["content-type"];
+    const contentType = contentTypeList?.split(";")[0];
 
     if (contentType === undefined) {
         return res
