@@ -1,10 +1,10 @@
-import { RequestHandler, Request, Response, NextFunction, json } from "express";
+import { RequestHandler, Request, Response } from "express";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
 import { CreateCommentDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { CommentService } from "../services/_.exporter";
-import { IResponse, IResponseCustom } from "../../constants/_.loader";
+import { IRecipeResponseCustom, IResponse, IResponseCustom } from "../../constants/_.loader";
 
 export default class CommentController {
     private commentService: CommentService;
@@ -13,17 +13,17 @@ export default class CommentController {
         this.commentService = new CommentService();
     }
 
-    public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    public createComment: RequestHandler = async (req: Request, res: Response): Promise<object> => {
         try {
             const file = req.file as Express.MulterS3.File;
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
 
-            const userId: number = res.locals.userId === undefined ? 1 : Number(res.locals.userId);
-            const nickname: string = res.locals.nickname === undefined ? "관리자" : res.locals.nickname;
+            const userId: number = res.locals.userId;
+            const nickname: string = res.locals.nickname;
 
-            const recipeId: number = Number(req.query!.recipeId);
-            const comment: string = req.query!.comment as string;
+            const recipeId = Number(req.query.recipeId);
+            const comment = req.query.comment as string;
 
             if (!recipeId && !comment) throw new Error("protected");
 
@@ -63,18 +63,14 @@ export default class CommentController {
         }
     };
 
-    public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
+    public deleteComment: RequestHandler = async (req: Request, res: Response): Promise<object> => {
         try {
-            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
+            const userId = res.locals.userId;
             const commentId: number = Number(req.params.commentId) as number;
 
             if (!commentId) throw new Error("protected");
 
             const deleteComment = await this.commentService.deleteComment(userId, commentId);
-
-            if (deleteComment === "undefined") {
-                throw new Error("here");
-            }
 
             return res.status(200).json({
                 isSuccess: true,
@@ -89,16 +85,16 @@ export default class CommentController {
         }
     };
 
-    public updateComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public updateComment: RequestHandler = async (req: Request, res: Response) => {
         try {
             const file = req.file as Express.MulterS3.File;
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
 
-            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
-            const nickname: string = res.locals.nickname === undefined ? "관리자" : res.locals.nickname;
-            const commentId: number = parseInt(req.params.commentId) as number;
-            const comment: string = req.query.comment as string;
+            const userId = res.locals.userId;
+            const nickname = res.locals.nickname;
+            const commentId = parseInt(req.params.commentId) as number;
+            const comment = req.query.comment as string;
 
             if (!commentId) throw new Error("protected");
 
@@ -125,16 +121,15 @@ export default class CommentController {
         }
     };
 
-    public getComments: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public getComments: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
-            const nickname: string = res.locals.nickname === undefined ? "관리자" : res.locals.nickname;
+            const nickname = res.locals.nickname;
 
-            const recipeId: number = Number(req.query.recipeId) as number;
-            const page: number = Number(req.query.page) as number;
-            const count: number = Number(req.query.count) as number;
+            const recipeId = Number(req.query.recipeId) as number;
+            const page = Number(req.query.page) as number;
+            const count = Number(req.query.count) as number;
 
-            const result: IResponseCustom = (await this.commentService!.getComments(recipeId, page, count)) as any;
+            const result: IResponseCustom = await this.commentService.getComments(recipeId, page, count);
 
             const responseData: object = result.map((e) => {
                 return {

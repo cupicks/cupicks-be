@@ -52,7 +52,7 @@ export class CommentService {
         }
     };
 
-    public deleteComment = async (userId: number, commentId: number): Promise<any> => {
+    public deleteComment = async (userId: number, commentId: number): Promise<void> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
