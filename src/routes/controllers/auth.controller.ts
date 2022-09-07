@@ -98,7 +98,7 @@ export default class AuthController {
 
             return res.json({
                 isSuccess: true,
-                message: "토큰 발행에 성공하셨습니다.",
+                message: "토큰 재발행에 성공하셨습니다.",
                 accessToken,
             });
         } catch (err) {
