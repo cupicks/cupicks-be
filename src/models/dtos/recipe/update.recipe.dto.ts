@@ -6,7 +6,9 @@ import { ICreateRecipeDto } from "./create.recipe.dto";
 
 import { IBaseDto } from "../i.base.dto";
 
-export class UpdateRecipeDto implements IBaseDto {
+import { RequestQueryExtractor } from "../request.query.extractor";
+
+export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IBaseDto {
     title: string;
     content: string;
     isIced: boolean;
@@ -15,6 +17,7 @@ export class UpdateRecipeDto implements IBaseDto {
     ingredientList: IngredientDto[];
 
     constructor({ title, content, isIced, isPublic, ingredientList = [] }: Omit<ICreateRecipeDto, "cupSize">) {
+        super();
         this.title = title;
         this.content = content;
         this.isIced = isIced;
