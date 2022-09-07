@@ -12,7 +12,7 @@ commentRouter.get("/", applicationJsonFilter, new CommentController().getComment
 commentRouter.post(
     "/",
     formDataFilter,
-    // preventUnLoginUserGuard,
+    preventUnLoginUserGuard,
     multerMiddleware,
     new CommentController().createComment,
 );
@@ -20,14 +20,14 @@ commentRouter.post(
 commentRouter.delete(
     "/:commentId",
     applicationJsonFilter,
-    // preventUnLoginUserGuard,
+    preventUnLoginUserGuard,
     new CommentController().deleteComment,
 );
 
 commentRouter.put(
     "/:commentId",
     formDataFilter,
-    // preventUnLoginUserGuard,
+    preventUnLoginUserGuard,
     multerMiddleware,
     new CommentController().updateComment,
 );

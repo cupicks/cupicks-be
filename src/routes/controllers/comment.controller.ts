@@ -21,7 +21,6 @@ export default class CommentController {
             const imageLocation = file?.location.length > 0 ? file.location : null;
 
             // const userId: number = res.locals.userId;
-            const userId: number = 1;
             const nickname: string = res.locals.nickname;
 
             const recipeId: number = Number(req.query!.recipeId);
