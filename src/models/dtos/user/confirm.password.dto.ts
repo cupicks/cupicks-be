@@ -3,13 +3,14 @@ import { ParsedQs } from "qs";
 import { ObjectSchema, string } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
+import { RequestQueryExtractor } from "../request.query.extractor";
 
 export interface IConfirmPasswordDto {
     userId: number;
     password: string;
 }
 
-export class ConfirmPasswordDto implements IBaseDto, IConfirmPasswordDto {
+export class ConfirmPasswordDto extends RequestQueryExtractor<"password"> implements IBaseDto, IConfirmPasswordDto {
     userId: number;
     password: string;
 
@@ -20,14 +21,9 @@ export class ConfirmPasswordDto implements IBaseDto, IConfirmPasswordDto {
         password: string | string[] | ParsedQs | ParsedQs[] | undefined;
         userId: number;
     }) {
+        super();
         this.userId = userId;
-        this.password = this.validateType(password);
-    }
-
-    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
-        if (value === undefined) throw new Error("값 누락");
-        else if (typeof value === "string") return value;
-        else throw new Error("값 오류");
+        this.password = this.validateType(password, "password");
     }
 
     getJoiInstance(): ObjectSchema<ConfirmPasswordDto> {

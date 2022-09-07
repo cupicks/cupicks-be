@@ -2,17 +2,19 @@ import * as joi from "joi";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
+import { RequestQueryExtractor } from "../request.query.extractor";
 
 export interface ISigninUserDto {
     email: string;
     password: string;
 }
 
-export class SigninUserDto implements IBaseDto, ISigninUserDto {
+export class SigninUserDto extends RequestQueryExtractor<string> implements IBaseDto, ISigninUserDto {
     email: string;
     password: string;
 
     constructor({ email, password }: ISigninUserDto) {
+        super();
         this.email = email;
         this.password = password;
     }
