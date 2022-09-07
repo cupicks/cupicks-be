@@ -30,6 +30,8 @@ import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
 import { UpdateRecipeDto } from "./dtos/recipe/update.recipe.dto";
+import { CommonRecipeDto } from "./dtos/recipe/common.recipe.dts";
+import { DeleteRecipeDto } from "./dtos/recipe/delete.recipe.dto";
 // COMMENT
 import { CreateCommentDto } from "./dtos/comment/create.comment.dto";
 import { DeleteCommentDto } from "./dtos/comment/delete.comment.dto";
@@ -75,6 +77,8 @@ export {
     UpdateRecipeDto,
     IngredientDto,
     IIngredientDto,
+    CommonRecipeDto,
+    DeleteRecipeDto,
     // COMMENT
     CreateCommentDto,
     DeleteCommentDto,

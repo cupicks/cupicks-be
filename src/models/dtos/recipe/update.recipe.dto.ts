@@ -15,14 +15,22 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
     cupSize?: number;
     isPublic: boolean;
     ingredientList: IngredientDto[];
+    userId: number;
+    recipeId: number;
 
-    constructor({ title, content, isIced, isPublic, ingredientList = [] }: Omit<ICreateRecipeDto, "cupSize">) {
+    constructor(
+        { title, content, isIced, isPublic, ingredientList = [] }: Omit<ICreateRecipeDto, "cupSize">,
+        userId: number,
+        recipeId: number,
+    ) {
         super();
         this.title = title;
         this.content = content;
         this.isIced = isIced;
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
+        this.userId = userId;
+        this.recipeId = recipeId;
 
         // 클래스가 아닙니다.
     }
@@ -51,6 +59,8 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
                     ingredientAmount: joi.number().max(1000).required(),
                 }),
             ),
+            userId: joi.number().min(1).required(),
+            recipeId: joi.number().min(1).required(),
         });
     }
 }
