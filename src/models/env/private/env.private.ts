@@ -30,7 +30,11 @@ function getEnvNumberValue(KEY: string): number {
 }
 
 function getPemKey(KEY: "private" | "public"): string {
-    return fs.readFileSync(path.join(process.cwd(), `${KEY}.pem`), "utf8");
+    const pemKey = fs.readFileSync(path.join(process.cwd(), `${KEY}.pem`), "utf8");
+
+    console.log(path.join(process.cwd(), `${KEY}.pem`));
+
+    return pemKey;
 }
 
 function getEnvLiteralTypeValue<T extends TALGORITHM>(KEY: string) {
