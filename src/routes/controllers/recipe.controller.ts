@@ -13,9 +13,10 @@ export default class RecipeController {
         this.recipeService = new RecipeService();
     }
 
+    // 정상
     public createRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
 
             const validator = await new JoiValidator().validateAsync<CreateRecipeDto>(new CreateRecipeDto(req.body));
 
@@ -35,6 +36,7 @@ export default class RecipeController {
         }
     };
 
+    // 정상
     public getRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const recipeId: number = Number(req.params.recipeId) as number;
@@ -67,6 +69,7 @@ export default class RecipeController {
         }
     };
 
+    // X
     public getRecipes: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.query.page && !req.query.count) throw new Error("페이지 번호나 개수를 확인해 주세요.");
@@ -92,9 +95,10 @@ export default class RecipeController {
         }
     };
 
+    // 정상
     public deleteRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
             const recipeId: number = Number(req.params.recipeId) as number;
 
             const result: boolean | undefined = await this.recipeService.deleteRecipe(recipeId, userId);
@@ -115,9 +119,10 @@ export default class RecipeController {
         }
     };
 
+    // 정상
     public updatedRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
             const recipeId: number = Number(req.params.recipeId) as number;
 
             const validator: UpdateRecipeDto = await new JoiValidator().validateAsync<UpdateRecipeDto>(
@@ -141,9 +146,10 @@ export default class RecipeController {
         }
     };
 
+    // 정상
     public likeRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
             const recipeId: number = Number(req.params.recipeId) as number;
 
             const result = await this.recipeService.likeRecipe(userId, recipeId);
@@ -162,9 +168,10 @@ export default class RecipeController {
         }
     };
 
+    // 정상
     public disRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
             const recipeId: number = Number(req.params.recipeId) as number;
 
             await this.recipeService.dislikeRecipe(userId, recipeId);

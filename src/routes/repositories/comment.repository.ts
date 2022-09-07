@@ -84,7 +84,7 @@ export class CommentRepository {
         return result;
     };
 
-    public deleteComment = async (conn: PoolConnection, commentId: number): Promise<any> => {
+    public deleteComment = async (conn: PoolConnection, commentId: number): Promise<ResultSetHeader | null> => {
         const query = `
             DELETE FROM comment
             WHERE comment_id = ?;

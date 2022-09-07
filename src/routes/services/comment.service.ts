@@ -2,6 +2,7 @@ import { CreateCommentDto } from "../../models/_.loader";
 import { CommentRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
 import { MulterProvider } from "../../modules/_.loader";
+import { IResponse, IResponseCustom } from "../../constants/_.loader";
 
 export class CommentService {
     private commentRepository: CommentRepository;
@@ -45,7 +46,7 @@ export class CommentService {
             };
         } catch (err) {
             await conn.rollback();
-            console.error(err);
+            throw err;
         } finally {
             await conn.release();
         }
@@ -60,7 +61,7 @@ export class CommentService {
 
             const isAuthenticated: number = result[0].userId as number;
 
-            if (userId !== isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
+            if (userId !== isAuthenticated && !isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
 
             const findCommentById = await this.commentRepository.findCommentByCommentId(conn, commentId);
 
@@ -73,10 +74,10 @@ export class CommentService {
 
             await this.commentRepository.deleteComment(conn, commentId);
 
-            return await conn.commit();
+            await conn.commit();
         } catch (err) {
             await conn.rollback();
-            console.error(err);
+            throw err;
         } finally {
             await conn.release();
         }
@@ -87,7 +88,7 @@ export class CommentService {
         comment: string,
         imageLocation: string | null,
         commentId: number,
-    ): Promise<any> => {
+    ): Promise<IResponse> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             const date = new Date().toISOString().slice(0, 19).replace("T", " ");

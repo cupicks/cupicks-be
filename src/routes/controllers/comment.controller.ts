@@ -1,5 +1,4 @@
 import { RequestHandler, Request, Response, NextFunction, json } from "express";
-import { number } from "joi";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
 import { CreateCommentDto } from "../../models/_.loader";
@@ -14,15 +13,14 @@ export default class CommentController {
         this.commentService = new CommentService();
     }
 
-    public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
+    public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
         try {
             const file = req.file as Express.MulterS3.File;
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
 
-            // const userId: number = res.locals.userId;
-            const userId: number = 1;
-            const nickname: string = res.locals.nickname;
+            const userId: number = res.locals.userId === undefined ? 1 : Number(res.locals.userId);
+            const nickname: string = res.locals.nickname === undefined ? "관리자" : res.locals.nickname;
 
             const recipeId: number = Number(req.query!.recipeId);
             const comment: string = req.query!.comment as string;
@@ -67,7 +65,7 @@ export default class CommentController {
 
     public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
         try {
-            const userId: number = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
             const commentId: number = Number(req.params.commentId) as number;
 
             if (!commentId) throw new Error("protected");
@@ -97,8 +95,8 @@ export default class CommentController {
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
 
-            const userId: number = res.locals.userId !== "undefined" ? "1" : res.locals.userId;
-            const nickname = res.locals.nickname !== "undefined" ? "관리자" : res.locals.nickname;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
+            const nickname: string = res.locals.nickname === undefined ? "관리자" : res.locals.nickname;
             const commentId: number = parseInt(req.params.commentId) as number;
             const comment: string = req.query.comment as string;
 
@@ -129,8 +127,8 @@ export default class CommentController {
 
     public getComments: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId: string | number = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
-            const nickname: string | number = res.locals.nickname !== "undefined" ? "admin" : res.locals.nickname;
+            const userId: number = res.locals.userId === undefined ? 1 : res.locals.userId;
+            const nickname: string = res.locals.nickname === undefined ? "관리자" : res.locals.nickname;
 
             const recipeId: number = Number(req.query.recipeId) as number;
             const page: number = Number(req.query.page) as number;
