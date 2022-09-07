@@ -32,8 +32,6 @@ function getEnvNumberValue(KEY: string): number {
 function getPemKey(KEY: "private" | "public"): string {
     const pemKey = fs.readFileSync(path.join(process.cwd(), `${KEY}.pem`), "utf8");
 
-    console.log(path.join(process.cwd(), `${KEY}.pem`));
-
     return pemKey;
 }
 

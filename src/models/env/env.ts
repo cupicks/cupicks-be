@@ -51,7 +51,7 @@ export class Env {
 
         this.SALT = this.getEnvNumberValue("SALT");
 
-        this.CORS_ORIGIN_LIST = [this.getEnvStringValue("CORS_ORIGIN_ONE")];
+        this.CORS_ORIGIN_LIST = [this.getEnvStringValue("CORS_ORIGIN_ONE"), this.getEnvStringValue("CORS_ORIGIN_TWO")];
 
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
