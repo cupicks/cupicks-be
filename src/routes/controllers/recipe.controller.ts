@@ -4,6 +4,7 @@ import { CustomException, UnkownTypeError, ValidationException } from "../../mod
 import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
+import { IRecipeIngredientCustom } from "../../constants/_.loader";
 
 export default class RecipeController {
     private recipeService: RecipeService;
@@ -26,6 +27,38 @@ export default class RecipeController {
                 recipeId: createRecipe,
             });
         } catch (err) {
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public getRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const recipeId: number = Number(req.params.recipeId) as number;
+
+            const getRecipe: IRecipeIngredientCustom = await this.recipeService.getRecipe(recipeId);
+
+            return res.status(200).json({
+                recipeId: getRecipe[0].recipeId,
+                title: getRecipe[0].title,
+                content: getRecipe[0].content,
+                isIced: getRecipe[0].isIced,
+                cupSize: getRecipe[0].cupSize,
+                createdAt: getRecipe[0].createdAt,
+                updatedAt: getRecipe[0].updatedAt,
+                ingredientList: getRecipe.map((e) => {
+                    return {
+                        ingredientName: e.ingredientName,
+                        ingredientColor: e.ingredientColor,
+                        ingredientAmount: e.ingredientAmount,
+                    };
+                }),
+            });
+        } catch (err) {
+            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -118,6 +151,27 @@ export default class RecipeController {
             return res.status(201).json({
                 isSuccess: false,
                 message: `${recipeId}번 레시피 좋아요에 성공하였습니다.`,
+            });
+        } catch (err) {
+            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public disRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const recipeId: number = Number(req.params.recipeId) as number;
+
+            await this.recipeService.dislikeRecipe(userId, recipeId);
+
+            return res.status(201).json({
+                isSuccess: false,
+                message: `${recipeId}번 레시피 싫어요에 성공하였습니다.`,
             });
         } catch (err) {
             console.log(err);

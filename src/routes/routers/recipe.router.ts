@@ -8,6 +8,8 @@ const recipeRouter: Router = Router();
 
 recipeRouter.get("/", applicationJsonFilter, new RecipeController().getRecipes);
 
+recipeRouter.get("/:recipeId", applicationJsonFilter, new RecipeController().getRecipe);
+
 recipeRouter.post(
     "/",
     applicationJsonFilter,
@@ -34,6 +36,13 @@ recipeRouter.patch(
     applicationJsonFilter,
     // preventUnLoginUserGuard,
     new RecipeController().likeRecipe,
+);
+
+recipeRouter.patch(
+    "/:recipeId/dislike",
+    applicationJsonFilter,
+    // preventUnLoginUserGuard,
+    new RecipeController().disRecipe,
 );
 
 export default recipeRouter;

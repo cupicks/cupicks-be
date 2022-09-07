@@ -6,4 +6,19 @@ interface IRecipeResponse extends RowDataPacket {
     recipe_id: number;
 }
 
+interface IRecipeIngredient {
+    recipeId: number;
+    title: string;
+    content: string;
+    isIced: boolean;
+    cupSize: string;
+    createdAt: string;
+    updatedAt: string;
+    ingredientName: string;
+    ingredientColor: string;
+    ingredientAmount: string;
+}
+
 export interface IRecipeResponseCustom extends Array<IRecipeResponse> {}
+
+export interface IRecipeIngredientCustom extends Array<IRecipeIngredient> {}
