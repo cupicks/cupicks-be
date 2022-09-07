@@ -98,7 +98,7 @@ export default class AuthController {
 
             return res.json({
                 isSuccess: true,
-                message: "엑세스 토큰 발행에 성공하셨습니다.",
+                message: "토큰 재발행에 성공하셨습니다.",
                 accessToken,
             });
         } catch (err) {
@@ -204,7 +204,7 @@ export default class AuthController {
 
             return res.json({
                 isSuccess: true,
-                message: "사용자 이메일 인증이 완료되었습니다.",
+                message: "사용자 닉네임 중복확인이 완료되었습니다.",
                 nicknameVerifyToken: nicknameVerifyToken,
             });
         } catch (err) {

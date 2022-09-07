@@ -10,38 +10,23 @@ recipeRouter.get("/", applicationJsonFilter, new RecipeController().getRecipes);
 
 recipeRouter.get("/:recipeId", applicationJsonFilter, new RecipeController().getRecipe);
 
-recipeRouter.post(
-    "/",
-    applicationJsonFilter,
-    // preventUnLoginUserGuard,
-    new RecipeController().createRecipe,
-);
+recipeRouter.post("/", applicationJsonFilter, preventUnLoginUserGuard, new RecipeController().createRecipe);
 
-recipeRouter.put(
-    "/:recipeId",
-    applicationJsonFilter,
-    // preventUnLoginUserGuard,
-    new RecipeController().updatedRecipe,
-);
+recipeRouter.put("/:recipeId", applicationJsonFilter, preventUnLoginUserGuard, new RecipeController().updatedRecipe);
 
-recipeRouter.delete(
-    "/:recipeId",
-    applicationJsonFilter,
-    // preventUnLoginUserGuard,
-    new RecipeController().deleteRecipe,
-);
+recipeRouter.delete("/:recipeId", applicationJsonFilter, preventUnLoginUserGuard, new RecipeController().deleteRecipe);
 
 recipeRouter.patch(
     "/:recipeId/like",
     applicationJsonFilter,
-    // preventUnLoginUserGuard,
+    preventUnLoginUserGuard,
     new RecipeController().likeRecipe,
 );
 
 recipeRouter.patch(
     "/:recipeId/dislike",
     applicationJsonFilter,
-    // preventUnLoginUserGuard,
+    preventUnLoginUserGuard,
     new RecipeController().disRecipe,
 );
 

@@ -23,7 +23,7 @@ export default class RecipeController {
 
             return res.status(201).json({
                 isSuccess: true,
-                message: "레시피 작성에 성공하였습니다.",
+                message: "레시피 등록에 성공하셨습니다",
                 recipeId: createRecipe,
             });
         } catch (err) {
@@ -42,20 +42,24 @@ export default class RecipeController {
             const getRecipe: IRecipeIngredientCustom = await this.recipeService.getRecipe(recipeId);
 
             return res.status(200).json({
-                recipeId: getRecipe[0].recipeId,
-                title: getRecipe[0].title,
-                content: getRecipe[0].content,
-                isIced: getRecipe[0].isIced,
-                cupSize: getRecipe[0].cupSize,
-                createdAt: getRecipe[0].createdAt,
-                updatedAt: getRecipe[0].updatedAt,
-                ingredientList: getRecipe.map((e) => {
-                    return {
-                        ingredientName: e.ingredientName,
-                        ingredientColor: e.ingredientColor,
-                        ingredientAmount: e.ingredientAmount,
-                    };
-                }),
+                isSuccess: true,
+                message: "레시피 조회에성공하셨습니다.",
+                recipe: {
+                    recipeId: getRecipe[0].recipeId,
+                    title: getRecipe[0].title,
+                    content: getRecipe[0].content,
+                    isIced: getRecipe[0].isIced,
+                    cupSize: getRecipe[0].cupSize,
+                    createdAt: getRecipe[0].createdAt,
+                    updatedAt: getRecipe[0].updatedAt,
+                    ingredientList: getRecipe.map((e) => {
+                        return {
+                            ingredientName: e.ingredientName,
+                            ingredientColor: e.ingredientColor,
+                            ingredientAmount: e.ingredientAmount,
+                        };
+                    }),
+                },
             });
         } catch (err) {
             console.log(err);
