@@ -104,12 +104,12 @@ export class AuthService {
             if (isSamePassword === false)
                 throw new ForBiddenException(`${userDto.password} 와 일치하지 않는 비밀번호 입니다.`);
 
-            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
+            const accessToken = this.jwtProvider.signAccessToken({
                 type: "AccessToken",
                 userId: findedUser.userId,
                 nickname: findedUser.nickname,
             });
-            const refreshToken = this.jwtProvider.sign<jwtLib.IRefreshTokenPayload>({
+            const refreshToken = this.jwtProvider.signRefreshToken({
                 type: "RefreshToken",
                 userId: findedUser.userId,
                 nickname: findedUser.nickname,
@@ -150,7 +150,7 @@ export class AuthService {
             if (tokenDto.refreshToken !== serverToken)
                 throw new NotFoundException(`등록되지 않은 RefreshToken 입니다.`);
 
-            const accessToken = this.jwtProvider.sign<jwtLib.IAccessTokenPayload>({
+            const accessToken = this.jwtProvider.signAccessToken({
                 type: "AccessToken",
                 userId: payload.userId,
                 nickname: payload.nickname,
@@ -241,7 +241,7 @@ export class AuthService {
                 if (findedVerifyList.emailVerifiedCode !== confirmEmailDto.emailVerifyCode)
                     throw new BadRequestException(`인증 번호가 틀렸습니다.`);
 
-                const emailVerifyToken = this.jwtProvider.sign<jwtLib.IEmailVerifyToken>({
+                const emailVerifyToken = this.jwtProvider.signEmailVerifyToken({
                     type: "EmailVerifyToken",
                     email: findedVerifyList.email,
                 });
@@ -302,7 +302,7 @@ export class AuthService {
                 );
 
             const date = this.dateProvider.getNowDatetime();
-            const nicknameVerifyToken = this.jwtProvider.sign<jwtLib.INicknameVerifyToken>({
+            const nicknameVerifyToken = this.jwtProvider.signNicknameVerifyToken({
                 type: "NicknameVerifyToken",
                 nickname: confirmNicknameDto.nickname,
             });

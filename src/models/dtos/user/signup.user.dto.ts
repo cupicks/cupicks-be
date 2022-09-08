@@ -3,6 +3,7 @@ import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
+import { RequestQueryExtractor } from "../request.query.extractor";
 
 export interface ISignupUserDto {
     nickname: string;
@@ -13,7 +14,10 @@ export interface ISignupUserDto {
     emailVerifyToken: string;
 }
 
-export class SignupUserDto implements IBaseDto, ISignupUserDto {
+export class SignupUserDto
+    extends RequestQueryExtractor<"nickname" | "email" | "password" | "nicknameVerifyToken" | "emailVerifyToken">
+    implements IBaseDto, ISignupUserDto
+{
     nickname: string;
     email: string;
     password: string;
@@ -36,19 +40,13 @@ export class SignupUserDto implements IBaseDto, ISignupUserDto {
         nicknameVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
         emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
-        console.log(nickname, email, password, imageUrl, nicknameVerifyToken, emailVerifyToken);
-        this.email = this.validateType(email);
-        this.nickname = this.validateType(nickname);
-        this.password = this.validateType(password);
+        super();
+        this.email = this.validateType(email, "email");
+        this.nickname = this.validateType(nickname, "nickname");
+        this.password = this.validateType(password, "password");
         this.imageUrl = imageUrl;
-        this.nicknameVerifyToken = this.validateType(nicknameVerifyToken);
-        this.emailVerifyToken = this.validateType(emailVerifyToken);
-    }
-
-    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
-        if (value === undefined) throw new Error("값 누락");
-        else if (typeof value === "string") return value;
-        else throw new Error("값 오류");
+        this.nicknameVerifyToken = this.validateType(nicknameVerifyToken, "nicknameVerifyToken");
+        this.emailVerifyToken = this.validateType(emailVerifyToken, "emailVerifyToken");
     }
 
     getJoiInstance(): ObjectSchema<SignupUserDto> {

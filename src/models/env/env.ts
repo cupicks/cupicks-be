@@ -4,6 +4,8 @@ import { TALGORITHM } from "../../constants/_.loader";
 export interface IJwtEnv {
     ACCESS_EXPIRED_IN: string;
     REFRESH_EXPIRED_IN: string;
+    VERIFY_EXPIRED_IN: string;
+
     HASH_ALGOIRHTM: TALGORITHM;
 
     HASH_PRIVATE_PEM_KEY: string;
@@ -56,6 +58,8 @@ export class Env {
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
             REFRESH_EXPIRED_IN: this.getEnvStringValue("JWT_REFRESH_EXPIRED_IN"),
+            VERIFY_EXPIRED_IN: this.getEnvStringValue("JWT_VERIFY_EXPIRED_IN"),
+
             HASH_ALGOIRHTM: this.getEnvLiteralTypeValue("JWT_HASH_ALGOIRHTM"),
             HASH_PRIVATE_PEM_KEY: this.getPemKey("private"),
             HASH_PUBLIC_PEM_KEY: this.getPemKey("public"),

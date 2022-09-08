@@ -2,14 +2,18 @@ import * as joi from "joi";
 import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
+import { RequestQueryExtractor } from "../request.query.extractor";
+
 import { IBaseDto } from "../i.base.dto";
 
 export interface IConfirmEmailDto {
     email: string;
     emailVerifyCode: string;
 }
-
-export class ConfirmEmailDto implements IBaseDto, IConfirmEmailDto {
+export class ConfirmEmailDto
+    extends RequestQueryExtractor<"email" | "email-verify-code">
+    implements IBaseDto, IConfirmEmailDto
+{
     email: string;
     emailVerifyCode: string;
 
@@ -20,14 +24,10 @@ export class ConfirmEmailDto implements IBaseDto, IConfirmEmailDto {
         email: string | string[] | ParsedQs | ParsedQs[] | undefined;
         emailVerifyCode: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
-        this.email = this.validateType(email);
-        this.emailVerifyCode = this.validateType(emailVerifyCode);
-    }
+        super();
 
-    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
-        if (value === undefined) throw new Error("값 누락");
-        else if (typeof value === "string") return value;
-        else throw new Error("값 오류");
+        this.email = this.validateType(email, "email");
+        this.emailVerifyCode = this.validateType(emailVerifyCode, "email-verify-code");
     }
 
     getJoiInstance(): ObjectSchema<ConfirmEmailDto> {

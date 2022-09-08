@@ -3,13 +3,17 @@ import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
+import { RequestQueryExtractor } from "../request.query.extractor";
 
 export interface IConfirmNicknameDto {
     email: string;
     nickname: string;
 }
 
-export class ConfirmNicknameDto implements IBaseDto, IConfirmNicknameDto {
+export class ConfirmNicknameDto
+    extends RequestQueryExtractor<"email" | "nickname">
+    implements IBaseDto, IConfirmNicknameDto
+{
     email: string;
     nickname: string;
 
@@ -20,14 +24,9 @@ export class ConfirmNicknameDto implements IBaseDto, IConfirmNicknameDto {
         email: string | string[] | ParsedQs | ParsedQs[] | undefined;
         nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
-        this.email = this.validateType(email);
-        this.nickname = this.validateType(nickname);
-    }
-
-    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
-        if (value === undefined) throw new Error("값 누락");
-        else if (typeof value === "string") return value;
-        else throw new Error("값 오류");
+        super();
+        this.email = this.validateType(email, "email");
+        this.nickname = this.validateType(nickname, "nickname");
     }
 
     getJoiInstance(): ObjectSchema<ConfirmNicknameDto> {
