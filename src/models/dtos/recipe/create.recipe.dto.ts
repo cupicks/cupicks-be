@@ -2,8 +2,8 @@ import * as joi from "joi";
 import { ObjectSchema } from "joi";
 
 import { IngredientDto } from "./ingredient.dto";
-
 import { IBaseDto } from "../i.base.dto";
+import { RequestQueryExtractor } from "../request.query.extractor";
 
 export interface ICreateRecipeDto {
     title: string;
@@ -12,24 +12,27 @@ export interface ICreateRecipeDto {
     cupSize?: number;
     isPublic: boolean;
     ingredientList: IngredientDto[];
+    userId: number;
 }
 
-export class CreateRecipeDto implements IBaseDto {
+export class CreateRecipeDto extends RequestQueryExtractor<string> implements IBaseDto {
     title: string;
     content: string;
     isIced: boolean;
     cupSize?: number;
     isPublic: boolean;
     ingredientList: IngredientDto[];
+    userId: number;
 
-    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [] }: ICreateRecipeDto) {
+    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [] }: ICreateRecipeDto, userId: number) {
+        super();
         this.title = title;
         this.content = content;
         this.isIced = isIced;
         this.cupSize = cupSize;
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
-
+        this.userId = userId;
         // 클래스가 아닙니다.
     }
 
@@ -58,6 +61,7 @@ export class CreateRecipeDto implements IBaseDto {
                     ingredientAmount: joi.number().max(1000).required(),
                 }),
             ),
+            userId: joi.number().min(1).required(),
         });
     }
 }
