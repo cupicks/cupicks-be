@@ -1,6 +1,7 @@
 import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, FieldPacket } from "mysql2/promise";
 import { IRecipeResponseCustom } from "../../constants/_.loader";
+import { number } from "joi";
 
 export class RecipeRepository {
     public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<any> => {
@@ -74,23 +75,27 @@ export class RecipeRepository {
         return insertId;
     };
 
-    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: Array<object>) => {
+    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: Array<object>): Promise<number[]> => {
         const query = `
             INSERT INTO recipe_ingredient SET ?
         `;
 
         let total = 0;
+        const insertIdList: number[] = [];
 
         for (let i = 0; i < ingredientList.length; i++) {
             const result = await conn.query<ResultSetHeader>(query, ingredientList[i]);
 
             const resultSetHeader = result[0];
-            const { affectedRows } = resultSetHeader;
+            const { affectedRows, insertId } = resultSetHeader;
 
             total += affectedRows;
+            insertIdList.push(insertId);
 
             if (total > 20) throw new Error("protected");
         }
+
+        return insertIdList;
     };
 
     public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
@@ -109,6 +114,22 @@ export class RecipeRepository {
         if (affectedRows > 1) throw new Error("protected");
 
         return JSON.stringify(result[0].insertId);
+    };
+
+    public createRecipeIngredientList = async (conn: PoolConnection, recipeId: number, ingredientIdList: number[]) => {
+        const ingredientString = ingredientIdList.join(",").toString();
+        const query = `INESRT INTO
+                recipe_ingredient_list (recipe_id, recipe_ingredient_list)
+            VALUES (${recipeId}, "${ingredientString}")`;
+
+        const result = await conn.query<ResultSetHeader>(query);
+
+        const resultSetHeader = result[0];
+        const { affectedRows, insertId } = resultSetHeader;
+
+        if (affectedRows > 1) throw new Error("protected");
+
+        return insertId;
     };
 
     public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<any> => {
