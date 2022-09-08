@@ -70,31 +70,4 @@ describe("EnvSystem's using Env and EnvProvider", () => {
             jest.clearAllMocks();
         });
     });
-
-    /**
-     * Env 프로토타입은 11 개의 프로퍼티를 가지고 있습니다.
-     *
-     * - 전제조건 : EnvProvider.init(key: NODE_ENV) 호출이 전제되어야 합니다.
-     */
-    describe("Env.prototype should return 11 prototype", () => {
-        //
-
-        beforeEach(() => {
-            EnvProvider.init("test");
-        });
-
-        it("When 'test', Env.prototpye", () => {
-            const env = new EnvFile.Env();
-
-            expect(Object.keys(env).length).toBe(11);
-            expect(env.PORT).not.toBeUndefined();
-            expect(env.SALT).not.toBeUndefined();
-            expect(env.CORS_ORIGIN_LIST).not.toBeUndefined();
-
-            expect(env.S3).not.toBeUndefined();
-            expect(env.SES).not.toBeUndefined();
-            expect(env.JWT).not.toBeUndefined();
-            expect(env.MYSQL).not.toBeUndefined();
-        });
-    });
 });
