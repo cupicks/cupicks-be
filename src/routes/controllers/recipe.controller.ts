@@ -1,10 +1,12 @@
-import { RequestHandler, Request, Response, NextFunction } from "express";
+import { RequestHandler, Request, Response } from "express";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
 import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
+import { CommonRecipeDto } from "../../models/_.loader";
 import { IRecipeIngredientCustom } from "../../constants/_.loader";
+import { DeleteRecipeDto } from "../../models/_.loader";
 
 export default class RecipeController {
     private recipeService: RecipeService;
@@ -13,13 +15,13 @@ export default class RecipeController {
         this.recipeService = new RecipeService();
     }
 
-    public createRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public createRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
+            const validator = await new JoiValidator().validateAsync<CreateRecipeDto>(
+                new CreateRecipeDto(req.body, res.locals.userId),
+            );
 
-            const validator = await new JoiValidator().validateAsync<CreateRecipeDto>(new CreateRecipeDto(req.body));
-
-            const createRecipe = await this.recipeService.createRecipe(validator, userId);
+            const createRecipe = await this.recipeService.createRecipe(validator, validator.userId);
 
             return res.status(201).json({
                 isSuccess: true,
@@ -35,11 +37,15 @@ export default class RecipeController {
         }
     };
 
-    public getRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public getRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const recipeId: number = Number(req.params.recipeId) as number;
+            const validator: CommonRecipeDto = await new JoiValidator().validateAsync<CommonRecipeDto>(
+                new CommonRecipeDto({
+                    recipeId: Number(req.params.recipeId),
+                }),
+            );
 
-            const getRecipe: IRecipeIngredientCustom = await this.recipeService.getRecipe(recipeId);
+            const getRecipe: IRecipeIngredientCustom = await this.recipeService.getRecipe(validator.recipeId);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -71,7 +77,7 @@ export default class RecipeController {
         }
     };
 
-    public getRecipes: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public getRecipes: RequestHandler = async (req: Request, res: Response) => {
         try {
             if (!req.query.page && !req.query.count) throw new Error("페이지 번호나 개수를 확인해 주세요.");
 
@@ -96,14 +102,16 @@ export default class RecipeController {
         }
     };
 
-    public deleteRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public deleteRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
-            const recipeId: number = Number(req.params.recipeId) as number;
+            const validator: DeleteRecipeDto = await new JoiValidator().validateAsync<DeleteRecipeDto>(
+                new DeleteRecipeDto({
+                    userId: res.locals.userId,
+                    recipeId: Number(req.params.recipeId),
+                }),
+            );
 
-            const result: boolean | undefined = await this.recipeService.deleteRecipe(recipeId, userId);
-
-            if (result === false) throw new Error("내가 작성한 레시피가 아닙니다.");
+            await this.recipeService.deleteRecipe(validator.recipeId, validator.userId);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -119,21 +127,18 @@ export default class RecipeController {
         }
     };
 
-    public updatedRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public updatedRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
-            const recipeId: number = Number(req.params.recipeId) as number;
-
             const validator: UpdateRecipeDto = await new JoiValidator().validateAsync<UpdateRecipeDto>(
-                new UpdateRecipeDto(req.body),
+                new UpdateRecipeDto(req.body, res.locals.userId, Number(req.params.recipeId)),
             );
 
-            const updateRecipe: boolean = await this.recipeService.updateRecipe(validator, recipeId, userId);
+            await this.recipeService.updateRecipe(validator, validator.recipeId, validator.userId);
 
             return res.status(200).json({
                 isSuccess: true,
                 message: "레시피 수정에 성공하셨습니다.",
-                recipeId,
+                recipeId: validator.recipeId,
             });
         } catch (err) {
             console.log(err);
@@ -145,16 +150,20 @@ export default class RecipeController {
         }
     };
 
-    public likeRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public likeRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
-            const recipeId: number = Number(req.params.recipeId) as number;
+            const validator = await new JoiValidator().validateAsync<DeleteRecipeDto>(
+                new DeleteRecipeDto({
+                    userId: res.locals.userId,
+                    recipeId: Number(req.params.recipeId),
+                }),
+            );
 
-            const result = await this.recipeService.likeRecipe(userId, recipeId);
+            await this.recipeService.likeRecipe(validator.userId, validator.recipeId);
 
             return res.status(201).json({
                 isSuccess: false,
-                message: `${recipeId}번 레시피 좋아요에 성공하였습니다.`,
+                message: "좋아요에 성공하셨습니다",
             });
         } catch (err) {
             console.log(err);
@@ -166,16 +175,20 @@ export default class RecipeController {
         }
     };
 
-    public disRecipe: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public disRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const userId = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
-            const recipeId: number = Number(req.params.recipeId) as number;
+            const validator = await new JoiValidator().validateAsync<DeleteRecipeDto>(
+                new DeleteRecipeDto({
+                    userId: res.locals.userId,
+                    recipeId: Number(req.params.recipeId),
+                }),
+            );
 
-            await this.recipeService.dislikeRecipe(userId, recipeId);
+            await this.recipeService.dislikeRecipe(validator.userId, validator.recipeId);
 
             return res.status(201).json({
                 isSuccess: false,
-                message: `${recipeId}번 레시피 싫어요에 성공하였습니다.`,
+                message: `좋아요 취소에 성공하셨습니다.`,
             });
         } catch (err) {
             console.log(err);

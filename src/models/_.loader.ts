@@ -30,7 +30,13 @@ import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
 import { UpdateRecipeDto } from "./dtos/recipe/update.recipe.dto";
-import { CreateCommentDto } from "./dtos/comment/comment.dto";
+import { CommonRecipeDto } from "./dtos/recipe/common.recipe.dts";
+import { DeleteRecipeDto } from "./dtos/recipe/delete.recipe.dto";
+// COMMENT
+import { CreateCommentDto } from "./dtos/comment/create.comment.dto";
+import { DeleteCommentDto } from "./dtos/comment/delete.comment.dto";
+import { UpdateCommentDto } from "./dtos/comment/update.comment.dto";
+import { GetCommentDto } from "./dtos/comment/get.comment.dto";
 
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
 import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
@@ -65,12 +71,19 @@ export {
     ISendEmailDto,
     EditProfileDto,
     IEditProfileDto,
+    // RECIPE
     CreateRecipeDto,
     ICreateRecipeDto,
     UpdateRecipeDto,
     IngredientDto,
     IIngredientDto,
+    CommonRecipeDto,
+    DeleteRecipeDto,
+    // COMMENT
     CreateCommentDto,
+    DeleteCommentDto,
+    UpdateCommentDto,
+    GetCommentDto,
     // CustomExceptions
     CustomException, // 500
     BadRequestException, // 400

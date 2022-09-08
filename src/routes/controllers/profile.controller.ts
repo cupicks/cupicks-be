@@ -49,7 +49,7 @@ export default class ProfileController {
 
             return res.json({
                 isSuccess: true,
-                message: "프로필 수정에성공하셨습니다.",
+                message: "프로필 수정에 성공하셨습니다.",
             });
         } catch (err) {
             console.log(err);
