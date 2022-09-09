@@ -1,5 +1,5 @@
-import { SendEmailCommandOutput, SES } from "@aws-sdk/client-ses";
-import { ISesConfigEnv } from "../../models/_.loader";
+import { MessageRejected, SendEmailCommandOutput, SES } from "@aws-sdk/client-ses";
+import { BadRequestException, ISesConfigEnv, UnkownError, UnkownTypeError } from "../../models/_.loader";
 
 /**
  * References
@@ -47,24 +47,31 @@ export class AwsSesProvider {
 
     public async sendVerifyCode(toEmail: string, emailVerifyCode: string): Promise<SendEmailCommandOutput> {
         const ses = this.getSesInstance();
-        return await ses.sendEmail({
-            Source: AwsSesProvider.SES_SENDER_EMAIL,
-            Destination: {
-                ToAddresses: [toEmail],
-            },
-            ReplyToAddresses: [],
-            Message: {
-                Body: {
-                    Html: {
+        try {
+            return await ses.sendEmail({
+                Source: AwsSesProvider.SES_SENDER_EMAIL,
+                Destination: {
+                    ToAddresses: [toEmail],
+                },
+                ReplyToAddresses: [],
+                Message: {
+                    Body: {
+                        Html: {
+                            Charset: "UTF-8",
+                            Data: `다음의 인증번호 [${emailVerifyCode}] 를 입력해주세요.`,
+                        },
+                    },
+                    Subject: {
                         Charset: "UTF-8",
-                        Data: `다음의 인증번호 [${emailVerifyCode}] 를 입력해주세요.`,
+                        Data: `Cupicks! 에서 이메일 중복확인이 실행되었습니다.`,
                     },
                 },
-                Subject: {
-                    Charset: "UTF-8",
-                    Data: `Cupicks! 에서 이메일 중복확인이 실행되었습니다.`,
-                },
-            },
-        });
+            });
+        } catch (err) {
+            if (err instanceof MessageRejected)
+                throw new BadRequestException(`${toEmail} 은 메일 수신이 불가능한 이메일입니다.`);
+            else if (err instanceof Error) throw new UnkownError(`${err.name}, ${err.message}`);
+            else throw new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
+        }
     }
 }
