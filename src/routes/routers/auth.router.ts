@@ -35,11 +35,4 @@ authRouter.get("/confirm-email", /* applicationXWwwFormUrlencodedFilter */ new A
 
 authRouter.get("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmNickname);
 
-authRouter.get(
-    "/confirm-password",
-    /* applicationJsonFilter */
-    preventUnLoginUserGuard,
-    new AuthController().confirmPassword,
-);
-
 export default authRouter;
