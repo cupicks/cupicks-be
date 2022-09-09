@@ -79,6 +79,8 @@ export class AwsSesProvider {
     public async sendTempPassword(toEmail: string, tempPassword: string, resetPasswordToken: string) {
         const ses = this.getSesInstance();
         try {
+            const url = `http://localhost:3000/api/auth/reset-password?resetPasswordToken=${resetPasswordToken}`;
+
             return await ses.sendEmail({
                 Source: AwsSesProvider.SES_SENDER_EMAIL,
                 Destination: {
@@ -93,7 +95,7 @@ export class AwsSesProvider {
                                 <div>
                                     <h1 style="color: red">임시 비밀번호 : ${tempPassword}</h1>
                                     <br>
-                                    <span> http://localhost:3000/api/auth/reset-password?resetPasswordToken=${resetPasswordToken} </span>
+                                    <a href="${url}";>비밀번호 확인</a>
                                 </div>
                             `,
                         },
