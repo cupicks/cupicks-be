@@ -7,7 +7,7 @@ export class RecipeRepository {
     public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<any> => {
         const query = `
             SELECT 
-            *
+                *
             FROM
                 (
                 SELECT R.recipe_id
@@ -242,8 +242,6 @@ export class RecipeRepository {
             DELETE FROM user_like_recipe
             WHERE user_id = ? AND recipe_id = ?
         `;
-
-        console.log(userId, recipeId);
 
         const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
 
