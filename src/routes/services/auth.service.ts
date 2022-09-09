@@ -1,6 +1,13 @@
 import * as jwtLib from "jsonwebtoken";
 import { AuthRepository, AuthVerifyListRepository } from "../repositories/_.exporter";
-import { AwsSesProvider, BcryptProvider, DateProvider, JwtProvider, MysqlProvider } from "../../modules/_.loader";
+import {
+    AwsSesProvider,
+    BcryptProvider,
+    DateProvider,
+    JwtProvider,
+    MysqlProvider,
+    RandomGenerator,
+} from "../../modules/_.loader";
 import {
     ConflictException,
     ForBiddenException,
@@ -14,6 +21,7 @@ import {
     ConfirmEmailDto,
     ConfirmNicknameDto,
     BadRequestException,
+    SendPasswordDto,
 } from "../../models/_.loader";
 
 export class AuthService {
@@ -22,6 +30,7 @@ export class AuthService {
     private sesProvider: AwsSesProvider;
     private bcryptProvider: BcryptProvider;
     private dateProvider: DateProvider;
+    private randomGenerator: RandomGenerator;
 
     private authRepository: AuthRepository;
     private authVerifyListRepository: AuthVerifyListRepository;
@@ -35,6 +44,7 @@ export class AuthService {
 
         this.authRepository = new AuthRepository();
         this.authVerifyListRepository = new AuthVerifyListRepository();
+        this.randomGenerator = new RandomGenerator();
     }
 
     public signup = async (userDto: SignupUserDto): Promise<UserDto> => {
@@ -200,7 +210,7 @@ export class AuthService {
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, sendEmailDto.email);
             if (isExistsUser) throw new ConflictException(`${sendEmailDto.email} 은 이미 가입한 이메일입니다.`);
 
-            const emailVerifyCode = this.sesProvider.getRandomSixDigitsVerifiedCode();
+            const emailVerifyCode = this.randomGenerator.getRandomVerifyCode();
 
             const findedUserVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
                 conn,
@@ -343,6 +353,34 @@ export class AuthService {
             return {
                 nicknameVerifyToken,
             };
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public resetPassword = async (sendPasswordDto: SendPasswordDto): Promise<null> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const findedUser = await this.authRepository.findUserByEmail(conn, sendPasswordDto.email);
+            if (findedUser === null)
+                throw new NotFoundException(`${sendPasswordDto.email} 은 존재하지 않는 이메일입니다.`);
+
+            const randomPassword = this.randomGenerator.getRandomPassword();
+            const resetPasswordToken = this.jwtProvider.signResetPasswordToken({
+                type: "ResetPasswordToken",
+                email: sendPasswordDto.email,
+                password: randomPassword,
+            });
+            await this.sesProvider.sendTempPassword(sendPasswordDto.email, randomPassword, resetPasswordToken);
+
+            await conn.commit();
+            return null;
         } catch (err) {
             await conn.rollback();
             throw err;
