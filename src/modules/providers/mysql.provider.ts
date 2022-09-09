@@ -21,7 +21,8 @@ export class MysqlProvider {
 
     static validateConnetion = async (pool: mysql.Pool) => {
         try {
-            await pool.getConnection();
+            const poolConnection: mysql.PoolConnection = await pool.getConnection();
+            poolConnection.destroy();
         } catch (err) {
             throw err;
         }
