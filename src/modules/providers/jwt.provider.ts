@@ -3,7 +3,12 @@ import { CustomException, IJwtEnv, JwtAuthorizationException, UnkownTypeError } 
 import { TALGORITHM } from "../../constants/_.loader";
 
 declare module "jsonwebtoken" {
-    export type CustomTokenType = "AccessToken" | "RefreshToken" | "EmailVerifyToken" | "NicknameVerifyToken";
+    export type CustomTokenType =
+        | "AccessToken"
+        | "RefreshToken"
+        | "EmailVerifyToken"
+        | "NicknameVerifyToken"
+        | "ResetPasswordToken";
 
     export interface ICustomPayload extends jwtLib.JwtPayload {
         type: CustomTokenType;
@@ -31,6 +36,12 @@ declare module "jsonwebtoken" {
     export interface INicknameVerifyToken extends ICustomPayload {
         type: "NicknameVerifyToken";
         nickname: string;
+    }
+
+    export interface IResetPasswordToken extends ICustomPayload {
+        type: "ResetPasswordToken";
+        email: string;
+        password: string;
     }
 }
 
@@ -115,6 +126,22 @@ export class JwtProvider {
     }
 
     public signNicknameVerifyToken(payload: jwtLib.INicknameVerifyToken): string {
+        this.validateIsInit();
+
+        return jwtLib.sign(
+            payload,
+            {
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
+            },
+            {
+                expiresIn: JwtProvider.VERIFY_EXPIRED_IN,
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
+            },
+        );
+    }
+
+    public signResetPasswordToken(payload: jwtLib.IResetPasswordToken): string {
         this.validateIsInit();
 
         return jwtLib.sign(
