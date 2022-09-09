@@ -12,8 +12,6 @@ import {
     AwsSesProvider,
 } from "./modules/_.loader";
 
-import * as jwt from "jsonwebtoken";
-
 /**
  * `IIFE`
  */

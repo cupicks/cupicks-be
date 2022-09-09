@@ -13,6 +13,7 @@
       "baseUrl": "./src",
       "incremental": true,
       "moduleResolution": "node",
+      "downlevelIteration": true
     },
     "include": ["src/**/*"]
   }

@@ -37,6 +37,7 @@ export class AwsSesProvider {
         return AwsSesProvider.ses;
     }
 
+    /** @deprecated */
     public getRandomSixDigitsVerifiedCode(): string {
         let emailVerifyCode = "";
         for (let i = 0; i < 6; i++) {
@@ -64,6 +65,42 @@ export class AwsSesProvider {
                     Subject: {
                         Charset: "UTF-8",
                         Data: `Cupicks! 에서 이메일 중복확인이 실행되었습니다.`,
+                    },
+                },
+            });
+        } catch (err) {
+            if (err instanceof MessageRejected)
+                throw new BadRequestException(`${toEmail} 은 메일 수신이 불가능한 이메일입니다.`);
+            else if (err instanceof Error) throw new UnkownError(`${err.name}, ${err.message}`);
+            else throw new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
+        }
+    }
+
+    public async sendTempPassword(toEmail: string, tempPassword: string, resetPasswordToken: string) {
+        const ses = this.getSesInstance();
+        try {
+            return await ses.sendEmail({
+                Source: AwsSesProvider.SES_SENDER_EMAIL,
+                Destination: {
+                    ToAddresses: [toEmail],
+                },
+                ReplyToAddresses: [],
+                Message: {
+                    Body: {
+                        Html: {
+                            Charset: "UTF-8",
+                            Data: `
+                                <div>
+                                    <h1 style="color: red">임시 비밀번호 : ${tempPassword}</h1>
+                                    <br>
+                                    <span> http://localhost:3000/api/auth/reset-password?resetPasswordToken=${resetPasswordToken} </span>
+                                </div>
+                            `,
+                        },
+                    },
+                    Subject: {
+                        Charset: "UTF-8",
+                        Data: `Cupicks! 에서 임시 비밀번호가 발급되었습니다.`,
                     },
                 },
             });
