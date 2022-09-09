@@ -372,11 +372,13 @@ export class AuthService {
                 throw new NotFoundException(`${sendPasswordDto.email} 은 존재하지 않는 이메일입니다.`);
 
             const randomPassword = this.randomGenerator.getRandomPassword();
+            const hashedPassword = await this.bcryptProvider.hashPassword(randomPassword);
             const resetPasswordToken = this.jwtProvider.signResetPasswordToken({
                 type: "ResetPasswordToken",
                 email: sendPasswordDto.email,
-                password: randomPassword,
+                password: hashedPassword,
             });
+
             await this.sesProvider.sendTempPassword(sendPasswordDto.email, randomPassword, resetPasswordToken);
 
             await conn.commit();
