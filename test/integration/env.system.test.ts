@@ -28,20 +28,6 @@ describe("EnvSystem's using Env and EnvProvider", () => {
             sutEnvConstructor = jest.spyOn(EnvFile, "Env");
         });
 
-        it("When 'prod', EnvSystem throw Error", () => {
-            EnvProvider.init("prod");
-
-            try {
-                const envProvider: EnvProvider = new EnvProvider();
-                envProvider.getEnvInstance();
-            } catch (err) {
-                expect(sutEnvConstructor).toBeCalled();
-                expect(sutEnvConstructor).toBeCalledTimes(1);
-
-                expect(err).toBeInstanceOf(Error);
-            }
-        });
-
         it("When 'dev', EnvSystem should return Env.prototype", () => {
             EnvProvider.init("dev");
 
