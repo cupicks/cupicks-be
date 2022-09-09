@@ -12,8 +12,6 @@ import {
     AwsSesProvider,
 } from "./modules/_.loader";
 
-import * as jwt from "jsonwebtoken";
-
 /**
  * `IIFE`
  */
@@ -30,5 +28,6 @@ import * as jwt from "jsonwebtoken";
     MulterProvider.init(env.S3);
     AwsSesProvider.init(env.SES);
 
-    new App(MODE, env.PORT, env.CORS_ORIGIN_LIST);
+    const app = new App(MODE, env.CORS_ORIGIN_LIST);
+    app.runServer(MODE, env.PORT);
 })();

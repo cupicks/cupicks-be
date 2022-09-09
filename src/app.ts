@@ -6,43 +6,43 @@ import { TNODE_ENV } from "constants/_.loader";
 import { authRouter, profileRouter, recipeRouter, commentRouter } from "./routes/routers/_.exporter";
 
 import { getCorsMiddleware } from "./middlewares/guards/_.exporter";
+import { Server } from "http";
 
 /**
  * `Singleton`
  */
 export default class App {
-    app: express.Application;
+    static app: express.Application;
 
     constructor(MODE: TNODE_ENV, PORT: number, CORS_ORIGIN_LIST: string[]) {
-        this.app = express();
+        App.app = express();
 
         this.setMiddleware(MODE, CORS_ORIGIN_LIST);
         this.setRouter();
-        this.runServer(MODE, PORT);
     }
 
     setMiddleware(MODE: TNODE_ENV, CORS_ORIGIN_LIST: string[]) {
         if (MODE === "dev") {
-            this.app;
-            this.app.use(morgan("dev"));
+            App.app;
+            App.app.use(morgan("dev"));
         } else if (MODE === "prod") {
-            this.app.use(morgan("combined"));
+            App.app.use(morgan("combined"));
         }
 
-        this.app.use(getCorsMiddleware(CORS_ORIGIN_LIST));
-        this.app.use(express.json());
-        this.app.use(express.urlencoded({ extended: true }));
+        App.app.use(getCorsMiddleware(CORS_ORIGIN_LIST));
+        App.app.use(express.json());
+        App.app.use(express.urlencoded({ extended: true }));
     }
 
     setRouter() {
-        this.app.use("/api/auth", authRouter);
-        this.app.use("/api/profile", profileRouter);
-        this.app.use("/api/recipes", recipeRouter);
-        this.app.use("/api/comments", commentRouter);
+        App.app.use("/api/auth", authRouter);
+        App.app.use("/api/profile", profileRouter);
+        App.app.use("/api/recipes", recipeRouter);
+        App.app.use("/api/comments", commentRouter);
     }
 
-    runServer(MODE: TNODE_ENV, PORT: number) {
-        this.app.listen(PORT, () => {
+    runServer(MODE: TNODE_ENV, PORT: number): Server {
+        return App.app.listen(PORT, () => {
             if (MODE !== "test") console.log(`Server is running on ${PORT} with ${MODE} MODE`);
         });
     }
