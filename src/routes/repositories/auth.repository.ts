@@ -210,8 +210,11 @@ export class AuthRepository {
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
 
-    public updateUserRefreshToken = async (conn: PoolConnection, userId: number, refreshToken: string) => {
-        const updateQuery = `UPDATE user SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
+    public updateUserRefreshToken = async (conn: PoolConnection, userId: number, refreshToken: string | null) => {
+        const updateQuery =
+            refreshToken === null
+                ? `UPDATE user SET refresh_token = ${refreshToken} WHERE user_id = ${userId};`
+                : `UPDATE user SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
         const [ResultSetHeader, _] = updateResult;

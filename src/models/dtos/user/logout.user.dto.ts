@@ -5,11 +5,11 @@ import { ObjectSchema, string } from "joi";
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
 
-export interface IPublishTokenDto {
+export interface ILogoutUserDto {
     refreshToken: string;
 }
 
-export class PublishTokenDto extends RequestQueryExtractor<"refreshToken"> implements IBaseDto, IPublishTokenDto {
+export class LogoutUserDto extends RequestQueryExtractor<"refreshToken"> implements IBaseDto, ILogoutUserDto {
     refreshToken: string;
 
     constructor({ refreshToken }: { refreshToken: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
@@ -17,8 +17,8 @@ export class PublishTokenDto extends RequestQueryExtractor<"refreshToken"> imple
         this.refreshToken = this.validateType(refreshToken, "refreshToken");
     }
 
-    getJoiInstance(): ObjectSchema<PublishTokenDto> {
-        return joi.object<PublishTokenDto>({
+    getJoiInstance(): ObjectSchema<LogoutUserDto> {
+        return joi.object<LogoutUserDto>({
             refreshToken: joi.string().required().trim().message("리프레쉬 토큰은 반드시 포함되어야 합니다."),
         });
     }

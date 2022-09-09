@@ -17,6 +17,7 @@ import { IBaseDto } from "./dtos/i.base.dto";
 import { UserDto, IUserDto } from "./dtos/user/user.dto";
 import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
 import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
+import { LogoutUserDto, ILogoutUserDto } from "./dtos/user/logout.user.dto";
 import { PublishTokenDto, IPublishTokenDto } from "./dtos/user/publish.token.dto";
 
 import { ConfirmEmailDto, IConfirmEmailDto } from "./dtos/user/confirm.email.dto";
@@ -50,14 +51,17 @@ export {
     IUserPacket,
     IUserRefresthTokenPacket,
     IUserVerifyListPacket,
-    // Dtos
+    // BaseDtos
     IBaseDto,
+    // Dtos
     UserDto,
     IUserDto,
     SignupUserDto,
     ISignupUserDto,
     SigninUserDto,
     ISigninUserDto,
+    LogoutUserDto,
+    ILogoutUserDto,
     PublishTokenDto,
     IPublishTokenDto,
     ConfirmEmailDto,

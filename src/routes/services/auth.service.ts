@@ -5,9 +5,10 @@ import {
     ConflictException,
     ForBiddenException,
     NotFoundException,
+    UserDto,
     SigninUserDto,
     SignupUserDto,
-    UserDto,
+    LogoutUserDto,
     PublishTokenDto,
     SendEmailDto,
     ConfirmEmailDto,
@@ -123,6 +124,31 @@ export class AuthService {
                 accessToken,
                 refreshToken,
             };
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public logout = async (logoutDto: LogoutUserDto): Promise<null> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const payload = this.jwtProvider.decodeToken<jwtLib.IRefreshTokenPayload>(logoutDto.refreshToken);
+            const userId = payload.userId;
+
+            const findedUser = await this.authRepository.findUserById(conn, userId);
+            if (findedUser === null) throw new NotFoundException(`존재하지 않는 사용자의 토큰을 제출하셨습니다.`);
+
+            await this.authRepository.updateUserRefreshToken(conn, userId, null);
+
+            await conn.commit();
+
+            return null;
         } catch (err) {
             await conn.rollback();
             throw err;
