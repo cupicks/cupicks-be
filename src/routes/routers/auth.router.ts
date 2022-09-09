@@ -27,6 +27,12 @@ authRouter.post(
     new AuthController().signin,
 );
 
+authRouter.patch(
+    "/logout",
+    /* applicationXWwwFormUrlencodedFilter */ preventLoginUserGuard,
+    new AuthController().logout,
+);
+
 authRouter.get("/token", /* applicationXWwwFormUrlencodedFilter */ new AuthController().publishToken);
 
 authRouter.get("/send-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendEmail);
