@@ -11,7 +11,7 @@ import {
     SendEmailDto,
     ConfirmEmailDto,
     ConfirmNicknameDto,
-    ConfirmPasswordDto,
+    SendPasswordDto,
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
@@ -208,6 +208,31 @@ export default class AuthController {
                 isSuccess: true,
                 message: "사용자 닉네임 중복확인이 완료되었습니다.",
                 nicknameVerifyToken: nicknameVerifyToken,
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public resetPassword: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const snedPasswordDto = await this.joiValidator.validateAsync<SendPasswordDto>(
+                new SendPasswordDto({
+                    email: req?.query["email"],
+                }),
+            );
+
+            await this.authService.resetPassword(snedPasswordDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "임시 비밀번호가 이메일로 발송되었습니다.",
             });
         } catch (err) {
             console.log(err);
