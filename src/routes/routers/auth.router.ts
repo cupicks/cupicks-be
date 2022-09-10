@@ -43,4 +43,6 @@ authRouter.get("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ ne
 
 authRouter.get("/send-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendPassword);
 
+authRouter.get("/reset-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().resetPassword);
+
 export default authRouter;

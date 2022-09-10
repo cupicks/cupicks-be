@@ -12,6 +12,7 @@ import {
     ConfirmEmailDto,
     ConfirmNicknameDto,
     SendPasswordDto,
+    ResetPasswordDto,
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
@@ -233,6 +234,31 @@ export default class AuthController {
             return res.json({
                 isSuccess: true,
                 message: "임시 비밀번호가 이메일로 발송되었습니다.",
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public resetPassword: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const snedPasswordDto = await this.joiValidator.validateAsync<ResetPasswordDto>(
+                new ResetPasswordDto({
+                    resetPasswordToken: req?.query["resetPasswordToken"],
+                }),
+            );
+
+            await this.authService.resetPassword(snedPasswordDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "지금부터 임시 비밀번호를 사용하실 수 있습니다.",
             });
         } catch (err) {
             console.log(err);

@@ -22,6 +22,7 @@ import {
     ConfirmNicknameDto,
     BadRequestException,
     SendPasswordDto,
+    ResetPasswordDto,
 } from "../../models/_.loader";
 
 export class AuthService {
@@ -142,7 +143,7 @@ export class AuthService {
         }
     };
 
-    public logout = async (logoutDto: LogoutUserDto): Promise<null> => {
+    public logout = async (logoutDto: LogoutUserDto): Promise<void> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -157,8 +158,6 @@ export class AuthService {
             await this.authRepository.updateUserRefreshToken(conn, userId, null);
 
             await conn.commit();
-
-            return null;
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -361,7 +360,7 @@ export class AuthService {
         }
     };
 
-    public sendPassword = async (sendPasswordDto: SendPasswordDto): Promise<null> => {
+    public sendPassword = async (sendPasswordDto: SendPasswordDto): Promise<void> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -376,13 +375,38 @@ export class AuthService {
             const resetPasswordToken = this.jwtProvider.signResetPasswordToken({
                 type: "ResetPasswordToken",
                 email: sendPasswordDto.email,
-                password: hashedPassword,
+                hashedPassword: hashedPassword,
             });
 
             await this.sesProvider.sendTempPassword(sendPasswordDto.email, randomPassword, resetPasswordToken);
 
             await conn.commit();
-            return null;
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public resetPassword = async (resetPasswordDto: ResetPasswordDto): Promise<void> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const payload = this.jwtProvider.verifyToken<jwtLib.IResetPasswordToken>(
+                resetPasswordDto.resetPasswordToken,
+            );
+            payload.email;
+            payload.hashedPassword;
+
+            const findedUser = await this.authRepository.findUserByEmail(conn, payload.email);
+            if (findedUser === null) throw new NotFoundException(`${payload.email} 은 존재하지 않는 이메일입니다.`);
+
+            await this.authRepository.updateUserPassword(conn, payload.email, payload.hashedPassword);
+
+            await conn.commit();
         } catch (err) {
             await conn.rollback();
             throw err;
