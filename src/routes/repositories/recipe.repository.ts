@@ -142,13 +142,13 @@ export class RecipeRepository {
                 I.ingredient_name, I.ingredient_color, I.ingredient_amount
             FROM
                 (
-                SELECT R.recipe_id, R.title, R.content, R.cup_size, R.is_iced, R.is_public, R.created_at, R.updated_at
-                FROM recipe R
+                    SELECT R.recipe_id, R.title, R.content, R.cup_size, R.is_iced, R.is_public, R.created_at, R.updated_at
+                    FROM recipe R
                 ) R
             RIGHT JOIN
                 (
-                SELECT I.recipe_id, I.ingredient_name, I.ingredient_color, I.ingredient_amount
-                FROM recipe_ingredient I
+                    SELECT I.recipe_id, I.ingredient_name, I.ingredient_color, I.ingredient_amount
+                    FROM recipe_ingredient I
                 ) I
             ON R.recipe_id = I.recipe_id; 
         `;
