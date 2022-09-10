@@ -31,5 +31,5 @@ import { AuthController } from "./routes/controllers/_.exporter";
 
     AuthController.init(env.URL.FROTN_REDIRECT_URL_WITHOUT_PORT);
 
-    new App(MODE, env.PORT, env.URL.FRONT_URL_LIST_WITHOUT_PORT);
+    new App(MODE, env.PORT, env.URL.CORS_URL_LIST_WITHOUT_PORT);
 })();
