@@ -16,8 +16,12 @@ export class AwsSesProvider {
     static isInit = false;
     static ses: SES;
     static SES_SENDER_EMAIL: string;
+    static SERVER_URL_WITH_PORT: string;
 
-    static init({ SES_API_VERSION, SES_API_REGION, SES_ACCESS_KEY, SES_SECRET_KEY, SES_SENDER_EMAIL }: ISesConfigEnv) {
+    static init(
+        { SES_API_VERSION, SES_API_REGION, SES_ACCESS_KEY, SES_SECRET_KEY, SES_SENDER_EMAIL }: ISesConfigEnv,
+        SERVER_URL_WITH_PORT: string,
+    ) {
         if (this.isInit === true) return;
 
         this.ses = new SES({
@@ -28,7 +32,9 @@ export class AwsSesProvider {
                 secretAccessKey: SES_SECRET_KEY,
             },
         });
+
         this.SES_SENDER_EMAIL = SES_SENDER_EMAIL;
+        this.SERVER_URL_WITH_PORT = SERVER_URL_WITH_PORT;
 
         return;
     }
@@ -79,7 +85,7 @@ export class AwsSesProvider {
     public async sendTempPassword(toEmail: string, tempPassword: string, resetPasswordToken: string) {
         const ses = this.getSesInstance();
         try {
-            const url = `http://localhost:3000/api/auth/reset-password?resetPasswordToken=${resetPasswordToken}`;
+            const url = `${AwsSesProvider.SERVER_URL_WITH_PORT}/api/auth/reset-password?resetPasswordToken=${resetPasswordToken}`;
 
             return await ses.sendEmail({
                 Source: AwsSesProvider.SES_SENDER_EMAIL,

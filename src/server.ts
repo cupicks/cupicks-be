@@ -26,7 +26,7 @@ import {
     BcryptProvider.init(env.SALT);
     MysqlProvider.init(env.MYSQL);
     MulterProvider.init(env.S3);
-    AwsSesProvider.init(env.SES);
+    AwsSesProvider.init(env.SES, env.URL.SERVER_URL_WITH_PORT);
 
-    new App(MODE, env.PORT, env.CORS_ORIGIN_LIST);
+    new App(MODE, env.PORT, env.URL.FRONT_URL_LIST_WITHOUT_PORT);
 })();
