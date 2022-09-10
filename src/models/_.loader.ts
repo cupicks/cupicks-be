@@ -23,6 +23,7 @@ import { PublishTokenDto, IPublishTokenDto } from "./dtos/user/publish.token.dto
 import { ConfirmEmailDto, IConfirmEmailDto } from "./dtos/user/confirm.email.dto";
 import { ConfirmNicknameDto, IConfirmNicknameDto } from "./dtos/user/confirm.nickname.dto";
 import { SendPasswordDto, ISendPasswordDto } from "./dtos/user/send.password.dto";
+import { ResetPasswordDto, IResetPasswordDto } from "./dtos/user/reset.password.dto";
 
 import { SendEmailDto, ISendEmailDto } from "./dtos/user/send.email.dto";
 
@@ -71,6 +72,8 @@ export {
     IConfirmNicknameDto,
     SendPasswordDto,
     ISendPasswordDto,
+    ResetPasswordDto,
+    IResetPasswordDto,
     SendEmailDto,
     ISendEmailDto,
     EditProfileDto,
