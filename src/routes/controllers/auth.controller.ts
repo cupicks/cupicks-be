@@ -220,7 +220,7 @@ export default class AuthController {
         }
     };
 
-    public resetPassword: RequestHandler = async (req: Request, res: Response) => {
+    public sendPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
             const snedPasswordDto = await this.joiValidator.validateAsync<SendPasswordDto>(
                 new SendPasswordDto({
@@ -228,7 +228,7 @@ export default class AuthController {
                 }),
             );
 
-            await this.authService.resetPassword(snedPasswordDto);
+            await this.authService.sendPassword(snedPasswordDto);
 
             return res.json({
                 isSuccess: true,

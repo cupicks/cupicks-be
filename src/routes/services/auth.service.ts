@@ -361,7 +361,7 @@ export class AuthService {
         }
     };
 
-    public resetPassword = async (sendPasswordDto: SendPasswordDto): Promise<null> => {
+    public sendPassword = async (sendPasswordDto: SendPasswordDto): Promise<null> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
