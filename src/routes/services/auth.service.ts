@@ -389,7 +389,7 @@ export class AuthService {
         }
     };
 
-    public resetPassword = async (resetPasswordDto: ResetPasswordDto): Promise<void> => {
+    public resetPassword = async (resetPasswordDto: ResetPasswordDto): Promise<string> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -407,6 +407,7 @@ export class AuthService {
             await this.authRepository.updateUserPassword(conn, payload.email, payload.hashedPassword);
 
             await conn.commit();
+            return payload.email;
         } catch (err) {
             await conn.rollback();
             throw err;

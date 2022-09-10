@@ -1,4 +1,3 @@
-import * as joi from "joi";
 import { Request, RequestHandler, Response } from "express";
 import {
     UnkownError,
@@ -18,6 +17,12 @@ import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
 
 export default class AuthController {
+    static FRONT_URL: string;
+
+    static init(FRONT_URL: string) {
+        this.FRONT_URL = FRONT_URL;
+    }
+
     private authService: AuthService;
     private joiValidator: JoiValidator;
 
@@ -254,12 +259,10 @@ export default class AuthController {
                 }),
             );
 
-            await this.authService.resetPassword(snedPasswordDto);
+            const email = await this.authService.resetPassword(snedPasswordDto);
 
-            return res.json({
-                isSuccess: true,
-                message: "지금부터 임시 비밀번호를 사용하실 수 있습니다.",
-            });
+            // FE message : 'ㅇㅇㅇㅇ@naver.com 님 임시 비밀번호를 사용하실 수 있습니다.'
+            return res.redirect(AuthController.FRONT_URL + `/signIn?email=` + email);
         } catch (err) {
             console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화

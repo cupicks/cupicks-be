@@ -38,6 +38,7 @@ export interface ISesConfigEnv {
 
 export interface IUrlEnv {
     FRONT_URL_LIST_WITHOUT_PORT: string[];
+    FROTN_REDIRECT_URL_WITHOUT_PORT: string;
     SERVER_URL_WITH_PORT: string;
 }
 
@@ -62,6 +63,7 @@ export class Env {
                 this.getEnvStringValue("FRONT_URL_ONE_WITHOUT_PORT"),
                 this.getEnvStringValue("FRONT_URL_TWO_WITHOUT_PORT"),
             ],
+            FROTN_REDIRECT_URL_WITHOUT_PORT: this.getEnvStringValue("FROTN_REDIRECT_URL_WITHOUT_PORT"),
             SERVER_URL_WITH_PORT: this.getEnvStringValue("SERVER_URL_WITH_PORT"),
         };
 
