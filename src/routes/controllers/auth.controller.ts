@@ -1,4 +1,3 @@
-import * as joi from "joi";
 import { Request, RequestHandler, Response } from "express";
 import {
     UnkownError,
@@ -12,11 +11,18 @@ import {
     ConfirmEmailDto,
     ConfirmNicknameDto,
     SendPasswordDto,
+    ResetPasswordDto,
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
 
 export default class AuthController {
+    static FRONT_URL: string;
+
+    static init(FRONT_URL: string) {
+        this.FRONT_URL = FRONT_URL;
+    }
+
     private authService: AuthService;
     private joiValidator: JoiValidator;
 
@@ -220,7 +226,7 @@ export default class AuthController {
         }
     };
 
-    public resetPassword: RequestHandler = async (req: Request, res: Response) => {
+    public sendPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
             const snedPasswordDto = await this.joiValidator.validateAsync<SendPasswordDto>(
                 new SendPasswordDto({
@@ -228,12 +234,35 @@ export default class AuthController {
                 }),
             );
 
-            await this.authService.resetPassword(snedPasswordDto);
+            await this.authService.sendPassword(snedPasswordDto);
 
             return res.json({
                 isSuccess: true,
                 message: "임시 비밀번호가 이메일로 발송되었습니다.",
             });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public resetPassword: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const snedPasswordDto = await this.joiValidator.validateAsync<ResetPasswordDto>(
+                new ResetPasswordDto({
+                    resetPasswordToken: req?.query["resetPasswordToken"],
+                }),
+            );
+
+            const email = await this.authService.resetPassword(snedPasswordDto);
+
+            // FE message : 'ㅇㅇㅇㅇ@naver.com 님 임시 비밀번호를 사용하실 수 있습니다.'
+            return res.redirect(AuthController.FRONT_URL + `/signIn?email=` + email);
         } catch (err) {
             console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화

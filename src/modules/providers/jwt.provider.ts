@@ -41,7 +41,7 @@ declare module "jsonwebtoken" {
     export interface IResetPasswordToken extends ICustomPayload {
         type: "ResetPasswordToken";
         email: string;
-        password: string;
+        hashedPassword: string;
     }
 }
 

@@ -36,13 +36,18 @@ export interface ISesConfigEnv {
     SES_SENDER_EMAIL: string;
 }
 
+export interface IUrlEnv {
+    FRONT_URL_LIST_WITHOUT_PORT: string[];
+    FROTN_REDIRECT_URL_WITHOUT_PORT: string;
+    SERVER_URL_WITH_PORT: string;
+}
+
 export class Env {
     PORT;
 
     SALT;
 
-    CORS_ORIGIN_LIST: string[];
-
+    URL: IUrlEnv;
     JWT: IJwtEnv;
     MYSQL: IMysqlEnv;
     S3: IS3ConfigEnv;
@@ -53,7 +58,14 @@ export class Env {
 
         this.SALT = this.getEnvNumberValue("SALT");
 
-        this.CORS_ORIGIN_LIST = [this.getEnvStringValue("CORS_ORIGIN_ONE"), this.getEnvStringValue("CORS_ORIGIN_TWO")];
+        this.URL = {
+            FRONT_URL_LIST_WITHOUT_PORT: [
+                this.getEnvStringValue("FRONT_URL_ONE_WITHOUT_PORT"),
+                this.getEnvStringValue("FRONT_URL_TWO_WITHOUT_PORT"),
+            ],
+            FROTN_REDIRECT_URL_WITHOUT_PORT: this.getEnvStringValue("FROTN_REDIRECT_URL_WITHOUT_PORT"),
+            SERVER_URL_WITH_PORT: this.getEnvStringValue("SERVER_URL_WITH_PORT"),
+        };
 
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
