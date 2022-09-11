@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS recipe;
 
 DROP TABLE IF EXISTS user_verify_list;
 
+
 CREATE TABLE IF NOT EXISTS user_verify_list (
     user_verify_list_id         INT              NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     email                       VARCHAR(100)     NOT NULL    UNIQUE,
@@ -61,7 +62,7 @@ CREATE TABLE IF NOT EXISTS user (
     reset_password_token                    VARCHAR(1000)   NULL,
     reset_password_date                     DATETIME        NULL,
     current_password_sent_count             INT             NULL        DEFAULT 0 CHECK (current_password_sent_count <= 5), -- 1 일일 당 5회만 가능
-    password_sent_exceeding_date            DATETIME        NOT NULL, -- 오버 플로우 시, 1일 간 사용 불가
+    password_sent_exceeding_date            DATETIME        NULL, -- 오버 플로우 시, 1일 간 사용 불가
     is_exeeded_of_password_sent             BOOLEAN         DEFAULT 0,
     FOREIGN KEY (user_verify_list_id) REFERENCES user_verify_list (user_verify_list_id)
         ON UPDATE CASCADE
