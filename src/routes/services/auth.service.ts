@@ -4,6 +4,7 @@ import {
     AwsSesProvider,
     BcryptProvider,
     DateProvider,
+    DayjsProvider,
     JwtProvider,
     MysqlProvider,
     RandomGenerator,
@@ -31,6 +32,7 @@ export class AuthService {
     private sesProvider: AwsSesProvider;
     private bcryptProvider: BcryptProvider;
     private dateProvider: DateProvider;
+    private dayjsProvider: DayjsProvider;
     private randomGenerator: RandomGenerator;
 
     private authRepository: AuthRepository;
@@ -42,6 +44,7 @@ export class AuthService {
         this.sesProvider = new AwsSesProvider();
         this.bcryptProvider = new BcryptProvider();
         this.dateProvider = new DateProvider();
+        this.dayjsProvider = new DayjsProvider();
 
         this.authRepository = new AuthRepository();
         this.authVerifyListRepository = new AuthVerifyListRepository();
@@ -70,6 +73,7 @@ export class AuthService {
                 conn,
                 emailVerifyTokenPayload.email,
             );
+
             if (finededVerifyList === null)
                 throw new NotFoundException(
                     `해당 이메일과 닉네임의 요청은 이미 만료되었습니다. 회원가입 절차를 다시 실행해주세요.`,
@@ -82,7 +86,7 @@ export class AuthService {
                     `서버에 등록되어 있지 않은 EmailVerifyToken 혹은 NicknameVerifyToken 을 제출하였습니다.`,
                 );
 
-            const date = this.dateProvider.getNowDatetime();
+            const date = this.dayjsProvider.getDatetime();
             await this.authRepository.createUser(
                 conn,
                 {
@@ -240,8 +244,7 @@ export class AuthService {
                 sendEmailDto.email,
             );
 
-            const nowDate = this.dateProvider.getNowDatetime();
-
+            const nowDate = this.dayjsProvider.getDatetime();
             if (findedUserVerifyList === null) {
                 await this.authVerifyListRepository.createVerifyListByEmailAndCode(
                     conn,
@@ -325,7 +328,7 @@ export class AuthService {
                 if (findedVerifyList.emailVerifiedCode !== confirmEmailDto.emailVerifyCode)
                     throw new BadRequestException(`인증 번호가 틀렸습니다.`);
 
-                const emailVerifiedDate = this.dateProvider.getNowDatetime();
+                const emailVerifiedDate = this.dayjsProvider.getDatetime();
                 const emailVerifyToken = this.jwtProvider.signEmailVerifyToken({
                     type: "EmailVerifyToken",
                     email: findedVerifyList.email,
@@ -402,7 +405,7 @@ export class AuthService {
                     `${emailVerifyTokenPayload.email} 은 인증번호 확인 과정이 진행되지 않았습니다.`,
                 );
 
-            const date = this.dateProvider.getNowDatetime();
+            const date = this.dayjsProvider.getDatetime();
             const nicknameVerifyToken = this.jwtProvider.signNicknameVerifyToken({
                 type: "NicknameVerifyToken",
                 nickname: confirmNicknameDto.nickname,
