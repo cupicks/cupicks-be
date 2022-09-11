@@ -55,15 +55,21 @@ export class AuthService {
             await conn.beginTransaction();
             userDto.password = this.bcryptProvider.hashPassword(userDto.password);
 
-            const emailVerifyToken = this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(userDto.emailVerifyToken);
-            const nicknameVerifyToken = this.jwtProvider.verifyToken<jwtLib.INicknameVerifyToken>(
+            const emailVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(
+                userDto.emailVerifyToken,
+            );
+            const nicknameVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.INicknameVerifyToken>(
                 userDto.nicknameVerifyToken,
             );
 
-            const isExistsUser = await this.authRepository.isExistsByEmail(conn, userDto.email);
-            if (isExistsUser === true) throw new ConflictException(`${userDto.email} 은 사용 중입니다.`);
+            const isExistsUser = await this.authRepository.isExistsByEmail(conn, emailVerifyTokenPayload.email);
+            if (isExistsUser === true)
+                throw new ConflictException(`${emailVerifyTokenPayload.email} 은 사용 중입니다.`);
 
-            const finededVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, userDto.email);
+            const finededVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
+                conn,
+                emailVerifyTokenPayload.email,
+            );
             if (finededVerifyList === null)
                 throw new NotFoundException(
                     `해당 이메일과 닉네임의 요청은 이미 만료되었습니다. 회원가입 절차를 다시 실행해주세요.`,
@@ -77,7 +83,17 @@ export class AuthService {
                 );
 
             const date = this.dateProvider.getNowDatetime();
-            await this.authRepository.createUser(conn, userDto, date, finededVerifyList.userVerifyListId);
+            await this.authRepository.createUser(
+                conn,
+                {
+                    email: emailVerifyTokenPayload.email,
+                    nickname: nicknameVerifyTokenPayload.nickname,
+                    password: userDto.password,
+                    imageUrl: userDto.imageUrl,
+                },
+                date,
+                finededVerifyList.userVerifyListId,
+            );
 
             // const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
@@ -87,7 +103,9 @@ export class AuthService {
                 userId: 1,
                 createdAt: date,
                 updatedAt: date,
-                ...userDto,
+                email: emailVerifyTokenPayload.email,
+                nickname: nicknameVerifyTokenPayload.nickname,
+                imageUrl: userDto.imageUrl,
             });
         } catch (err) {
             await conn.rollback();
@@ -113,7 +131,7 @@ export class AuthService {
 
             const isSamePassword = await this.bcryptProvider.comparedPassword(userDto.password, findedUser.password);
             if (isSamePassword === false)
-                throw new ForBiddenException(`${userDto.password} 와 일치하지 않는 비밀번호 입니다.`);
+                throw new ForBiddenException(`${userDto.email} 와 일치하지 않는 비밀번호 입니다.`);
 
             const accessToken = this.jwtProvider.signAccessToken({
                 type: "AccessToken",
@@ -326,13 +344,17 @@ export class AuthService {
         try {
             await conn.beginTransaction();
 
+            const emailVerifyTokenPayload = await this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(
+                confirmNicknameDto.emailVerifyToken,
+            );
+
             const isExists = await this.authRepository.isExistsByNickname(conn, confirmNicknameDto.nickname);
             if (isExists) throw new ConflictException(`${confirmNicknameDto.nickname} 은 이미 가입한 닉네임입니다.`);
 
             const isExistsOthersNickname = await this.authVerifyListRepository.isExistsByNicknameExceptEmail(
                 conn,
                 confirmNicknameDto.nickname,
-                confirmNicknameDto.email,
+                emailVerifyTokenPayload.email,
             );
             if (isExistsOthersNickname === true)
                 throw new ConflictException(
@@ -341,13 +363,15 @@ export class AuthService {
 
             const findedVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
                 conn,
-                confirmNicknameDto.email,
+                emailVerifyTokenPayload.email,
             );
             if (findedVerifyList === null)
-                throw new NotFoundException(`${confirmNicknameDto.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
+                throw new NotFoundException(
+                    `${emailVerifyTokenPayload.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`,
+                );
             if (findedVerifyList.isVerifiedEmail === 0)
                 throw new BadRequestException(
-                    `${confirmNicknameDto.email} 은 인증번호 확인 과정이 진행되지 않았습니다.`,
+                    `${emailVerifyTokenPayload.email} 은 인증번호 확인 과정이 진행되지 않았습니다.`,
                 );
 
             const date = this.dateProvider.getNowDatetime();
@@ -357,7 +381,7 @@ export class AuthService {
             });
             await this.authVerifyListRepository.updateVerifyListByNickname(
                 conn,
-                confirmNicknameDto.email,
+                emailVerifyTokenPayload.email,
                 confirmNicknameDto.nickname,
                 date,
                 nicknameVerifyToken,

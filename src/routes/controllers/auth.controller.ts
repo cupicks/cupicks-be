@@ -43,8 +43,6 @@ export default class AuthController {
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
                     imageUrl: file.location,
-                    email: req?.query["email"],
-                    nickname: req?.query["nickname"],
                     password: req?.query["password"],
                     emailVerifyToken: req?.query["emailVerifyToken"],
                     nicknameVerifyToken: req?.query["nicknameVerifyToken"],
@@ -203,7 +201,7 @@ export default class AuthController {
         try {
             const confirmNicknameDto = await this.joiValidator.validateAsync<ConfirmNicknameDto>(
                 new ConfirmNicknameDto({
-                    email: req?.query["email"],
+                    emailVerifyToken: req?.query["emailVerifyToken"],
                     nickname: req?.query["nickname"],
                 }),
             );

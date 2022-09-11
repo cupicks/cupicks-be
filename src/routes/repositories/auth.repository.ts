@@ -128,7 +128,12 @@ export class AuthRepository {
 
     public createUser = async (
         conn: PoolConnection,
-        userDto: SignupUserDto,
+        userDto: {
+            email: string;
+            nickname: string;
+            password: string;
+            imageUrl?: string;
+        },
         date: string,
         userVerifyListId: number,
     ): Promise<number> => {
@@ -147,7 +152,15 @@ export class AuthRepository {
     };
 
     /** @deprecated */
-    public createUserLegacy = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {
+    public createUserLegacy = async (
+        conn: PoolConnection,
+        userDto: {
+            email: string;
+            nickname: string;
+            password: string;
+            imageUrl: string;
+        },
+    ): Promise<number> => {
         const createUserQuery = userDto.imageUrl
             ? `INSERT INTO user (email, nickname, password, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}");`
             : `INSERT INTO user (email, nickname, password) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}");`;
