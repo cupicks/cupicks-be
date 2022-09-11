@@ -38,9 +38,9 @@ CREATE TABLE IF NOT EXISTS user_verify_list (
     email_verified_token        VARCHAR(1000)    NULL,
     email_verified_code         VARCHAR(6)       NULL,
     is_verified_email           BOOLEAN          DEFAULT 0,
-    limited_email_count         INT              NULL, -- 1 일일 당 5 회만 가능
-    limited_email_overflow_date DATETIME         NULL, -- 오버 플로우 시, 1일 간 사용 불가
-    is_overflowed_email         BOOLEAN          DEFAULT 0,
+    current_email_sent_count    INT              NULL       DEFAULT 0 CHECK (current_email_sent_count <= 5), -- 1 일일 당 5 회만 가능
+    email_sent_exceeding_date   DATETIME         NULL, -- 오버 플로우 시, 1일 간 사용 불가
+    is_exeeded_of_email_sent    BOOLEAN          DEFAULT 0,
     nickname                    VARCHAR(20)      NULL,
     nickname_verified_date      DATETIME         NULL,
     nickname_verified_token     VARCHAR(1000)    NULL,
@@ -59,13 +59,14 @@ CREATE TABLE IF NOT EXISTS user (
     updated_at                              DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     reset_password_token                    VARCHAR(1000)   NULL,
     reset_password_date                     DATETIME        NULL,
-    limited_send_passsword_count            INT             NULL, -- 1 일일 당 5회만 가능
-    limited_send_passsword_overflow_date    DATETIME        NOT NULL, -- 오버 플로우 시, 1일 간 사용 불가
-    is_overflowed_send_password             BOOLEAN         DEFAULT 0,
+    current_password_sent_count             INT             NULL        DEFAULT 0 CHECK (current_password_sent_count <= 5), -- 1 일일 당 5회만 가능
+    password_sent_exceeding_date            DATETIME        NOT NULL, -- 오버 플로우 시, 1일 간 사용 불가
+    is_exeeded_of_password_sent             BOOLEAN         DEFAULT 0,
     FOREIGN KEY (user_verify_list_id) REFERENCES user_verify_list (user_verify_list_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
 
 CREATE TABLE IF NOT EXISTS recipe (
     recipe_id   INT                 NOT NULL    PRIMARY KEY AUTO_INCREMENT,
