@@ -114,4 +114,54 @@ export class AuthVerifyListRepository {
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
     };
+
+    public reUpdateVerifyListByIdAndCode = async (
+        conn: PoolConnection,
+        userVerifyId: number,
+        emailVerifyCode: string,
+    ) => {
+        const updateQuery = `UPDATE user_verify_list
+        SET
+            email_verified_date = ${null},
+            email_verified_token = ${null},
+            email_verified_code = "${emailVerifyCode}",
+            is_verified_email = ${false},
+            nickname = ${null},
+            nickname_verified_date = ${null},
+            nickname_verified_token = ${null},
+            is_verified_nickname = ${false}
+        WHERE user_verify_list_id = ${userVerifyId};`;
+
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [resultSetHeader, _] = updateResult;
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+    };
+
+    public reUpdateVerifyListByEmailAndEmailVerifyToken = async (
+        conn: PoolConnection,
+        email: string,
+        emailVerifiedDate: string,
+        emailVerifiedToken: string,
+    ) => {
+        const updateQuery = `UPDATE user_verify_list
+        SET
+            email_verified_date = "${emailVerifiedDate}",
+            email_verified_token = "${emailVerifiedToken}",
+            is_verified_email = ${true},
+            nickname = ${null},
+            nickname_verified_date = ${null},
+            nickname_verified_token = ${null},
+            is_verified_nickname = ${false}
+        WHERE email = "${email}";`;
+
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [resultSetHeader, _] = updateResult;
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+    };
 }

@@ -223,16 +223,21 @@ export class AuthService {
                     emailVerifyCode,
                 );
             } else {
-                if (findedUserVerifyList.isVerifiedEmail === 1)
-                    throw new BadRequestException(
-                        `${sendEmailDto.email} 은 ${findedUserVerifyList.emailVerifiedDate} 에 이미 인증이 완료된 사용자입니다.`,
+                if (findedUserVerifyList.isVerifiedEmail === 1) {
+                    // 회원가입 직전 까지 인증 절차를 따라간 사용자
+                    await this.authVerifyListRepository.reUpdateVerifyListByIdAndCode(
+                        conn,
+                        findedUserVerifyList.userVerifyListId,
+                        emailVerifyCode,
                     );
-
-                await this.authVerifyListRepository.updateVerifyListByIdAndCode(
-                    conn,
-                    findedUserVerifyList.userVerifyListId,
-                    emailVerifyCode,
-                );
+                } else {
+                    // 최초 인증을 진행하는 사용자
+                    await this.authVerifyListRepository.updateVerifyListByIdAndCode(
+                        conn,
+                        findedUserVerifyList.userVerifyListId,
+                        emailVerifyCode,
+                    );
+                }
             }
 
             const email = await this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode);
@@ -260,6 +265,9 @@ export class AuthService {
         try {
             await conn.beginTransaction();
 
+            const isExistsUser = await this.authRepository.isExistsByEmail(conn, confirmEmailDto.email);
+            if (isExistsUser) throw new ConflictException(`${confirmEmailDto.email} 은 이미 가입한 이메일입니다.`);
+
             const findedVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
                 conn,
                 confirmEmailDto.email,
@@ -268,25 +276,32 @@ export class AuthService {
             if (findedVerifyList === null) {
                 throw new BadRequestException(`${confirmEmailDto.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
             } else {
-                if (findedVerifyList.isVerifiedEmail === 1)
-                    throw new BadRequestException(
-                        `${findedVerifyList.email} 은 ${findedVerifyList.emailVerifiedDate} 에 이미 인증이 완료된 사용자입니다.`,
-                    );
                 if (findedVerifyList.emailVerifiedCode !== confirmEmailDto.emailVerifyCode)
                     throw new BadRequestException(`인증 번호가 틀렸습니다.`);
 
+                const emailVerifiedDate = this.dateProvider.getNowDatetime();
                 const emailVerifyToken = this.jwtProvider.signEmailVerifyToken({
                     type: "EmailVerifyToken",
                     email: findedVerifyList.email,
                 });
 
-                const date = this.dateProvider.getNowDatetime();
-                await this.authVerifyListRepository.updateVerifyListByEmailAndEmailVerifyToken(
-                    conn,
-                    findedVerifyList.email,
-                    date,
-                    emailVerifyToken,
-                );
+                if (findedVerifyList.isVerifiedNickname === 1) {
+                    await this.authVerifyListRepository.reUpdateVerifyListByEmailAndEmailVerifyToken(
+                        conn,
+                        confirmEmailDto.email,
+                        emailVerifiedDate,
+                        emailVerifyToken,
+                    );
+
+                    //
+                } else {
+                    await this.authVerifyListRepository.updateVerifyListByEmailAndEmailVerifyToken(
+                        conn,
+                        findedVerifyList.email,
+                        emailVerifiedDate,
+                        emailVerifyToken,
+                    );
+                }
 
                 await conn.commit();
                 return {
