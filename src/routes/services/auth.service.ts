@@ -218,7 +218,13 @@ export class AuthService {
         }
     };
 
-    public sendEmail = async (sendEmailDto: SendEmailDto): Promise<{ date: string }> => {
+    public sendEmail = async (
+        sendEmailDto: SendEmailDto,
+    ): Promise<{
+        isExceeded: boolean;
+        email: string;
+        date: string;
+    }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -234,6 +240,8 @@ export class AuthService {
                 sendEmailDto.email,
             );
 
+            const nowDate = this.dateProvider.getNowDatetime();
+
             if (findedUserVerifyList === null) {
                 await this.authVerifyListRepository.createVerifyListByEmailAndCode(
                     conn,
@@ -241,6 +249,25 @@ export class AuthService {
                     emailVerifyCode,
                 );
             } else {
+                // 일일 이메일 발송 제한 초과의 경우
+                if (
+                    findedUserVerifyList.isExeededOfEmailSent === 1 ||
+                    findedUserVerifyList.currentEmailSentCount >= 5
+                ) {
+                    await this.authVerifyListRepository.exceedOfEmailSent(
+                        conn,
+                        findedUserVerifyList.userVerifyListId,
+                        nowDate,
+                    );
+
+                    return {
+                        isExceeded: true,
+                        email: sendEmailDto.email,
+                        date: nowDate,
+                    };
+                }
+
+                // 일일 이메일 발송 제한 초과의 X 경우
                 if (findedUserVerifyList.isVerifiedEmail === 1) {
                     // 회원가입 직전 까지 인증 절차를 따라간 사용자
                     await this.authVerifyListRepository.reUpdateVerifyListByIdAndCode(
@@ -258,12 +285,13 @@ export class AuthService {
                 }
             }
 
-            const email = await this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode);
-            console.log(email);
+            await this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode);
 
             await conn.commit();
             return {
-                date: this.dateProvider.getNowDatetime(),
+                isExceeded: false,
+                email: sendEmailDto.email,
+                date: nowDate,
             };
         } catch (err) {
             await conn.rollback();

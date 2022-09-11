@@ -32,6 +32,9 @@ export class AuthVerifyListRepository {
             email_verified_token as emailVerifiedToken,
             email_verified_code as emailVerifiedCode,
             is_verified_email as isVerifiedEmail,
+            current_email_sent_count as currentEmailSentCount,
+            email_sent_exceeding_date as emailSentExceedingDate,
+            is_exeeded_of_email_sent as isExeededOfEmailSent,
             nickname as nickname,
             nickname_verified_date as nicknameVerifiedDate,
             nickname_verified_token as nicknameVerifiedToken,
@@ -68,7 +71,10 @@ export class AuthVerifyListRepository {
         userVerifyId: number,
         emailVerifyCode: string,
     ): Promise<void> => {
-        const updateQuery = `UPDATE user_verify_list SET email_verified_code = "${emailVerifyCode}" WHERE user_verify_list_id = ${userVerifyId};`;
+        const updateQuery = `
+            UPDATE user_verify_list
+            SET email_verified_code = "${emailVerifyCode}", current_email_sent_count = current_email_sent_count + 1
+            WHERE user_verify_list_id = ${userVerifyId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
         const [resultSetHeader, _] = updateResult;
@@ -84,8 +90,11 @@ export class AuthVerifyListRepository {
         emailVerifiedDate: string,
         emailVerifiedToken: string,
     ): Promise<void> => {
-        const updateQuery = `UPDATE user_verify_list SET 
-                email_verified_date = "${emailVerifiedDate}", email_verified_token = "${emailVerifiedToken}", is_verified_email = ${true}
+        const updateQuery = `UPDATE user_verify_list
+            SET
+                email_verified_date = "${emailVerifiedDate}",
+                email_verified_token = "${emailVerifiedToken}",
+                is_verified_email = ${true}
             WHERE email = "${email}";`;
 
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
@@ -105,7 +114,11 @@ export class AuthVerifyListRepository {
         nicknameVerifedToken: string,
     ): Promise<void> => {
         const updateQuery = `UPDATE user_verify_list
-                SET nickname = "${nickname}", nickname_verified_date = "${nicknameVerifiedDate}", nickname_verified_token = "${nicknameVerifedToken}", is_verified_nickname = ${true}
+            SET
+                nickname = "${nickname}",
+                nickname_verified_date = "${nicknameVerifiedDate}",
+                nickname_verified_token = "${nicknameVerifedToken}",
+                is_verified_nickname = ${true}
             WHERE email = "${email}";`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
@@ -114,6 +127,8 @@ export class AuthVerifyListRepository {
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
     };
+
+    // reUpdate
 
     public reUpdateVerifyListByIdAndCode = async (
         conn: PoolConnection,
@@ -129,7 +144,8 @@ export class AuthVerifyListRepository {
             nickname = ${null},
             nickname_verified_date = ${null},
             nickname_verified_token = ${null},
-            is_verified_nickname = ${false}
+            is_verified_nickname = ${false},
+            current_email_sent_count = current_email_sent_count + 1
         WHERE user_verify_list_id = ${userVerifyId};`;
 
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
@@ -160,6 +176,27 @@ export class AuthVerifyListRepository {
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
         const [resultSetHeader, _] = updateResult;
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+    };
+
+    // exipre
+
+    public exceedOfEmailSent = async (
+        conn: PoolConnection,
+        userVerifyListId: number,
+        emailSentExceedingDate: string,
+    ) => {
+        const exceedQuery = `UPDATE user_verify_list
+            SET
+                current_email_sent_count = 0,
+                email_sent_exceeding_date = "${emailSentExceedingDate}",
+                is_exeeded_of_email_sent = ${true}
+            WHERE user_verify_list_id = ${userVerifyListId};`;
+        const exceedResult = await conn.query<ResultSetHeader>(exceedQuery);
+
+        const [resultSetHeader, _] = exceedResult;
         const { affectedRows } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");

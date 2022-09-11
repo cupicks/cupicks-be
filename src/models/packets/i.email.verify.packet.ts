@@ -9,6 +9,10 @@ export interface IUserVerifyListPacket extends RowDataPacket {
     emailVerifiedCode: string;
     isVerifiedEmail: 0 | 1;
 
+    currentEmailSentCount: number;
+    emailSentExceedingDate: string;
+    isExeededOfEmailSent: 0 | 1;
+
     nickname: string;
     nicknameVerifiedDate: string;
     nicknameVerifiedToken: string;
