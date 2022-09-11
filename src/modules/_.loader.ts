@@ -6,6 +6,8 @@ import { MulterProvider } from "./providers/multer.provider";
 import { AwsSesProvider } from "./providers/aws.ses.provider";
 import { DateProvider } from "./providers/date.provider";
 
+import { DayjsProvider } from "./providers/dayjs.provider";
+
 import { JoiValidator } from "./validators/joi.validator";
 
 import { RandomGenerator } from "./generator/random.generator";
@@ -18,6 +20,7 @@ export {
     JwtProvider,
     MulterProvider,
     DateProvider,
+    DayjsProvider,
     JoiValidator,
     RandomGenerator,
 };
