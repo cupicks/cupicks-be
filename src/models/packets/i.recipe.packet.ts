@@ -7,11 +7,11 @@ export interface IRecipePacket extends RowDataPacket {
     content: string;
 
     isIced: 0 | 1;
-    isPublic?: 0 | 1;
 
     createdAt: string;
     updatedAt: string;
     ingredientName: string;
     ingredientColor: string;
     ingredientAmount: string;
+    isPublic: 0 | 1;
 }

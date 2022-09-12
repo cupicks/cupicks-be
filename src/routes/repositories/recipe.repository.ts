@@ -201,7 +201,7 @@ export class RecipeRepository {
     };
 
     /** @deprecated */
-    public getRecipesLegacy = async (conn: PoolConnection, page: number, count: number) => {
+    public getRecipesLegacy = async (conn: PoolConnection, page: number, count: number): Promise<any> => {
         const query = `
         SELECT
             R.recipe_id AS recipeId, R.title, R.content,

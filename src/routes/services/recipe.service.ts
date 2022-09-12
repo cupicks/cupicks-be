@@ -191,7 +191,9 @@ export class RecipeService {
                 };
             });
 
-            await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
+            // await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
+
+            const updateRecipeIngredient = await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
 
             await conn.commit();
         } catch (err) {

@@ -43,13 +43,13 @@ export class CommentService {
                 commentId,
             );
 
+            await conn.commit();
+
             return {
                 commentId,
                 createdAt: date,
                 updatedAt: date,
             };
-
-            await conn.commit();
         } catch (err) {
             await conn.rollback();
             throw err;

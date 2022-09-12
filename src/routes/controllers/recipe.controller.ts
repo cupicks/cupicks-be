@@ -10,7 +10,6 @@ import {
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
-import { IRecipeIngredientCustom } from "../../constants/_.loader";
 import { IRecipePacket } from "../../models/_.loader";
 
 export default class RecipeController {
