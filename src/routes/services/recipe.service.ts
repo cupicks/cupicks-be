@@ -1,57 +1,70 @@
-import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
-import { RecipeRepository } from "../repositories/_.exporter";
+import {
+    BadRequestException,
+    CreateRecipeDto,
+    IIngredientDto,
+    IngredientDto,
+    IRecipeIngredientPacket,
+    IRecipePacket,
+    NotFoundException,
+    RecipeDto,
+    UpdateRecipeDto,
+} from "../../models/_.loader";
+import {
+    AuthRepository,
+    RecipeIngredientRepository,
+    RecipeIngredientListRepository,
+    RecipeRepository,
+} from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
 
 export class RecipeService {
     private recipeRepository: RecipeRepository;
+    private recipeIngredientRepository: RecipeIngredientRepository;
+    private recipeIngredientListRepository: RecipeIngredientListRepository;
+    private authRepository: AuthRepository;
     private mysqlProvider: MysqlProvider;
 
     constructor() {
         this.recipeRepository = new RecipeRepository();
+        this.recipeIngredientRepository = new RecipeIngredientRepository();
+        this.recipeIngredientListRepository = new RecipeIngredientListRepository();
         this.mysqlProvider = new MysqlProvider();
+        this.authRepository = new AuthRepository();
     }
 
-    createRecipe = async (recipeDto: CreateRecipeDto, userId: number): Promise<any> => {
+    createRecipe = async (recipeDto: CreateRecipeDto, userId: number): Promise<number> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
-            const recipdId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
-            const result = recipeDto.ingredientList.map((e) => {
-                return {
-                    recipe_id: recipdId,
-                    ingredient_name: e.ingredientName,
-                    ingredient_color: e.ingredientColor,
-                    ingredient_amount: e.ingredientAmount,
-                };
-            });
+            const recipeId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
 
-            const createRecipeIngredient = Promise.resolve(this.recipeRepository.createRecipeIngredient(conn, result));
-            const createUserRecipe = Promise.resolve(this.recipeRepository.createUserRecipe(conn, userId, recipdId));
+            const ingredientList: IngredientDto[] = recipeDto.ingredientList;
+            const insertedIdList = await this.recipeRepository.createRecipeIngredients(conn, recipeId, ingredientList);
+            const createUserRecipe = await this.recipeRepository.createUserRecipe(conn, userId, recipeId);
 
-            const [ingredientIdList, userRecipeId]: [createdIngredientId: number[], createdUserRecipeId: string] =
-                await Promise.all([createRecipeIngredient, createUserRecipe]);
-
-            this.recipeRepository.createRecipeIngredientList(conn, recipdId, ingredientIdList);
+            await this.recipeRepository.createRecipeIngredientList(conn, recipeId, insertedIdList);
 
             await conn.commit();
-            return recipdId;
+            return recipeId;
         } catch (err) {
             await conn.rollback();
             throw err;
         } finally {
-            await conn.release();
+            conn.release();
         }
     };
 
-    getRecipe = async (recipeId: number): Promise<any> => {
+    getRecipe = async (recipeId: number): Promise<IRecipePacket[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
-            const findRecipeById = (await this.recipeRepository.findRecipeById(conn, recipeId)) as Array<object>;
 
-            if (findRecipeById.length <= 0) throw new Error("존재하지 않는 레시피입니다.");
+            const findRecipeById = await this.recipeRepository.findRecipeById(conn, recipeId);
+            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
 
             const getRecipe = await this.recipeRepository.getRecipe(conn, recipeId);
 
@@ -62,19 +75,60 @@ export class RecipeService {
             await conn.rollback();
             throw err;
         } finally {
-            await conn.release();
+            conn.release();
         }
     };
 
-    getRecipes = async (page: number, count: number): Promise<any> => {
+    getRecipes = async (page: number, count: number, filterOptions?: object): Promise<RecipeDto[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
-            const getRecipesOne = await this.recipeRepository.getRecipes(conn, count);
+            if (filterOptions === undefined) {
+                const recipeList: IRecipePacket[] = await this.recipeRepository.getRecipes(conn, page, count);
 
-            await conn.commit();
-            return getRecipesOne;
+                const recipeIdList = recipeList.map(({ recipeId }) => recipeId);
+
+                // @dpereacted
+                // const recipeIngredientIdList = await this.recipeIngredientListRepository.getRecipeIngrdientList(
+                //     conn,
+                //     recipeIdList,
+                // );
+
+                const recipeIngredientList: IRecipeIngredientPacket[][] = await Promise.all(
+                    recipeIdList.map(
+                        async (recipeId) =>
+                            await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(conn, recipeId),
+                    ),
+                );
+
+                const recipeDtoList = new Array<RecipeDto>();
+                const loopLength = recipeList.length;
+                for (let i = 0; i < loopLength; i++) {
+                    const recipeDto = new RecipeDto({
+                        recipeId: recipeList[i].recipeId,
+                        title: recipeList[i].title,
+                        content: recipeList[i].content,
+                        isIced: recipeList[i].isIced,
+                        cupSize: recipeList[i].cupSize,
+                        createdAt: recipeList[i].createdAt,
+                        updatedAt: recipeList[i].updatedAt,
+                        ingredientList: recipeIngredientList[i].map((ingredient): IIngredientDto => {
+                            return {
+                                ingredientName: ingredient.ingredientName,
+                                ingredientAmount: ingredient.ingredientAmount,
+                                ingredientColor: ingredient.ingredientColor,
+                            };
+                        }),
+                    });
+                    recipeDtoList.push(recipeDto);
+                }
+
+                await conn.commit();
+                return recipeDtoList;
+            } else {
+                throw new BadRequestException(`필터 기반 검색은 아직 지원하지 않는 도메인입니다.`);
+            }
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -83,39 +137,48 @@ export class RecipeService {
         }
     };
 
-    deleteRecipe = async (recipeId: number, userId: number): Promise<boolean | undefined> => {
+    deleteRecipe = async (recipeId: number, userId: number): Promise<boolean> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+
+            const findRecipeById = await this.recipeRepository.findRecipeById(conn, recipeId);
+            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+
             const isAuthenticated = await this.recipeRepository.isAuthenticated(conn, recipeId, userId);
+            if (!isAuthenticated) throw new Error("내가 작성한 레시피가 아닙니다.");
 
-            if (isAuthenticated.length <= 0) return false;
-
-            const deleteRecipe = await this.recipeRepository.deleteRecipe(conn, recipeId);
+            await this.recipeRepository.deleteRecipe(conn, recipeId);
 
             await conn.commit();
+            return true;
         } catch (err) {
             await conn.rollback();
             throw err;
         } finally {
-            await conn.release();
+            conn.release();
         }
     };
 
-    updateRecipe = async (updateRecipeDto: UpdateRecipeDto, recipeId: number, userId: number): Promise<boolean> => {
+    updateRecipe = async (updateRecipeDto: UpdateRecipeDto, recipeId: number, userId: number): Promise<void> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+
+            const findRecipeById = await this.recipeRepository.findRecipeById(conn, recipeId);
+            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+
             const isAuthenticated = await this.recipeRepository.isAuthenticated(conn, recipeId, userId);
+            if (!isAuthenticated) throw new Error("내가 작성한 레시피가 아닙니다.");
 
-            if (isAuthenticated.length <= 0) return false;
-
-            const updateRecipe = Promise.resolve(this.recipeRepository.updateRecipe(conn, updateRecipeDto, recipeId));
-            const deleteRecipeIngredient = Promise.resolve(
-                this.recipeRepository.deleteRecipeIngredient(conn, recipeId),
-            );
+            const updateRecipe = this.recipeRepository.updateRecipe(conn, updateRecipeDto, recipeId);
+            const deleteRecipeIngredient = this.recipeRepository.deleteRecipeIngredient(conn, recipeId);
 
             await Promise.all([updateRecipe, deleteRecipeIngredient]);
 
@@ -128,10 +191,9 @@ export class RecipeService {
                 };
             });
 
-            const updateRecipeIngredient = await this.recipeRepository.createRecipeIngredient(conn, result);
+            await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
 
             await conn.commit();
-            return true;
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -140,63 +202,53 @@ export class RecipeService {
         }
     };
 
-    likeRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+    likeRecipe = async (userId: number, recipeId: number): Promise<void> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
-            const findRecipeById = (await this.recipeRepository.findRecipeById(conn, recipeId)) as Array<object>;
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
-            if (findRecipeById.length <= 0) throw new Error("존재하지 않는 레시피입니다.");
+            const findRecipeById = await this.recipeRepository.findRecipeById(conn, recipeId);
+            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
 
-            const existLikeRecipe = (await this.recipeRepository.existLikeRecipeById(
-                conn,
-                userId,
-                recipeId,
-            )) as Array<object>;
+            const existLikeRecipe = await this.recipeRepository.existLikeRecipeById(conn, userId, recipeId);
+            if (existLikeRecipe) throw new Error("이미 좋아요 누른 레피시입니다.");
 
-            // 서비스에서 에러를 던지자
-            if (existLikeRecipe.length >= 1) throw new Error("이미 좋아요 누른 레시피입니다.");
-
-            const likeRecipe = await this.recipeRepository.likeRecipe(conn, userId, recipeId);
+            await this.recipeRepository.likeRecipe(conn, userId, recipeId);
 
             await conn.commit();
-
-            return likeRecipe;
         } catch (err) {
             await conn.rollback();
             throw err;
         } finally {
-            await conn.release();
+            conn.release();
         }
     };
 
-    dislikeRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+    dislikeRecipe = async (userId: number, recipeId: number): Promise<void> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
-            const findRecipeById = (await this.recipeRepository.findRecipeById(conn, recipeId)) as Array<object>;
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
-            if (findRecipeById.length <= 0) throw new Error("존재하지 않는 레시피입니다.");
+            const findRecipeById = await this.recipeRepository.findRecipeById(conn, recipeId);
+            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
 
-            const existDislikeRecipe = (await this.recipeRepository.existLikeRecipeById(
-                conn,
-                userId,
-                recipeId,
-            )) as Array<object>;
+            const existDislikeRecipe = await this.recipeRepository.existLikeRecipeById(conn, userId, recipeId);
 
-            // 서비스에서 에러를 던지자
-            if (existDislikeRecipe.length <= 0) throw new Error("내가 좋아요 한 레시피가 아닙니다.");
+            if (!existDislikeRecipe) throw new Error("좋아요 누른 레피시가 아닙니다.");
+            await this.recipeRepository.disRecipe(conn, userId, recipeId);
 
-            const dislikeRecipe = await this.recipeRepository.disRecipe(conn, userId, recipeId);
-
-            return dislikeRecipe;
+            await conn.commit();
         } catch (err) {
             await conn.rollback();
             throw err;
         } finally {
-            await conn.release();
+            conn.release();
         }
     };
 }

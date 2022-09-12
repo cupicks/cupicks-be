@@ -1,12 +1,17 @@
 import { RequestHandler, Request, Response } from "express";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
-import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
+import {
+    CreateRecipeDto,
+    UpdateRecipeDto,
+    DeleteRecipeDto,
+    CommonRecipeDto,
+    GetRecipeDto,
+} from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
-import { CommonRecipeDto } from "../../models/_.loader";
 import { IRecipeIngredientCustom } from "../../constants/_.loader";
-import { DeleteRecipeDto } from "../../models/_.loader";
+import { IRecipePacket } from "../../models/_.loader";
 
 export default class RecipeController {
     private recipeService: RecipeService;
@@ -29,6 +34,7 @@ export default class RecipeController {
                 recipeId: createRecipe,
             });
         } catch (err) {
+            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -45,7 +51,7 @@ export default class RecipeController {
                 }),
             );
 
-            const getRecipe: IRecipeIngredientCustom = await this.recipeService.getRecipe(validator.recipeId);
+            const getRecipe: IRecipePacket[] = await this.recipeService.getRecipe(validator.recipeId);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -79,19 +85,20 @@ export default class RecipeController {
 
     public getRecipes: RequestHandler = async (req: Request, res: Response) => {
         try {
-            if (!req.query.page && !req.query.count) throw new Error("페이지 번호나 개수를 확인해 주세요.");
+            const validator = await new JoiValidator().validateAsync<GetRecipeDto>(
+                new GetRecipeDto({
+                    page: Number(req.query.page),
+                    count: Number(req.query.count),
+                }),
+            );
 
-            const page = Number(req.query.page);
-            const count = Number(req.query.count);
+            const recipeDtoList = await this.recipeService.getRecipes(validator.page, validator.count);
 
-            const result: any[] = await this.recipeService.getRecipes(page, count);
-
-            const title: any = {};
-            const array: any[] = [];
-
-            console.log(result);
-
-            return res.end();
+            return res.json({
+                isSuccess: true,
+                message: "레시피 조회에성공하셨습니다.",
+                recipeList: recipeDtoList,
+            });
         } catch (err) {
             console.log(err);
             const exception = this.errorHandler(err);

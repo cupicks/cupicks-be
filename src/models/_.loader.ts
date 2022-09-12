@@ -34,6 +34,10 @@ import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.d
 import { UpdateRecipeDto } from "./dtos/recipe/update.recipe.dto";
 import { CommonRecipeDto } from "./dtos/recipe/common.recipe.dts";
 import { DeleteRecipeDto } from "./dtos/recipe/delete.recipe.dto";
+import { GetRecipeDto } from "./dtos/recipe/get.recipe.dto";
+
+import { RecipeDto, IRecipeDto } from "./dtos/recipe/recipe.dto";
+
 // COMMENT
 import { CreateCommentDto } from "./dtos/comment/create.comment.dto";
 import { DeleteCommentDto } from "./dtos/comment/delete.comment.dto";
@@ -42,6 +46,10 @@ import { GetCommentDto } from "./dtos/comment/get.comment.dto";
 
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
 import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
+import { IRecipePacket } from "./packets/i.recipe.packet";
+import { IRecipeIngredientPacket } from "./packets/i.recipe.ingredient.packet";
+import { IRecipeIngredientListPacket } from "./packets/i.recipe.ingredient.list.packet";
+import { ICommentPacket } from "./packets/i.comment.packet";
 
 export {
     Env,
@@ -53,6 +61,10 @@ export {
     IUserPacket,
     IUserRefresthTokenPacket,
     IUserVerifyListPacket,
+    IRecipePacket,
+    IRecipeIngredientPacket,
+    IRecipeIngredientListPacket,
+    ICommentPacket,
     // BaseDtos
     IBaseDto,
     // Dtos
@@ -86,6 +98,9 @@ export {
     IIngredientDto,
     CommonRecipeDto,
     DeleteRecipeDto,
+    GetRecipeDto,
+    RecipeDto,
+    IRecipeDto,
     // COMMENT
     CreateCommentDto,
     DeleteCommentDto,

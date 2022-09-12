@@ -1,7 +1,7 @@
 export interface IIngredientDto {
     ingredientName: string;
     ingredientColor: string;
-    ingredientAmount: number;
+    ingredientAmount: string;
 }
 
 // 서버 ㅡ> 클래스 !== 인터페이스
@@ -9,7 +9,7 @@ export interface IIngredientDto {
 export class IngredientDto implements IIngredientDto {
     ingredientName: string;
     ingredientColor: string;
-    ingredientAmount: number;
+    ingredientAmount: string;
 
     constructor({ ingredientName, ingredientColor, ingredientAmount }: IIngredientDto) {
         this.ingredientName = ingredientName;
