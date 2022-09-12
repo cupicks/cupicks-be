@@ -70,7 +70,19 @@ export class AuthRepository {
     };
 
     public findUserByEmail = async (conn: PoolConnection, email: string): Promise<IUserPacket | null> => {
-        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE email = "${email}" LIMIT 1;`;
+        const findQuery = `SELECT
+                user_id as userId,
+                email,
+                nickname,
+                password,
+                image_url as imageUrl,
+                reset_password_token as resetPasswordToken,
+                reset_password_date as resetPasswordDate,
+                current_password_sent_count as currentPasswordSentCount,
+                password_sent_exceeding_date as passwordSentExceedingDate,
+                is_exeeded_of_password_sent as isExeededOfPasswordSent
+            FROM user
+            WHERE email = "${email}" LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
 
         const userDataPacket = findResult[0];
@@ -246,6 +258,53 @@ export class AuthRepository {
         const [ResultSetHeader, _] = updateResult;
         const { affectedRows } = ResultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
+
+    public updateUserResetPassword = async (
+        conn: PoolConnection,
+        userId: number,
+        resetPasswordToken: string,
+        resetPasswordDate: string,
+    ) => {
+        const updateQuery = `UPDATE
+            user
+        SET
+            reset_password_token = "${resetPasswordToken}",
+            reset_password_date = "${resetPasswordDate}",
+            current_password_sent_count = current_password_sent_count + 1,
+            password_sent_exceeding_date = null,
+            is_exeeded_of_password_sent = null
+        WHERE
+            user_id = ${userId};`;
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [ResultSetHeader, _] = updateResult;
+        const { affectedRows } = ResultSetHeader;
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
+
+    // exipre
+    public exceedOfResetPasswordSent = async (
+        conn: PoolConnection,
+        userId: number,
+        passwordSentExceedingDate: string | null,
+    ) => {
+        const exceedQuery = `UPDATE
+            user
+        SET
+            reset_password_token = null,
+            reset_password_date = null,
+            current_password_sent_count = 0,
+            password_sent_exceeding_date = "${passwordSentExceedingDate}",
+            is_exeeded_of_password_sent = 1
+        WHERE
+            user_id = ${userId};`;
+        const exceedResult = await conn.query<ResultSetHeader>(exceedQuery);
+
+        const [resultSetHeader, _] = exceedResult;
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
     };
 
     /** @deprecated */

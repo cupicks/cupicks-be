@@ -159,12 +159,14 @@ export default class AuthController {
                     isSuccess: true,
                     message: `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
                     date: result.date,
+                    exceededDate: result.exceededDate,
                 });
             } else {
                 return res.status(201).json({
                     isSuccess: true,
                     message: `사용자 이메일로 6자리 숫자가 발송되었어요!`,
                     date: result.date,
+                    exceededDate: result.exceededDate,
                 });
             }
         } catch (err) {
@@ -240,12 +242,23 @@ export default class AuthController {
                 }),
             );
 
-            await this.authService.sendPassword(snedPasswordDto);
+            const result = await this.authService.sendPassword(snedPasswordDto);
 
-            return res.json({
-                isSuccess: true,
-                message: "임시 비밀번호를 이메일로 발송했어요!",
-            });
+            if (result.isExceeded) {
+                return res.status(201).json({
+                    isSuccess: true,
+                    message: `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
+                    date: result.date,
+                    exceededDate: result.exceededDate,
+                });
+            } else {
+                return res.status(201).json({
+                    isSuccess: true,
+                    message: `임시 비밀번호를 이메일로 발송했어요!`,
+                    date: result.date,
+                    exceededDate: result.exceededDate,
+                });
+            }
         } catch (err) {
             console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
