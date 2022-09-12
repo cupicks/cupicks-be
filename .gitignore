@@ -10,6 +10,7 @@
 # 위 커맨드로 가져온 이후에는 아래 리스트를 주석을 풀어주세요!
 
 ecosystem.config.ts
+ecosystem.config.js
 
 .env
 .env.dev

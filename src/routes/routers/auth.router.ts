@@ -1,18 +1,17 @@
 import { Router } from "express";
 import { preventLoginUserGuard, preventUnLoginUserGuard } from "../../middlewares/guards/_.exporter";
-import {
-    applicationJsonFilter,
-    applicationXWwwFormUrlencodedFilter,
-    formDataFilter,
-} from "../../middlewares/filters/_.exporter";
+// import {
+//     applicationJsonFilter,
+//     applicationXWwwFormUrlencodedFilter,
+//     formDataFilter,
+// } from "../../middlewares/filters/_.exporter";
 import { AuthController } from "../controllers/_.exporter";
 import { MulterProvider } from "../../modules/_.loader";
 
-const multer = {};
 const authRouter: Router = Router();
 authRouter.post(
     "/signup",
-    formDataFilter,
+    /* formDataFilter */
     preventLoginUserGuard,
     /**
      * 1주차 기술 피드백 - https://github.com/cupicks/cupicks-be/issues/51
@@ -22,21 +21,28 @@ authRouter.post(
     MulterProvider.uploadSingle,
     new AuthController().signup,
 );
-authRouter.post("/signin", applicationXWwwFormUrlencodedFilter, preventLoginUserGuard, new AuthController().signin);
-
-authRouter.get("/token", applicationXWwwFormUrlencodedFilter, new AuthController().publishToken);
-
-authRouter.get("/send-email", applicationXWwwFormUrlencodedFilter, new AuthController().sendEmail);
-
-authRouter.get("/confirm-email", applicationXWwwFormUrlencodedFilter, new AuthController().confirmEmailCode);
-
-authRouter.get("/confirm-nickname", applicationXWwwFormUrlencodedFilter, new AuthController().confirmNickname);
-
-authRouter.get(
-    "/confirm-password",
-    applicationJsonFilter,
-    preventUnLoginUserGuard,
-    new AuthController().confirmPassword,
+authRouter.post(
+    "/signin",
+    /* applicationXWwwFormUrlencodedFilter */ preventLoginUserGuard,
+    new AuthController().signin,
 );
+
+authRouter.patch(
+    "/logout",
+    /* applicationXWwwFormUrlencodedFilter */ preventLoginUserGuard,
+    new AuthController().logout,
+);
+
+authRouter.get("/token", /* applicationXWwwFormUrlencodedFilter */ new AuthController().publishToken);
+
+authRouter.get("/send-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendEmail);
+
+authRouter.get("/confirm-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmEmailCode);
+
+authRouter.get("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmNickname);
+
+authRouter.get("/send-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendPassword);
+
+authRouter.get("/reset-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().resetPassword);
 
 export default authRouter;

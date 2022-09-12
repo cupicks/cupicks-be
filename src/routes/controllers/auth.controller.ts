@@ -1,21 +1,28 @@
-import * as joi from "joi";
 import { Request, RequestHandler, Response } from "express";
 import {
-    SignupUserDto,
-    CustomException,
-    UnkownTypeError,
     UnkownError,
+    UnkownTypeError,
+    CustomException,
+    SignupUserDto,
     SigninUserDto,
+    LogoutUserDto,
     PublishTokenDto,
-    ConfirmPasswordDto,
     SendEmailDto,
     ConfirmEmailDto,
     ConfirmNicknameDto,
+    SendPasswordDto,
+    ResetPasswordDto,
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
 
 export default class AuthController {
+    static FRONT_URL: string;
+
+    static init(FRONT_URL: string) {
+        this.FRONT_URL = FRONT_URL;
+    }
+
     private authService: AuthService;
     private joiValidator: JoiValidator;
 
@@ -36,8 +43,6 @@ export default class AuthController {
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
                     imageUrl: file.location,
-                    email: req?.query["email"],
-                    nickname: req?.query["nickname"],
                     password: req?.query["password"],
                     emailVerifyToken: req?.query["emailVerifyToken"],
                     nicknameVerifyToken: req?.query["nicknameVerifyToken"],
@@ -88,18 +93,19 @@ export default class AuthController {
         }
     };
 
-    public publishToken: RequestHandler = async (req: Request, res: Response) => {
+    public logout: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const publishTokenDto = await this.joiValidator.validateAsync<PublishTokenDto>(
-                new PublishTokenDto(req?.query["refresh_token"]),
+            const logoutUserDto = await this.joiValidator.validateAsync<LogoutUserDto>(
+                new LogoutUserDto({
+                    refreshToken: req?.query["refreshToken"],
+                }),
             );
 
-            const accessToken = await this.authService.publishToken(publishTokenDto);
+            await this.authService.logout(logoutUserDto);
 
             return res.json({
                 isSuccess: true,
-                message: "토큰 재발행에 성공하셨습니다.",
-                accessToken,
+                message: "로그아웃에 성공하셨습니다.",
             });
         } catch (err) {
             console.log(err);
@@ -112,20 +118,20 @@ export default class AuthController {
         }
     };
 
-    public confirmPassword: RequestHandler = async (req: Request, res: Response) => {
+    public publishToken: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const confirmDto = await this.joiValidator.validateAsync<ConfirmPasswordDto>(
-                new ConfirmPasswordDto({
-                    password: req?.query["password"],
-                    userId: res.locals.userId,
+            const publishTokenDto = await this.joiValidator.validateAsync<PublishTokenDto>(
+                new PublishTokenDto({
+                    refreshToken: req?.query["refreshToken"],
                 }),
             );
 
-            await this.authService.confirmPassword(confirmDto);
+            const accessToken = await this.authService.publishToken(publishTokenDto);
 
             return res.json({
                 isSuccess: true,
-                message: "본인 확인에 성공하셨습니다.",
+                message: "토큰 재발행에 성공하셨습니다.",
+                accessToken,
             });
         } catch (err) {
             console.log(err);
@@ -148,11 +154,19 @@ export default class AuthController {
 
             const result = await this.authService.sendEmail(sendEmailDto);
 
-            return res.json({
-                isSuccess: true,
-                message: "사용자 이메일로 6자리 숫자가 발송되었습니다.",
-                date: result.date,
-            });
+            if (result.isExceeded) {
+                return res.status(201).json({
+                    isSuccess: true,
+                    message: `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
+                    date: result.date,
+                });
+            } else {
+                return res.status(201).json({
+                    isSuccess: true,
+                    message: `사용자 이메일로 6자리 숫자가 발송되었어요!`,
+                    date: result.date,
+                });
+            }
         } catch (err) {
             console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
@@ -195,7 +209,7 @@ export default class AuthController {
         try {
             const confirmNicknameDto = await this.joiValidator.validateAsync<ConfirmNicknameDto>(
                 new ConfirmNicknameDto({
-                    email: req?.query["email"],
+                    emailVerifyToken: req?.query["emailVerifyToken"],
                     nickname: req?.query["nickname"],
                 }),
             );
@@ -207,6 +221,54 @@ export default class AuthController {
                 message: "사용자 닉네임 중복확인이 완료되었습니다.",
                 nicknameVerifyToken: nicknameVerifyToken,
             });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public sendPassword: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const snedPasswordDto = await this.joiValidator.validateAsync<SendPasswordDto>(
+                new SendPasswordDto({
+                    email: req?.query["email"],
+                }),
+            );
+
+            await this.authService.sendPassword(snedPasswordDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "임시 비밀번호를 이메일로 발송했어요!",
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public resetPassword: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const snedPasswordDto = await this.joiValidator.validateAsync<ResetPasswordDto>(
+                new ResetPasswordDto({
+                    resetPasswordToken: req?.query["resetPasswordToken"],
+                }),
+            );
+
+            const email = await this.authService.resetPassword(snedPasswordDto);
+
+            // FE message : 'ㅇㅇㅇㅇ@naver.com 님 임시 비밀번호를 사용하실 수 있습니다.'
+            return res.redirect(AuthController.FRONT_URL + `/signIn?email=` + email);
         } catch (err) {
             console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화

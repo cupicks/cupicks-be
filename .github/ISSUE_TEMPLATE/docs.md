@@ -3,7 +3,6 @@ name: 문서 작업
 about: 특이한 기술 문법 / 간단한 소개 + URL
 title: 'Docs : 소개글'
 labels: 'documentation'
-assignees: ['unchaptered', 'axisotherwise']
 ---
 
 ### 한 일

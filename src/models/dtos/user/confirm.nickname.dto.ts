@@ -3,36 +3,39 @@ import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
+import { RequestQueryExtractor } from "../request.query.extractor";
 
 export interface IConfirmNicknameDto {
-    email: string;
+    emailVerifyToken: string;
     nickname: string;
 }
 
-export class ConfirmNicknameDto implements IBaseDto, IConfirmNicknameDto {
-    email: string;
+export class ConfirmNicknameDto
+    extends RequestQueryExtractor<"emailVerifyToken" | "nickname">
+    implements IBaseDto, IConfirmNicknameDto
+{
+    emailVerifyToken: string;
     nickname: string;
 
     constructor({
-        email,
+        emailVerifyToken,
         nickname,
     }: {
-        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
         nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
-        this.email = this.validateType(email);
-        this.nickname = this.validateType(nickname);
-    }
-
-    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
-        if (value === undefined) throw new Error("값 누락");
-        else if (typeof value === "string") return value;
-        else throw new Error("값 오류");
+        super();
+        this.emailVerifyToken = this.validateType(emailVerifyToken, "emailVerifyToken");
+        this.nickname = this.validateType(nickname, "nickname");
     }
 
     getJoiInstance(): ObjectSchema<ConfirmNicknameDto> {
         return joi.object<ConfirmNicknameDto>({
-            email: joi.string().required().trim().max(100).email().message("email 은 20자 이하여야 합니다."),
+            emailVerifyToken: joi
+                .string()
+                .required()
+                .max(1000)
+                .message("NicknameVerifyToken 은 반드시 포함하여야 합니다."),
             nickname: joi
                 .string()
                 .required()

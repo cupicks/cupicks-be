@@ -120,14 +120,16 @@ export class CommentRepository {
         count: number,
     ): Promise<object> => {
         const query = `
-            SELECT 
-                R.user_id AS userId, R.recipe_id AS recipeId,
-                C.comment_id AS commentId, C.comment, C.image_url AS imageUrl , C.created_at AS createdAt, C.updated_at AS updatedAt
-            FROM recipe_comment R
-            JOIN comment C
-            ON R.comment_id = C.comment_id
-            WHERE R.recipe_id = ?
-            LIMIT ?, ?
+        SELECT 
+            R.user_id AS userId, U.nickname AS nickname, R.recipe_id AS recipeId,
+            C.comment_id AS commentId, C.comment, C.image_url AS imageUrl , C.created_at AS createdAt, C.updated_at AS updatedAt
+        FROM recipe_comment R
+        JOIN comment C
+        ON R.comment_id = C.comment_id
+        LEFT JOIN user U
+        ON R.user_id = U.user_id
+        WHERE R.recipe_id = ?
+        LIMIT ?, ?
         `;
 
         const [result] = await conn.query<ResultSetHeader>(query, [recipeId, page, count]);
