@@ -5,6 +5,7 @@ export interface IJwtEnv {
     ACCESS_EXPIRED_IN: string;
     REFRESH_EXPIRED_IN: string;
     VERIFY_EXPIRED_IN: string;
+    RESET_EXPIRED_IN: string;
 
     HASH_ALGOIRHTM: TALGORITHM;
 
@@ -71,6 +72,7 @@ export class Env {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
             REFRESH_EXPIRED_IN: this.getEnvStringValue("JWT_REFRESH_EXPIRED_IN"),
             VERIFY_EXPIRED_IN: this.getEnvStringValue("JWT_VERIFY_EXPIRED_IN"),
+            RESET_EXPIRED_IN: this.getEnvStringValue("JWT_RESET_EXPIRED_IN"),
 
             HASH_ALGOIRHTM: this.getEnvLiteralTypeValue("JWT_HASH_ALGOIRHTM"),
             HASH_PRIVATE_PEM_KEY: this.getPemKey("private"),

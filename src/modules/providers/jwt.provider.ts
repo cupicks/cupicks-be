@@ -50,6 +50,7 @@ export class JwtProvider {
     static ACCESS_EXPIRED_IN: string;
     static REFRESH_EXPIRED_IN: string;
     static VERIFY_EXPIRED_IN: string;
+    static RESET_EXPIRED_IN: string;
     static HASH_ALGOIRHTM: TALGORITHM;
     static HASH_PRIVATE_PEM_KEY: string;
     static HASH_PUBLIC_PEM_KEY: string;
@@ -59,6 +60,8 @@ export class JwtProvider {
         ACCESS_EXPIRED_IN,
         REFRESH_EXPIRED_IN,
         VERIFY_EXPIRED_IN,
+        RESET_EXPIRED_IN,
+
         HASH_ALGOIRHTM,
         HASH_PRIVATE_PEM_KEY,
         HASH_PUBLIC_PEM_KEY,
@@ -69,6 +72,7 @@ export class JwtProvider {
         this.ACCESS_EXPIRED_IN = ACCESS_EXPIRED_IN;
         this.REFRESH_EXPIRED_IN = REFRESH_EXPIRED_IN;
         this.VERIFY_EXPIRED_IN = VERIFY_EXPIRED_IN;
+        this.RESET_EXPIRED_IN = RESET_EXPIRED_IN;
 
         this.HASH_ALGOIRHTM = HASH_ALGOIRHTM;
         this.HASH_PRIVATE_PEM_KEY = HASH_PRIVATE_PEM_KEY;
@@ -151,7 +155,7 @@ export class JwtProvider {
                 passphrase: JwtProvider.HASH_PASSPHRASE,
             },
             {
-                expiresIn: JwtProvider.VERIFY_EXPIRED_IN,
+                expiresIn: JwtProvider.RESET_EXPIRED_IN,
                 algorithm: JwtProvider.HASH_ALGOIRHTM,
             },
         );
