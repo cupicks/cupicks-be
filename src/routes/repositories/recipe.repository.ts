@@ -197,7 +197,8 @@ export class RecipeRepository {
             is_public as isPublic,
             created_at as createdAt,
             updated_at as updatedAt
-        FROM recipe LIMIT ${page - 1}, ${count};`;
+        FROM recipe
+        LIMIT ${count} OFFSET ${(page - 1) * count};`;
         const selectResult = await conn.query<IRecipePacket[]>(selectQuery);
         const [recipePackets, _] = selectResult;
 
