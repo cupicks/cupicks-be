@@ -1,10 +1,16 @@
 import { RequestHandler, Request, Response } from "express";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
-import { CreateCommentDto, DeleteCommentDto, UpdateCommentDto, GetCommentDto } from "../../models/_.loader";
+import {
+    CreateCommentDto,
+    DeleteCommentDto,
+    UpdateCommentDto,
+    GetCommentDto,
+    ICommentPacket,
+} from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { CommentService } from "../services/_.exporter";
-import { IRecipeResponseCustom, IResponse, IResponseCustom } from "../../constants/_.loader";
+import { ICommentResponse } from "../../constants/_.loader";
 
 export default class CommentController {
     private commentService: CommentService;
@@ -28,9 +34,7 @@ export default class CommentController {
                 }),
             );
 
-            console.log(typeof validator.recipeId);
-
-            const createComment = await this.commentService.createComment(
+            const createComment: ICommentResponse = await this.commentService.createComment(
                 validator,
                 validator.userId,
                 validator.recipeId,
@@ -100,7 +104,7 @@ export default class CommentController {
                 }),
             );
 
-            const updateComment = await this.commentService.updateComment(
+            const updateComment: ICommentPacket[] = await this.commentService.updateComment(
                 validator.userId,
                 validator.comment,
                 imageLocation,
@@ -113,12 +117,12 @@ export default class CommentController {
                 comment: {
                     userId: validator.userId,
                     nickname: validator.nickname,
-                    commentId: validator.commentId,
-                    imageUrl: imageLocation,
+                    commentId: updateComment[0].commentId,
+                    imageUrl: updateComment[0].image_url,
                     resizedUrl: null,
-                    comment: validator.comment,
-                    createdAt: updateComment.createdAt,
-                    updatedAt: updateComment.updatedAt,
+                    comment: updateComment[0].comment,
+                    createdAt: updateComment[0].createdAt,
+                    updatedAt: updateComment[0].updatedAt,
                 },
             });
         } catch (err) {
