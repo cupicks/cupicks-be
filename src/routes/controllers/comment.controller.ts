@@ -4,6 +4,7 @@ import { CustomException, UnkownTypeError, ValidationException } from "../../mod
 import { CreateCommentDto, DeleteCommentDto, UpdateCommentDto, GetCommentDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { CommentService } from "../services/_.exporter";
+import { IRecipeResponseCustom, IResponse, IResponseCustom } from "../../constants/_.loader";
 
 export default class CommentController {
     private commentService: CommentService;
@@ -75,6 +76,7 @@ export default class CommentController {
                 message: "댓글 삭제에 성공하였습니다.",
             });
         } catch (err) {
+            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
