@@ -1,14 +1,16 @@
-import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
-import { RecipeRepository } from "../repositories/_.exporter";
+import { CreateRecipeDto, IngredientDto, NotFoundException, UpdateRecipeDto } from "../../models/_.loader";
+import { AuthRepository, RecipeRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
 
 export class RecipeService {
     private recipeRepository: RecipeRepository;
+    private authRepository: AuthRepository;
     private mysqlProvider: MysqlProvider;
 
     constructor() {
         this.recipeRepository = new RecipeRepository();
         this.mysqlProvider = new MysqlProvider();
+        this.authRepository = new AuthRepository();
     }
 
     createRecipe = async (recipeDto: CreateRecipeDto, userId: number): Promise<any> => {
@@ -16,32 +18,39 @@ export class RecipeService {
         try {
             await conn.beginTransaction();
 
-            const recipdId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
-            const result = recipeDto.ingredientList.map((e) => {
-                return {
-                    recipe_id: recipdId,
-                    ingredient_name: e.ingredientName,
-                    ingredient_color: e.ingredientColor,
-                    ingredient_amount: e.ingredientAmount,
-                };
-            });
+            const recipeId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
+            // const result = recipeDto.ingredientList.map((e) => {
+            //     return {
+            //         recipe_id: recipeId,
+            //         ingredient_name: e.ingredientName,
+            //         ingredient_color: e.ingredientColor,
+            //         ingredient_amount: e.ingredientAmount,
+            //     };
+            // });
 
-            const createRecipeIngredient = Promise.resolve(this.recipeRepository.createRecipeIngredient(conn, result));
-            const createUserRecipe = Promise.resolve(this.recipeRepository.createUserRecipe(conn, userId, recipdId));
+            const ingredientList: IngredientDto[] = recipeDto.ingredientList;
+            // const createRecipeIngredient = await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
+            const insertedIdList = await this.recipeRepository.createRecipeIngredients(conn, recipeId, ingredientList);
+            const createUserRecipe = await this.recipeRepository.createUserRecipe(conn, userId, recipeId);
 
-            const [ingredientIdList, userRecipeId]: [createdIngredientId: number[], createdUserRecipeId: string] =
-                await Promise.all([createRecipeIngredient, createUserRecipe]);
+            await this.recipeRepository.createRecipeIngredientList(conn, recipeId, insertedIdList);
 
-            this.recipeRepository.createRecipeIngredientList(conn, recipdId, ingredientIdList);
+            // const [ingredientIdList, userRecipeId]: [createdIngredientId: number[], createdUserRecipeId: string] =
+            //     await Promise.all([createRecipeIngredient, createUserRecipe]);
 
+            // this.recipeRepository.createRecipeIngredientList(conn, recipdId, ingredientIdList);
+
+            // await conn.rollback();
             await conn.commit();
-            return recipdId;
+            return recipeId;
         } catch (err) {
             await conn.rollback();
             throw err;
         } finally {
-            await conn.release();
+            conn.release();
         }
     };
 
@@ -128,7 +137,7 @@ export class RecipeService {
                 };
             });
 
-            const updateRecipeIngredient = await this.recipeRepository.createRecipeIngredient(conn, result);
+            const updateRecipeIngredient = await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
 
             await conn.commit();
             return true;

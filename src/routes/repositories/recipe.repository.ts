@@ -1,4 +1,4 @@
-import { CreateRecipeDto, UpdateRecipeDto } from "../../models/_.loader";
+import { CreateRecipeDto, IngredientDto, UnkownError, UpdateRecipeDto } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, FieldPacket } from "mysql2/promise";
 import { IRecipeResponseCustom } from "../../constants/_.loader";
 
@@ -69,12 +69,16 @@ export class RecipeRepository {
         const resultSetHeader = result[0];
         const { affectedRows, insertId } = resultSetHeader;
 
-        if (affectedRows > 1) throw new Error("protected");
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
 
         return insertId;
     };
 
-    public createRecipeIngredient = async (conn: PoolConnection, ingredientList: Array<object>): Promise<number[]> => {
+    /** @deprecated */
+    public createRecipeIngredientLegacy = async (
+        conn: PoolConnection,
+        ingredientList: Array<object>,
+    ): Promise<number[]> => {
         const query = `
             INSERT INTO recipe_ingredient SET ?
         `;
@@ -91,10 +95,37 @@ export class RecipeRepository {
             total += affectedRows;
             insertIdList.push(insertId);
 
-            if (total > 20) throw new Error("protected");
+            if (total > 20) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
         }
 
         return insertIdList;
+    };
+
+    public createRecipeIngredients = async (
+        conn: PoolConnection,
+        recipeId: number,
+        ingredientList: IngredientDto[],
+    ): Promise<number[]> => {
+        let tmpCreateQuery = `INSERT INTO recipe_ingredient (recipe_id, ingredient_name, ingredient_color, ingredient_amount) VALUES`;
+
+        for (const ingre of ingredientList) {
+            const ingreRowQuery = `(${recipeId}, "${ingre.ingredientName}", "${ingre.ingredientColor}", "${ingre.ingredientAmount}"), `;
+            tmpCreateQuery += ingreRowQuery;
+        }
+
+        const createQuery = tmpCreateQuery.substring(0, tmpCreateQuery.length - 2) + ";";
+
+        const createResult = await conn.query<ResultSetHeader>(createQuery);
+        const [resultSetHeader, _] = createResult;
+
+        if (resultSetHeader.affectedRows !== ingredientList.length)
+            throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+
+        const insertedIdList = new Array(resultSetHeader.affectedRows)
+            .fill(resultSetHeader.insertId)
+            .map((insertedId, idx) => insertedId + idx);
+
+        return insertedIdList;
     };
 
     public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
@@ -110,23 +141,24 @@ export class RecipeRepository {
         const resultSetHeader = result[0];
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows > 1) throw new Error("protected");
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
 
         return JSON.stringify(result[0].insertId);
     };
 
     public createRecipeIngredientList = async (conn: PoolConnection, recipeId: number, ingredientIdList: number[]) => {
         const ingredientString = ingredientIdList.join(",").toString();
-        const query = `INESRT INTO
-                recipe_ingredient_list (recipe_id, recipe_ingredient_list)
-            VALUES (${recipeId}, "${ingredientString}")`;
+
+        const query = `INSERT INTO recipe_ingredient_list
+                (recipe_id, recipe_ingredient_list)
+            VALUES (${recipeId}, "${ingredientString}");`;
 
         const result = await conn.query<ResultSetHeader>(query);
 
         const resultSetHeader = result[0];
         const { affectedRows, insertId } = resultSetHeader;
 
-        if (affectedRows > 1) throw new Error("protected");
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
 
         return insertId;
     };
