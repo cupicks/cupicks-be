@@ -3,6 +3,7 @@ import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
+import { RequestQueryExtractor } from "../request.query.extractor";
 
 export interface IEditProfileDto {
     userId: number;
@@ -11,7 +12,10 @@ export interface IEditProfileDto {
     imageUrl?: string;
 }
 
-export class EditProfileDto implements IBaseDto, IEditProfileDto {
+export class EditProfileDto
+    extends RequestQueryExtractor<"nickname" | "password">
+    implements IBaseDto, IEditProfileDto
+{
     userId: number;
     nickname?: string | undefined;
     password?: string | undefined;
@@ -28,16 +32,11 @@ export class EditProfileDto implements IBaseDto, IEditProfileDto {
         password: string | string[] | ParsedQs | ParsedQs[] | undefined;
         imageUrl: string;
     }) {
+        super();
         this.userId = userId;
-        this.nickname = this.validateType(nickname);
-        this.password = this.validateType(password);
+        this.nickname = this.validateType(nickname, "nickname");
+        this.password = this.validateType(password, "password");
         this.imageUrl = imageUrl;
-    }
-
-    private validateType(value: string | string[] | ParsedQs | ParsedQs[] | undefined): string {
-        if (value === undefined) throw new Error("값 누락");
-        else if (typeof value === "string") return value;
-        else throw new Error("값 오류");
     }
 
     getJoiInstance(): ObjectSchema<EditProfileDto> {

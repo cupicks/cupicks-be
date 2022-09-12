@@ -16,11 +16,11 @@ export class RecipeService {
         try {
             await conn.beginTransaction();
 
-            const createRecipe = await this.recipeRepository.createRecipe(conn, recipeDto);
+            const recipdId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
 
             const result = recipeDto.ingredientList.map((e) => {
                 return {
-                    recipe_id: createRecipe,
+                    recipe_id: recipdId,
                     ingredient_name: e.ingredientName,
                     ingredient_color: e.ingredientColor,
                     ingredient_amount: e.ingredientAmount,
@@ -28,14 +28,15 @@ export class RecipeService {
             });
 
             const createRecipeIngredient = Promise.resolve(this.recipeRepository.createRecipeIngredient(conn, result));
-            const createUserRecipe = Promise.resolve(
-                this.recipeRepository.createUserRecipe(conn, userId, createRecipe),
-            );
+            const createUserRecipe = Promise.resolve(this.recipeRepository.createUserRecipe(conn, userId, recipdId));
 
-            await Promise.all([createRecipeIngredient, createUserRecipe]);
+            const [ingredientIdList, userRecipeId]: [createdIngredientId: number[], createdUserRecipeId: string] =
+                await Promise.all([createRecipeIngredient, createUserRecipe]);
+
+            this.recipeRepository.createRecipeIngredientList(conn, recipdId, ingredientIdList);
 
             await conn.commit();
-            return createRecipe;
+            return recipdId;
         } catch (err) {
             await conn.rollback();
             throw err;

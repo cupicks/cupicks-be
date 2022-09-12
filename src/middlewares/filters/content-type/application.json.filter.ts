@@ -7,7 +7,10 @@ export const applicationJsonFilter: RequestHandler = (req: Request, res: Respons
     // /api/auth/signin
     const originUrlExceptQuery: string = originUrl.split("?")[0];
 
-    if (req.headers["content-type"] === "application/json") return next();
+    const contentTypeList = req.headers["content-type"];
+    const contentType = contentTypeList?.split(";")[0];
+
+    if (contentType === "application/json") return next();
     else
         return res
             .status(500)

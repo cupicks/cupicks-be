@@ -11,7 +11,10 @@ export const applicationXWwwFormUrlencodedFilter: RequestHandler = (
     // /api/auth/signin
     const originUrlExceptQuery: string = originUrl.split("?")[0];
 
-    if (req.headers["content-type"] === "application/x-www-form-urlencoded") return next();
+    const contentTypeList = req.headers["content-type"];
+    const contentType = contentTypeList?.split(";")[0];
+
+    if (contentType === "application/x-www-form-urlencoded") return next();
     else
         return res
             .status(500)

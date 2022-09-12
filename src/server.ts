@@ -11,8 +11,7 @@ import {
     MulterProvider,
     AwsSesProvider,
 } from "./modules/_.loader";
-
-import * as jwt from "jsonwebtoken";
+import { AuthController } from "./routes/controllers/_.exporter";
 
 /**
  * `IIFE`
@@ -28,7 +27,9 @@ import * as jwt from "jsonwebtoken";
     BcryptProvider.init(env.SALT);
     MysqlProvider.init(env.MYSQL);
     MulterProvider.init(env.S3);
-    AwsSesProvider.init(env.SES);
+    AwsSesProvider.init(env.SES, env.URL.SERVER_URL_WITH_PORT);
 
-    new App(MODE, env.PORT, env.CORS_ORIGIN_LIST);
+    AuthController.init(env.URL.FROTN_REDIRECT_URL_WITHOUT_PORT);
+
+    new App(MODE, env.PORT, env.URL.CORS_URL_LIST_WITHOUT_PORT);
 })();

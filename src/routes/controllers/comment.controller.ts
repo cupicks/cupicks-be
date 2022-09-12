@@ -1,11 +1,9 @@
-import { RequestHandler, Request, Response, NextFunction, json } from "express";
-import { number } from "joi";
+import { RequestHandler, Request, Response } from "express";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
-import { CreateCommentDto } from "../../models/_.loader";
+import { CreateCommentDto, DeleteCommentDto, UpdateCommentDto, GetCommentDto } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { CommentService } from "../services/_.exporter";
-import { IResponse, IResponseCustom } from "../../constants/_.loader";
 
 export default class CommentController {
     private commentService: CommentService;
@@ -14,155 +12,151 @@ export default class CommentController {
         this.commentService = new CommentService();
     }
 
-    // public createComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
-    //     try {
-    //         const file = req.file as Express.MulterS3.File;
+    public createComment: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const file = req.file as Express.MulterS3.File;
 
-    //         const imageLocation = file?.location.length > 0 ? file.location : null;
+            const imageLocation = file?.location.length > 0 ? file.location : null;
 
-    //         // const userId: number = res.locals.userId;
-    //         const nickname: string = res.locals.nickname;
+            const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
+                new CreateCommentDto({
+                    userId: res.locals.userId,
+                    nickname: res.locals.nickname,
+                    recipeId: req.query.recipeId,
+                    comment: req.query.comment,
+                }),
+            );
 
-    //         const recipeId: number = Number(req.query!.recipeId);
-    //         const comment: string = req.query!.comment as string;
+            console.log(typeof validator.recipeId);
 
-    //         if (!recipeId && !comment) throw new Error("protected");
+            const createComment = await this.commentService.createComment(
+                validator,
+                validator.userId,
+                validator.recipeId,
+                imageLocation,
+            );
 
-    //         const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
-    //             new CreateCommentDto(comment),
-    //         );
+            return res.status(201).json({
+                isSuccess: false,
+                message: "댓글 작성에 성공하였습니다.",
+                comment: {
+                    userId: validator.userId,
+                    nickname: validator.nickname,
+                    recipeId: validator.recipeId,
+                    commentId: createComment.commentId,
+                    imageUrl: imageLocation,
+                    resizedUrl: null,
+                    createdAt: createComment.createdAt,
+                    updatedAt: createComment.updatedAt,
+                },
+            });
+        } catch (err) {
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
 
-    //         const createComment: CreateCommentDto = await this.commentService.createComment(
-    //             validator,
-    //             userId,
-    //             recipeId,
-    //             imageLocation,
-    //         );
+    public deleteComment: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const validator = await new JoiValidator().validateAsync<DeleteCommentDto>(
+                new DeleteCommentDto({
+                    userId: res.locals.userId,
+                    commentId: Number(req.params.commentId),
+                }),
+            );
 
-    //         // IResponseDto??
-    //         const responseStringify = JSON.stringify(createComment);
-    //         const responseParse = JSON.parse(responseStringify);
+            await this.commentService.deleteComment(validator.userId, validator.commentId);
 
-    //         responseParse.userId = userId;
-    //         responseParse.nickname = nickname;
-    //         responseParse.recipeId = recipeId;
-    //         responseParse.imageUrl = req.body.imageValue;
-    //         responseParse.comment = req.body.comment;
-    //         responseParse.imageUrl = imageLocation;
+            return res.status(200).json({
+                isSuccess: true,
+                message: "댓글 삭제에 성공하였습니다.",
+            });
+        } catch (err) {
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
 
-    //         return res.status(201).json({
-    //             isSuccess: true,
-    //             message: "댓글 작성에 성공하였습니다.",
-    //             responseParse,
-    //         });
-    //     } catch (err) {
-    //         const exception = this.errorHandler(err);
-    //         return res.status(exception.statusCode).json({
-    //             isSuccess: false,
-    //             message: exception.message,
-    //         });
-    //     }
-    // };
+    public updateComment: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const file = req.file as Express.MulterS3.File;
 
-    // public deleteComment: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<object> => {
-    //     try {
-    //         const userId: number = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
-    //         const commentId: number = Number(req.params.commentId) as number;
+            const imageLocation = file?.location.length > 0 ? file.location : null;
 
-    //         if (!commentId) throw new Error("protected");
+            const validator = await new JoiValidator().validateAsync<UpdateCommentDto>(
+                new UpdateCommentDto({
+                    userId: res.locals.userId,
+                    nickname: res.locals.nickname,
+                    commentId: Number(req.params.commentId),
+                    comment: req.query.comment,
+                }),
+            );
 
-    //         const deleteComment = await this.commentService.deleteComment(userId, commentId);
+            const updateComment = await this.commentService.updateComment(
+                validator.userId,
+                validator.comment,
+                imageLocation,
+                validator.commentId,
+            );
 
-    //         if (deleteComment === "undefined") {
-    //             throw new Error("here");
-    //         }
+            return res.status(200).json({
+                isSuccess: true,
+                message: "댓글 수정에 성공하였습니다.",
+                comment: {
+                    userId: validator.userId,
+                    nickname: validator.nickname,
+                    commentId: validator.commentId,
+                    imageUrl: imageLocation,
+                    resizedUrl: null,
+                    comment: validator.comment,
+                    createdAt: updateComment.createdAt,
+                    updatedAt: updateComment.updatedAt,
+                },
+            });
+        } catch (err) {
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
 
-    //         return res.status(200).json({
-    //             isSuccess: true,
-    //             message: "댓글 삭제에 성공하였습니다.",
-    //         });
-    //     } catch (err) {
-    //         const exception = this.errorHandler(err);
-    //         return res.status(exception.statusCode).json({
-    //             isSuccess: false,
-    //             message: exception.message,
-    //         });
-    //     }
-    // };
+    public getComments: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const validator = await new JoiValidator().validateAsync<GetCommentDto>(
+                new GetCommentDto({
+                    recipeId: Number(req.query.recipeId),
+                    page: Number(req.query.page),
+                    count: Number(req.query.count),
+                }),
+            );
 
-    // public updateComment: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
-    //     try {
-    //         const file = req.file as Express.MulterS3.File;
+            const getComments = await this.commentService.getComments(
+                validator.recipeId,
+                validator.page,
+                validator.count,
+            );
 
-    //         const imageLocation = file?.location.length > 0 ? file.location : null;
-
-    //         const userId: number = res.locals.userId !== "undefined" ? "1" : res.locals.userId;
-    //         const nickname = res.locals.nickname !== "undefined" ? "관리자" : res.locals.nickname;
-    //         const commentId: number = parseInt(req.params.commentId) as number;
-    //         const comment: string = req.query.comment as string;
-
-    //         if (!commentId) throw new Error("protected");
-
-    //         const responseData: IResponse = await this.commentService.updateComment(
-    //             userId,
-    //             comment,
-    //             imageLocation,
-    //             commentId,
-    //         );
-
-    //         responseData.nickname = nickname;
-
-    //         return res.status(200).json({
-    //             isSuccess: true,
-    //             message: "코멘트 수정에 성공하였습니다.",
-    //             comment: responseData,
-    //         });
-    //     } catch (err) {
-    //         const exception = this.errorHandler(err);
-    //         return res.status(exception.statusCode).json({
-    //             isSuccess: false,
-    //             message: exception.message,
-    //         });
-    //     }
-    // };
-
-    // public getComments: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
-    //     try {
-    //         const userId: string | number = res.locals.userId !== "undefined" ? 1 : res.locals.userId;
-    //         const nickname: string | number = res.locals.nickname !== "undefined" ? "admin" : res.locals.nickname;
-
-    //         const recipeId: number = Number(req.query.recipeId) as number;
-    //         const page: number = Number(req.query.page) as number;
-    //         const count: number = Number(req.query.count) as number;
-
-    //         const result: IResponseCustom = (await this.commentService!.getComments(recipeId, page, count)) as any;
-
-    //         const responseData: object = result.map((e) => {
-    //             return {
-    //                 userId: e.userId,
-    //                 nickname,
-    //                 recipeId: e.recipeId,
-    //                 commentId: e.commentId,
-    //                 imageUrl: e.imageUrl,
-    //                 comment: e.comment,
-    //                 createdAt: e.createdAt,
-    //                 updatedAt: e.updatedAt,
-    //             };
-    //         });
-
-    //         return res.status(200).json({
-    //             isSuccess: true,
-    //             message: `${recipeId}번 레시피에대한 코멘트 전체 조회에 성공했습니다.`,
-    //             commentList: responseData,
-    //         });
-    //     } catch (err) {
-    //         const exception = this.errorHandler(err);
-    //         return res.status(exception.statusCode).json({
-    //             isSuccess: false,
-    //             message: exception.message,
-    //         });
-    //     }
-    // };
+            return res.status(200).json({
+                isSuccess: true,
+                message: "댓글 전체 조회에 성공했습니다.",
+                commentList: getComments,
+            });
+        } catch (err) {
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
 
     public errorHandler = (err: unknown): CustomException => {
         if (err instanceof CustomException) return err;

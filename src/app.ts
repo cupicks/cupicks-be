@@ -13,15 +13,15 @@ import { getCorsMiddleware } from "./middlewares/guards/_.exporter";
 export default class App {
     app: express.Application;
 
-    constructor(MODE: TNODE_ENV, PORT: number, CORS_ORIGIN_LIST: string[]) {
+    constructor(MODE: TNODE_ENV, PORT: number, CORS_URL_LIST_WITHOUT_PORT: string[]) {
         this.app = express();
 
-        this.setMiddleware(MODE, CORS_ORIGIN_LIST);
+        this.setMiddleware(MODE, CORS_URL_LIST_WITHOUT_PORT);
         this.setRouter();
         this.runServer(MODE, PORT);
     }
 
-    setMiddleware(MODE: TNODE_ENV, CORS_ORIGIN_LIST: string[]) {
+    setMiddleware(MODE: TNODE_ENV, CORS_URL_LIST_WITHOUT_PORT: string[]) {
         if (MODE === "dev") {
             this.app;
             this.app.use(morgan("dev"));
@@ -29,7 +29,7 @@ export default class App {
             this.app.use(morgan("combined"));
         }
 
-        this.app.use(getCorsMiddleware(CORS_ORIGIN_LIST));
+        this.app.use(getCorsMiddleware(CORS_URL_LIST_WITHOUT_PORT));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
     }

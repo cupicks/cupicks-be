@@ -3,7 +3,12 @@ import { CustomException, IJwtEnv, JwtAuthorizationException, UnkownTypeError } 
 import { TALGORITHM } from "../../constants/_.loader";
 
 declare module "jsonwebtoken" {
-    export type CustomTokenType = "AccessToken" | "RefreshToken" | "EmailVerifyToken" | "NicknameVerifyToken";
+    export type CustomTokenType =
+        | "AccessToken"
+        | "RefreshToken"
+        | "EmailVerifyToken"
+        | "NicknameVerifyToken"
+        | "ResetPasswordToken";
 
     export interface ICustomPayload extends jwtLib.JwtPayload {
         type: CustomTokenType;
@@ -32,12 +37,20 @@ declare module "jsonwebtoken" {
         type: "NicknameVerifyToken";
         nickname: string;
     }
+
+    export interface IResetPasswordToken extends ICustomPayload {
+        type: "ResetPasswordToken";
+        email: string;
+        hashedPassword: string;
+    }
 }
 
 export class JwtProvider {
     static isInit = false;
     static ACCESS_EXPIRED_IN: string;
     static REFRESH_EXPIRED_IN: string;
+    static VERIFY_EXPIRED_IN: string;
+    static RESET_EXPIRED_IN: string;
     static HASH_ALGOIRHTM: TALGORITHM;
     static HASH_PRIVATE_PEM_KEY: string;
     static HASH_PUBLIC_PEM_KEY: string;
@@ -46,6 +59,9 @@ export class JwtProvider {
     static init({
         ACCESS_EXPIRED_IN,
         REFRESH_EXPIRED_IN,
+        VERIFY_EXPIRED_IN,
+        RESET_EXPIRED_IN,
+
         HASH_ALGOIRHTM,
         HASH_PRIVATE_PEM_KEY,
         HASH_PUBLIC_PEM_KEY,
@@ -55,6 +71,9 @@ export class JwtProvider {
 
         this.ACCESS_EXPIRED_IN = ACCESS_EXPIRED_IN;
         this.REFRESH_EXPIRED_IN = REFRESH_EXPIRED_IN;
+        this.VERIFY_EXPIRED_IN = VERIFY_EXPIRED_IN;
+        this.RESET_EXPIRED_IN = RESET_EXPIRED_IN;
+
         this.HASH_ALGOIRHTM = HASH_ALGOIRHTM;
         this.HASH_PRIVATE_PEM_KEY = HASH_PRIVATE_PEM_KEY;
         this.HASH_PUBLIC_PEM_KEY = HASH_PUBLIC_PEM_KEY;
@@ -62,7 +81,7 @@ export class JwtProvider {
         this.isInit = true;
     }
 
-    public sign<T extends jwtLib.ICustomPayload>(payload: T): string {
+    public signAccessToken(payload: jwtLib.IAccessTokenPayload): string {
         this.validateIsInit();
 
         return jwtLib.sign(
@@ -73,6 +92,70 @@ export class JwtProvider {
             },
             {
                 expiresIn: JwtProvider.ACCESS_EXPIRED_IN,
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
+            },
+        );
+    }
+
+    public signRefreshToken(payload: jwtLib.IRefreshTokenPayload): string {
+        this.validateIsInit();
+
+        return jwtLib.sign(
+            payload,
+            {
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
+            },
+            {
+                expiresIn: JwtProvider.REFRESH_EXPIRED_IN,
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
+            },
+        );
+    }
+
+    public signEmailVerifyToken(payload: jwtLib.IEmailVerifyToken): string {
+        this.validateIsInit();
+
+        return jwtLib.sign(
+            payload,
+            {
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
+            },
+            {
+                expiresIn: JwtProvider.VERIFY_EXPIRED_IN,
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
+            },
+        );
+    }
+
+    public signNicknameVerifyToken(payload: jwtLib.INicknameVerifyToken): string {
+        this.validateIsInit();
+
+        return jwtLib.sign(
+            payload,
+            {
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
+            },
+            {
+                expiresIn: JwtProvider.VERIFY_EXPIRED_IN,
+                algorithm: JwtProvider.HASH_ALGOIRHTM,
+            },
+        );
+    }
+
+    public signResetPasswordToken(payload: jwtLib.IResetPasswordToken): string {
+        this.validateIsInit();
+
+        return jwtLib.sign(
+            payload,
+            {
+                key: JwtProvider.HASH_PRIVATE_PEM_KEY,
+                passphrase: JwtProvider.HASH_PASSPHRASE,
+            },
+            {
+                expiresIn: JwtProvider.RESET_EXPIRED_IN,
                 algorithm: JwtProvider.HASH_ALGOIRHTM,
             },
         );
