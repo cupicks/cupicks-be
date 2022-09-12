@@ -3,7 +3,7 @@ import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mys
 import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeRepository {
-    public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<any> => {
+    public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<boolean> => {
         const query = `
             SELECT 
                 *
@@ -21,40 +21,36 @@ export class RecipeRepository {
             WHERE U.user_id = ?
         `;
 
-        const [result] = await conn.query(query, [recipeId, userId]);
+        const [selectResult] = await conn.query<RowDataPacket[]>(query, [recipeId, userId]);
+        const [recipePackets, _] = selectResult;
 
-        return result;
+        return recipePackets ? true : false;
     };
 
-    public findRecipeById = async (
-        conn: PoolConnection,
-        recipeId: number,
-    ): Promise<IRecipeResponseCustom | ResultSetHeader> => {
+    public findRecipeById = async (conn: PoolConnection, recipeId: number): Promise<boolean> => {
         const query = `
             SELECT *
             FROM recipe
             WHERE recipe_id = ?
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, recipeId);
+        const selectResult = await conn.query<RowDataPacket[]>(query, recipeId);
+        const [recipePackets, _] = selectResult;
 
-        return result;
+        return recipePackets.length !== 0 ? true : false;
     };
 
-    public existLikeRecipeById = async (
-        conn: PoolConnection,
-        userId: number,
-        recipeId: number,
-    ): Promise<IRecipeResponseCustom | ResultSetHeader> => {
+    public existLikeRecipeById = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
         const query = `
             SELECT *
             FROM user_like_recipe
             WHERE user_id = ? AND recipe_id = ?;
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+        const selectResult = await conn.query<RowDataPacket[]>(query, [userId, recipeId]);
+        const [recipePackets, _] = selectResult;
 
-        return result;
+        return recipePackets.length !== 0 ? true : false;
     };
 
     public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
@@ -163,7 +159,7 @@ export class RecipeRepository {
         return insertId;
     };
 
-    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<any> => {
+    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipePacket[]> => {
         const query = `
         SELECT 
             R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
@@ -182,7 +178,7 @@ export class RecipeRepository {
         WHERE R.recipe_id = ?
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, recipeId);
+        const [result] = await conn.query<IRecipePacket[]>(query, recipeId);
 
         return result;
     };

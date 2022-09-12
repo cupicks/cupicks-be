@@ -49,6 +49,7 @@ import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
 import { IRecipePacket } from "./packets/i.recipe.packet";
 import { IRecipeIngredientPacket } from "./packets/i.recipe.ingredient.packet";
 import { IRecipeIngredientListPacket } from "./packets/i.recipe.ingredient.list.packet";
+import { ICommentPacket } from "./packets/i.comment.packet";
 
 export {
     Env,
@@ -63,6 +64,7 @@ export {
     IRecipePacket,
     IRecipeIngredientPacket,
     IRecipeIngredientListPacket,
+    ICommentPacket,
     // BaseDtos
     IBaseDto,
     // Dtos

@@ -1,16 +1,21 @@
-import { CreateCommentDto } from "../../models/_.loader";
-import { CommentRepository } from "../repositories/_.exporter";
+import { CreateCommentDto, NotFoundException } from "../../models/_.loader";
+import { CommentRepository, RecipeRepository, AuthRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
 import { MulterProvider } from "../../modules/_.loader";
-import { IResponse, IResponseCustom } from "../../constants/_.loader";
+import { ICommentPacket } from "../../models/_.loader";
+import { ICommentResponse } from "../../constants/_.loader";
 
 export class CommentService {
     private commentRepository: CommentRepository;
     private mysqlProvider: MysqlProvider;
+    private recipeRepository: RecipeRepository;
+    private authRepository: AuthRepository;
 
     constructor() {
         this.commentRepository = new CommentRepository();
         this.mysqlProvider = new MysqlProvider();
+        this.recipeRepository = new RecipeRepository();
+        this.authRepository = new AuthRepository();
     }
 
     public createComment = async (
@@ -18,17 +23,18 @@ export class CommentService {
         userId: number,
         recipeId: number,
         imageLocation: string | null,
-    ): Promise<any> => {
+    ): Promise<ICommentResponse> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             const date = new Date().toISOString().slice(0, 19).replace("T", " ");
 
             await conn.beginTransaction();
 
-            const createComment = await this.commentRepository.createComment(conn, commentDto, imageLocation);
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
-            const createCommentResult = JSON.stringify(createComment);
-            const commentId = JSON.parse(createCommentResult).insertId;
+            const createComment = await this.commentRepository.createComment(conn, commentDto, imageLocation);
+            const commentId = createComment;
 
             const createRecipeComment = await this.commentRepository.createRecipeComment(
                 conn,
@@ -57,20 +63,16 @@ export class CommentService {
         try {
             await conn.beginTransaction();
 
-            const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
-            const isAuthenticated: number = result[0].userId as number;
-
-            if (userId !== isAuthenticated && !isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
+            const isAuthenticated = await this.commentRepository.isAuthenticated(conn, userId, commentId);
+            if (!isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
 
             const findCommentById = await this.commentRepository.findCommentByCommentId(conn, commentId);
-
-            const image = JSON.stringify(findCommentById);
-            const imageValue = JSON.parse(image)[0].image_url;
-
-            const imageResult = imageValue !== null ? (imageValue.split("/")[4] as string) : null;
-
-            if (imageResult !== null) MulterProvider.deleteImage(imageResult);
+            const findCommentResult = findCommentById[0].image_url;
+            const imageValue = findCommentResult !== null ? findCommentResult?.split("/")[4] : null;
+            if (imageValue !== null && imageValue === "undefined") MulterProvider.deleteImage(imageValue);
 
             await this.commentRepository.deleteComment(conn, commentId);
 
@@ -88,40 +90,32 @@ export class CommentService {
         comment: string,
         imageLocation: string | null,
         commentId: number,
-    ): Promise<IResponse> => {
+    ): Promise<ICommentPacket[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             const date = new Date().toISOString().slice(0, 19).replace("T", " ");
 
             await conn.beginTransaction();
 
-            const result = await this.commentRepository.isAuthenticated(conn, userId, commentId);
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
-            const isAuthenticated: number = result[0]!.userId as number;
+            const isAuthenticated = await this.commentRepository.isAuthenticated(conn, userId, commentId);
+            if (!isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
 
-            if (userId !== isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
+            const findCommentById: ICommentPacket[] = await this.commentRepository.findCommentByCommentId(
+                conn,
+                commentId,
+            );
+            const findCommentResult = findCommentById;
+            const imageValue = findCommentResult !== null ? findCommentResult[0].image_url?.split("/")[4] : null;
+            if (imageValue !== null && imageValue === "undefined") MulterProvider.deleteImage(imageValue);
 
-            const findCommentById = await this.commentRepository.findCommentByCommentId(conn, commentId);
-
-            const image = JSON.stringify(findCommentById);
-            const imageValue = JSON.parse(image)[0].image_url;
-
-            const imageResult = imageValue !== null ? (imageValue.split("/")[4] as string) : null;
-
-            if (imageResult !== null) MulterProvider.deleteImage(imageResult);
-
-            await this.commentRepository.updateComment(conn, comment, imageLocation, commentId);
+            const updateComment = await this.commentRepository.updateComment(conn, comment, imageLocation, commentId);
 
             await conn.commit();
 
-            return {
-                userId,
-                comment,
-                commentId,
-                imageUrl: imageLocation,
-                createdAt: date,
-                updatedAt: date,
-            };
+            return findCommentById;
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -130,17 +124,23 @@ export class CommentService {
         }
     };
 
-    public getComments = async (recipeId: number, page: number, count: number): Promise<any> => {
+    public getComments = async (recipeId: number, page: number, count: number): Promise<ICommentPacket[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
-            const getComments = await this.commentRepository.getComments(conn, recipeId, page, count);
+            await conn.beginTransaction();
+
+            const findRecipeById: boolean = await this.recipeRepository.findRecipeById(conn, recipeId);
+
+            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+
+            const getComments: ICommentPacket[] = await this.commentRepository.getComments(conn, recipeId, page, count);
 
             return getComments;
         } catch (err) {
             await conn.rollback();
             throw err;
         } finally {
-            await conn.release();
+            conn.release();
         }
     };
 }

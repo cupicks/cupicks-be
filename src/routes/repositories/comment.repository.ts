@@ -1,8 +1,9 @@
-import { CreateCommentDto } from "../../models/_.loader";
-import { PoolConnection, ResultSetHeader } from "mysql2/promise";
+import { CreateCommentDto, UnkownError } from "../../models/_.loader";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { ICommentPacket } from "../../models/_.loader";
 
 export class CommentRepository {
-    public isAuthenticated = async (conn: PoolConnection, userId: number, commentId: number): Promise<any> => {
+    public isAuthenticated = async (conn: PoolConnection, userId: number, commentId: number): Promise<boolean> => {
         const query = `
         SELECT 
         R.user_id AS userId
@@ -20,31 +21,30 @@ export class CommentRepository {
         WHERE R.user_id = ? AND C.comment_id = ? 
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [userId, commentId]);
-        const resultSetHeader = result.affectedRows;
+        const [selectResult] = await conn.query<RowDataPacket[]>(query, [userId, commentId]);
+        const [commentPackets, _] = selectResult;
 
-        if (resultSetHeader > 1) throw new Error("protected");
-
-        return result;
+        return commentPackets ? true : false;
     };
 
-    public findCommentByCommentId = async (conn: PoolConnection, commentId: number): Promise<any> => {
+    public findCommentByCommentId = async (conn: PoolConnection, commentId: number): Promise<ICommentPacket[]> => {
         const query = `
-            SELECT image_url
+            SELECT *
             FROM comment
             WHERE comment_id = ?
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, commentId);
+        const selectResult = await conn.query<ICommentPacket[]>(query, commentId);
+        const [commentPackets, _] = selectResult;
 
-        return result;
+        return commentPackets;
     };
 
     public createComment = async (
         conn: PoolConnection,
         commentDto: CreateCommentDto,
         imageLocation: string | null,
-    ): Promise<object> => {
+    ): Promise<number> => {
         const query = `
             INSERT INTO comment
                 (comment, image_url)
@@ -52,15 +52,16 @@ export class CommentRepository {
                 (?, ?);
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [
+        const insertResult = await conn.query<ResultSetHeader>(query, [
             commentDto.comment,
             imageLocation === null ? null : imageLocation,
         ]);
-        const resultSetHeader = result.affectedRows;
+        const [resultSetHeader, _] = insertResult;
+        const { affectedRows, insertId } = resultSetHeader;
 
-        if (resultSetHeader > 1) throw new Error("protected");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
 
-        return result;
+        return insertId;
     };
 
     public createRecipeComment = async (
@@ -68,7 +69,7 @@ export class CommentRepository {
         userId: number,
         recipeId: number,
         commentId: number,
-    ): Promise<object> => {
+    ): Promise<number> => {
         const query = `
             INSERT INTO recipe_comment
                 (user_id, recipe_id, comment_id)
@@ -76,12 +77,13 @@ export class CommentRepository {
                 (?, ?, ?);
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId, commentId]);
-        const resultSetHeader = result.affectedRows;
+        const insertResult = await conn.query<ResultSetHeader>(query, [userId, recipeId, commentId]);
+        const [resultSetHeader, _] = insertResult;
+        const { affectedRows, insertId } = resultSetHeader;
 
-        if (resultSetHeader > 1) throw new Error("protected");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
 
-        return result;
+        return insertId;
     };
 
     public deleteComment = async (conn: PoolConnection, commentId: number): Promise<ResultSetHeader | null> => {
@@ -118,7 +120,7 @@ export class CommentRepository {
         recipeId: number,
         page: number,
         count: number,
-    ): Promise<object> => {
+    ): Promise<ICommentPacket[]> => {
         const query = `
         SELECT 
             R.user_id AS userId, U.nickname AS nickname, R.recipe_id AS recipeId,
@@ -132,7 +134,7 @@ export class CommentRepository {
         LIMIT ?, ?
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [recipeId, page, count]);
+        const [result] = await conn.query<ICommentPacket[]>(query, [recipeId, page, count]);
 
         return result;
     };
