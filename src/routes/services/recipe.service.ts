@@ -1,14 +1,33 @@
-import { CreateRecipeDto, IngredientDto, NotFoundException, UpdateRecipeDto } from "../../models/_.loader";
-import { AuthRepository, RecipeRepository } from "../repositories/_.exporter";
+import {
+    BadRequestException,
+    CreateRecipeDto,
+    IIngredientDto,
+    IngredientDto,
+    IRecipeIngredientPacket,
+    IRecipePacket,
+    NotFoundException,
+    RecipeDto,
+    UpdateRecipeDto,
+} from "../../models/_.loader";
+import {
+    AuthRepository,
+    RecipeIngredientRepository,
+    RecipeIngredientListRepository,
+    RecipeRepository,
+} from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
 
 export class RecipeService {
     private recipeRepository: RecipeRepository;
+    private recipeIngredientRepository: RecipeIngredientRepository;
+    private recipeIngredientListRepository: RecipeIngredientListRepository;
     private authRepository: AuthRepository;
     private mysqlProvider: MysqlProvider;
 
     constructor() {
         this.recipeRepository = new RecipeRepository();
+        this.recipeIngredientRepository = new RecipeIngredientRepository();
+        this.recipeIngredientListRepository = new RecipeIngredientListRepository();
         this.mysqlProvider = new MysqlProvider();
         this.authRepository = new AuthRepository();
     }
@@ -60,15 +79,56 @@ export class RecipeService {
         }
     };
 
-    getRecipes = async (page: number, count: number): Promise<any> => {
+    getRecipes = async (page: number, count: number, filterOptions?: object): Promise<RecipeDto[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
-            const getRecipesOne = await this.recipeRepository.getRecipes(conn, page, count);
+            if (filterOptions === undefined) {
+                const recipeList: IRecipePacket[] = await this.recipeRepository.getRecipes(conn, page, count);
 
-            await conn.commit();
-            return getRecipesOne;
+                const recipeIdList = recipeList.map(({ recipeId }) => recipeId);
+
+                // @dpereacted
+                // const recipeIngredientIdList = await this.recipeIngredientListRepository.getRecipeIngrdientList(
+                //     conn,
+                //     recipeIdList,
+                // );
+
+                const recipeIngredientList: IRecipeIngredientPacket[][] = await Promise.all(
+                    recipeIdList.map(
+                        async (recipeId) =>
+                            await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(conn, recipeId),
+                    ),
+                );
+
+                const recipeDtoList = new Array<RecipeDto>();
+                const loopLength = recipeList.length;
+                for (let i = 0; i < loopLength; i++) {
+                    const recipeDto = new RecipeDto({
+                        recipeId: recipeList[i].recipeId,
+                        title: recipeList[i].title,
+                        content: recipeList[i].content,
+                        isIced: recipeList[i].isIced,
+                        cupSize: recipeList[i].cupSize,
+                        createdAt: recipeList[i].createdAt,
+                        updatedAt: recipeList[i].updatedAt,
+                        ingredientList: recipeIngredientList[i].map((ingredient): IIngredientDto => {
+                            return {
+                                ingredientName: ingredient.ingredientName,
+                                ingredientAmount: ingredient.ingredientAmount,
+                                ingredientColor: ingredient.ingredientColor,
+                            };
+                        }),
+                    });
+                    recipeDtoList.push(recipeDto);
+                }
+
+                await conn.commit();
+                return recipeDtoList;
+            } else {
+                throw new BadRequestException(`필터 기반 검색은 아직 지원하지 않는 도메인입니다.`);
+            }
         } catch (err) {
             await conn.rollback();
             throw err;

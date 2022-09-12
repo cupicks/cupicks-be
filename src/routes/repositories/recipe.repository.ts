@@ -1,5 +1,5 @@
-import { CreateRecipeDto, IngredientDto, UnkownError, UpdateRecipeDto } from "../../models/_.loader";
-import { PoolConnection, ResultSetHeader, FieldPacket } from "mysql2/promise";
+import { CreateRecipeDto, IngredientDto, IRecipePacket, UnkownError, UpdateRecipeDto } from "../../models/_.loader";
+import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
 import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeRepository {
@@ -187,7 +187,25 @@ export class RecipeRepository {
         return result;
     };
 
-    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<any> => {
+    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipePacket[]> => {
+        const selectQuery = `SELECT
+            recipe_id as recipeId,
+            cup_size as cupSize,
+            title as title,
+            content as content,
+            is_iced as isIced,
+            is_public as isPublic,
+            created_at as createdAt,
+            updated_at as updatedAt
+        FROM recipe LIMIT ${page - 1}, ${count};`;
+        const selectResult = await conn.query<IRecipePacket[]>(selectQuery);
+        const [recipePackets, _] = selectResult;
+
+        return recipePackets;
+    };
+
+    /** @deprecated */
+    public getRecipesLegacy = async (conn: PoolConnection, page: number, count: number): Promise<any> => {
         const query = `
         SELECT
             R.recipe_id AS recipeId, R.title, R.content,

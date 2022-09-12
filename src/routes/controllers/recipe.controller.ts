@@ -91,11 +91,13 @@ export default class RecipeController {
                 }),
             );
 
-            const result = await this.recipeService.getRecipes(validator.page, validator.count);
+            const recipeDtoList = await this.recipeService.getRecipes(validator.page, validator.count);
 
-            console.log(result);
-
-            return res.end();
+            return res.json({
+                isSuccess: true,
+                message: "레시피 조회에성공하셨습니다.",
+                recipeList: recipeDtoList,
+            });
         } catch (err) {
             console.log(err);
             const exception = this.errorHandler(err);
