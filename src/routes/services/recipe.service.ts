@@ -22,28 +22,13 @@ export class RecipeService {
             if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
             const recipeId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
-            // const result = recipeDto.ingredientList.map((e) => {
-            //     return {
-            //         recipe_id: recipeId,
-            //         ingredient_name: e.ingredientName,
-            //         ingredient_color: e.ingredientColor,
-            //         ingredient_amount: e.ingredientAmount,
-            //     };
-            // });
 
             const ingredientList: IngredientDto[] = recipeDto.ingredientList;
-            // const createRecipeIngredient = await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
             const insertedIdList = await this.recipeRepository.createRecipeIngredients(conn, recipeId, ingredientList);
             const createUserRecipe = await this.recipeRepository.createUserRecipe(conn, userId, recipeId);
 
             await this.recipeRepository.createRecipeIngredientList(conn, recipeId, insertedIdList);
 
-            // const [ingredientIdList, userRecipeId]: [createdIngredientId: number[], createdUserRecipeId: string] =
-            //     await Promise.all([createRecipeIngredient, createUserRecipe]);
-
-            // this.recipeRepository.createRecipeIngredientList(conn, recipdId, ingredientIdList);
-
-            // await conn.rollback();
             await conn.commit();
             return recipeId;
         } catch (err) {
