@@ -10,7 +10,7 @@ import {
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
-import { IRecipeIngredientCustom } from "../../constants/_.loader";
+import { IRecipePacket } from "../../models/_.loader";
 
 export default class RecipeController {
     private recipeService: RecipeService;
@@ -50,7 +50,7 @@ export default class RecipeController {
                 }),
             );
 
-            const getRecipe: IRecipeIngredientCustom = await this.recipeService.getRecipe(validator.recipeId);
+            const getRecipe: IRecipePacket[] = await this.recipeService.getRecipe(validator.recipeId);
 
             return res.status(200).json({
                 isSuccess: true,

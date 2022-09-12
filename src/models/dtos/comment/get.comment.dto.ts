@@ -19,7 +19,7 @@ export class GetCommentDto implements IBaseDto {
     getJoiInstance(): ObjectSchema<GetCommentDto> {
         return joi.object<GetCommentDto>({
             recipeId: joi.number().min(1).required(),
-            page: joi.number().min(1).required(),
+            page: joi.number().min(0).required(),
             count: joi.number().min(1).required(),
         });
     }
