@@ -52,7 +52,15 @@ export class AwsSesProvider {
         return emailVerifyCode;
     }
 
-    public async sendVerifyCode(toEmail: string, emailVerifyCode: string): Promise<SendEmailCommandOutput> {
+    public async sendVerifyCode(
+        toEmail: string,
+        emailVerifyCode: string,
+        remainingEmailSentChance: number,
+        dateTimeValues: {
+            publishedDate: string;
+            expiredDate: string;
+        },
+    ): Promise<SendEmailCommandOutput> {
         const ses = this.getSesInstance();
         try {
             return await ses.sendEmail({
@@ -65,7 +73,19 @@ export class AwsSesProvider {
                     Body: {
                         Html: {
                             Charset: "UTF-8",
-                            Data: `다음의 인증번호 [${emailVerifyCode}] 를 입력해주세요.`,
+                            Data: `
+                                <div>
+                                    <h2>Cupick 회원가입을 위한 인증번호입니다.</h2>
+                                    <h4>아래의 인증번호를 확인하여 이메일 주소 인증을 확인해주세요.</h4>
+
+                                    <p>cupick 계정 : ${toEmail}</p>
+                                    <p>인증번호 : ${emailVerifyCode}</p>
+
+                                    <p>남은 횟수 : ${remainingEmailSentChance}회 </p>
+                                    <p>발급 시간 : ${dateTimeValues.publishedDate} </p>
+                                    <p>만료 시간 : ${dateTimeValues.expiredDate} </p>
+                                </div>
+                            `,
                         },
                     },
                     Subject: {
@@ -82,7 +102,16 @@ export class AwsSesProvider {
         }
     }
 
-    public async sendTempPassword(toEmail: string, tempPassword: string, resetPasswordToken: string) {
+    public async sendTempPassword(
+        toEmail: string,
+        tempPassword: string,
+        resetPasswordToken: string,
+        remainingEmailSentChance: number,
+        dateTimeValues: {
+            publishedDate: string;
+            expiredDate: string;
+        },
+    ) {
         const ses = this.getSesInstance();
         try {
             const url = `${AwsSesProvider.SERVER_URL_WITH_PORT}/api/auth/reset-password?resetPasswordToken=${resetPasswordToken}`;
@@ -99,9 +128,15 @@ export class AwsSesProvider {
                             Charset: "UTF-8",
                             Data: `
                                 <div>
-                                    <h1 style="color: red">임시 비밀번호 : ${tempPassword}</h1>
-                                    <br>
-                                    <a href="${url}";>비밀번호 확인</a>
+                                    <h2>Cupick 임시 비밀번호 발급을 위한 인증번호입니다.</h2>
+                                    <h4>안녕하세요, Cupick 고객님. 요청하신 임시 비밀번호는 다음과 같습니다.</h4>
+
+                                    <p>임시 비밀번호 : ${tempPassword}</p>
+
+                                    <p>남은 횟수 : ${remainingEmailSentChance}회 </p>
+                                    <p>발급 시간 : ${dateTimeValues.publishedDate} </p>
+                                    <p>만료 시간 : ${dateTimeValues.expiredDate} </p>
+                                    <a href="${url}">비밀번호 바로 변경하기</a>
                                 </div>
                             `,
                         },
