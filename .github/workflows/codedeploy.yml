@@ -46,7 +46,7 @@ jobs:
       #     echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
 
       - name: zip file
-        run: zip -r hous.zip .github/workflows ./package.json ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
+        run: zip -r hous2.zip .github/workflows ./package.json ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -56,14 +56,14 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./hous.zip s3://cupick-s3-codedeploy
+        run: aws s3 cp --region ap-northeast-2 ./hous2.zip s3://cupick-s3-codedeploy
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
           --application-name cupick-codedeploy
           --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name cupick-server-codedeploy-group
-          --s3-location bucket=cupick-s3-codedeploy,bundleType=zip,key=hous.zip
+          --s3-location bucket=cupick-s3-codedeploy,bundleType=zip,key=hous2.zip
 #
 # - name: pm2 start
 #   run: sudo pm2 start app.js
