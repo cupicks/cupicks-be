@@ -52,7 +52,11 @@ jobs:
 
       - name: Hello World2
         run: echo ${{github.event.head_commit}}
+
+      - name: Hello World3
         run: echo ${{github.event.head_commit.message}}
+        
+      - name: Hello World4
         run: echo ${{github.event.head_commit.timestamp}}
 
       - name: zip file
