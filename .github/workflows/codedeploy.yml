@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: 'feature/cicd'
   pull_request:
     branches: ['main']
 
@@ -19,14 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: create env
-        run: |
-          pwd
-          touch .env
-          echo DB_ID=${{ secrets.DB_ID }} >> .env
-
       - name: Zip file
-        run: zip -r ${{github.event.head_commit.timestamp}}-server.zip .github/workflows ./src ./scripts ./appspec.yml ./gitignore ./package.json ./package-lock.json ./tsconfig.json .env
+        run: zip -r ${{github.event.head_commit.timestamp}}-server.zip .github/workflows ./src ./scripts ./appspec.yml ./gitignore ./package.json ./package-lock.json ./tsconfig.json
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
