@@ -3,7 +3,7 @@ name: CI
 
 on:
   push:
-    branches: ['feature/cicd']
+    branches: 'feature/cicd'
   pull_request:
     branches: ['main']
 
@@ -47,7 +47,7 @@ jobs:
 
       - name: Hello World
         run: echo ${{github.event}}
-        
+
       - name: zip file
         run: zip -r hous2.zip .github/workflows ./package.json ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
 
