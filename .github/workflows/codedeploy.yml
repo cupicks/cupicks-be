@@ -48,6 +48,9 @@ jobs:
       - name: Hello World
         run: echo ${{github.event}}
 
+      - name: Hello World2
+        run: echo ${{github.event.head_commit}}
+
       - name: zip file
         run: zip -r hous2.zip .github/workflows ./package.json ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
 
