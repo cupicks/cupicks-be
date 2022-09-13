@@ -52,6 +52,8 @@ jobs:
 
       - name: Hello World2
         run: echo ${{github.event.head_commit}}
+        run: echo ${{github.event.head_commit.message}}
+        run: echo ${{github.event.head_commit.timestamp}}
 
       - name: zip file
         run: zip -r hous2.zip .github/workflows ./package.json ./node_modules ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
