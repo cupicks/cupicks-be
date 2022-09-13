@@ -19,8 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: create env
+        run: |
+          pwd
+          touch .env
+          echo DB_ID=${{ secrets.DB_ID }} >> .env
+
       - name: Zip file
-        run: zip -r 1234q_cupick-server.zip .github/workflows ./src ./scripts ./appspec.yml ./gitignore ./package.json ./package-lock.json ./ttsconfigsconfig.json
+        run: zip -r 1234q_cupick-server.zip .github/workflows ./src ./scripts ./appspec.yml ./gitignore ./package.json ./package-lock.json ./tsconfig.json
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
