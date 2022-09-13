@@ -45,6 +45,8 @@ jobs:
       #     echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env
       #     echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
 
+      - run: npm ci
+
       - name: Hello World
         run: echo ${{github.event}}
 
@@ -52,7 +54,7 @@ jobs:
         run: echo ${{github.event.head_commit}}
 
       - name: zip file
-        run: zip -r hous2.zip .github/workflows ./package.json ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
+        run: zip -r hous2.zip .github/workflows ./package.json ./node_modules ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
