@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Zip file
-        run: zip -r ${{github.event.head_commit.timestamp}}_cupick-server.zip .github/workflows ./package.json ./node_modules ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
+        run: zip -r ${{github.event.head_commit.timestamp}}_cupick-server.zip .github/workflows ./package.json ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
