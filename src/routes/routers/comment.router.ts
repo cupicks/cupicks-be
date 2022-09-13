@@ -7,11 +7,11 @@ import { multerMiddleware } from "../../middlewares/multer.middleware";
 
 const commentRouter: Router = Router();
 
-commentRouter.get("/", applicationJsonFilter, new CommentController().getComments);
+commentRouter.get("/", /** applicationJsonFilter, */ new CommentController().getComments);
 
 commentRouter.post(
     "/",
-    formDataFilter,
+    /** formDataFilter */
     preventUnLoginUserGuard,
     multerMiddleware,
     new CommentController().createComment,
@@ -19,14 +19,14 @@ commentRouter.post(
 
 commentRouter.delete(
     "/:commentId",
-    applicationJsonFilter,
+    /** applicationJsonFilter, */
     preventUnLoginUserGuard,
     new CommentController().deleteComment,
 );
 
 commentRouter.put(
     "/:commentId",
-    formDataFilter,
+    /** formDataFilter, */
     preventUnLoginUserGuard,
     multerMiddleware,
     new CommentController().updateComment,
