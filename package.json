@@ -7,10 +7,10 @@
   "license": "ISC",
   "description": "",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && vite build",
     "prestart": "npm run build",
     "start": "pm2 start ecosystem.config.js --env production",
-    "start:dev": "cross-env NODE_ENV=dev tsc-watch --onSuccess \"node dist/server.js\"",
+    "start:dev": "cross-env NODE_ENV=dev vite \"node dist/server.js\"",
     "test": "cross-env NODE_ENV=test jest --findRelatedTests test/ --silent",
     "test:watch": "cross-env NODE_ENV=test jest --findRelatedTests test/unit/ --runInBand --silent --watch",
     "test:unit": "cross-env NODE_ENV=test jest --findRelatedTests test/unit/ --silent",
@@ -64,7 +64,9 @@
     "ts-jest": "^28.0.8",
     "ts-node": "^10.9.1",
     "tsc-watch": "^4.2.9",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.3",
+    "vite": "^2.9.15",
+    "vite-plugin-node": "^1.0.0"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
