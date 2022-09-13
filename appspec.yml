@@ -10,12 +10,12 @@ file_exists_behavior: OVERWRITE
 permissions:
   - object: /home/ubuntu
     pattern: '**'
-    owner: sudo
-    group: sudo
+    owner: ubuntu
+    group: ubuntu
 
 hooks:
   AfterInstall:
     - location: scripts/after-deploy.sh
       timeout: 300
-      runas: sudo
+      runas: ubuntu
       # runas는 사용자 이름
