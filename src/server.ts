@@ -16,7 +16,7 @@ import { AuthController } from "./routes/controllers/_.exporter";
 /**
  * `IIFE`
  */
-(async () => {
+export default (async () => {
     const MODE: TNODE_ENV = getNodeEnvValue("NODE_ENV");
     EnvProvider.init(MODE);
 
@@ -31,5 +31,43 @@ import { AuthController } from "./routes/controllers/_.exporter";
 
     AuthController.init(env.URL.FROTN_REDIRECT_URL_WITHOUT_PORT);
 
-    new App(MODE, env.PORT, env.URL.CORS_URL_LIST_WITHOUT_PORT);
+    const appInstance = new App(MODE, env.PORT, env.URL.CORS_URL_LIST_WITHOUT_PORT);
+
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+    console.log(`CI/CD, try 1`);
+
+    return appInstance.app;
 })();
