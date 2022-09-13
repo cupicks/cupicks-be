@@ -24,43 +24,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-
-      # - name: Run a one-line script
-      #   run: sudo -s
-
-      # - name: create env
-      #   run: |
-      #     pwd
-      #     touch .env
-      #     echo DB_ID=${{ secrets.DB_ID }} >> .env
-      #     echo DB_PW=${{ secrets.DB_PW }} >> .env
-      #     echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-      #     echo DB=${{ secrets.DB }} >> .env
-      #     echo GIT_ID=${{ secrets.GIT_ID }} >> .env
-      #     echo GIT_SECRET=${{ secrets.GIT_SECRET }} >> .env
-      #     echo GIT_URL=${{ secrets.GIT_URL }} >> .env
-      #     echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
-      #     echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
-      #     echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env
-      #     echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env
-      #     echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
-
-      - run: npm ci
-
-      - name: Hello World
-        run: echo ${{github.event}}
-
-      - name: Hello World2
-        run: echo ${{github.event.head_commit}}
-
-      - name: Hello World3
-        run: echo ${{github.event.head_commit.message}}
         
       - name: Hello World4
-        run: echo ${{github.event.head_commit.timestamp}}
+        run: echo 
 
       - name: zip file
-        run: zip -r hous2.zip .github/workflows ./package.json ./node_modules ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
+        run: zip -r ${{github.event.head_commit.timestamp}}.zip .github/workflows ./package.json ./node_modules ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -70,7 +39,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./hous2.zip s3://cupick-s3-codedeploy
+        run: aws s3 cp --region ap-northeast-2 ./${{github.event.head_commit.timestamp}}.zip s3://cupick-s3-codedeploy
         # https://isntyet.tistory.com/126
 
       - name: deploy with AWS codeDeploy
@@ -78,7 +47,7 @@ jobs:
           --application-name cupick-codedeploy
           --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name cupick-server-codedeploy-group
-          --s3-location bucket=cupick-s3-codedeploy,bundleType=zip,key=hous2.zip
+          --s3-location bucket=cupick-s3-codedeploy,bundleType=zip,key=${{github.event.head_commit.timestamp}}.zip
 #
 # - name: pm2 start
 #   run: sudo pm2 start app.js
