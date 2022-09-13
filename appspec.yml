@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/project
+    destination: /home/ubuntu/project2
     overwrite: yes
 
 file_exists_behavior: OVERWRITE
