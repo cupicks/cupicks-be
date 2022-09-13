@@ -29,7 +29,7 @@ jobs:
         run: echo 
 
       - name: zip file
-        run: zip -r ${{github.event.head_commit.timestamp}}.zip .github/workflows ./package.json ./node_modules ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
+        run: zip -r ${{github.event.head_commit.timestamp}}_cupick-server.zip .github/workflows ./package.json ./node_modules ./package-lock.json ./src ./appspec.yml ./scripts .gitignore
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -39,7 +39,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./${{github.event.head_commit.timestamp}}.zip s3://cupick-s3-codedeploy
+        run: aws s3 cp --region ap-northeast-2 ./${{github.event.head_commit.timestamp}}_cupick-server.zip s3://cupick-s3-codedeploy
         # https://isntyet.tistory.com/126
 
       - name: deploy with AWS codeDeploy
@@ -47,7 +47,7 @@ jobs:
           --application-name cupick-codedeploy
           --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name cupick-server-codedeploy-group
-          --s3-location bucket=cupick-s3-codedeploy,bundleType=zip,key=${{github.event.head_commit.timestamp}}.zip
+          --s3-location bucket=cupick-s3-codedeploy,bundleType=zip,key=${{github.event.head_commit.timestamp}}_cupick-server.zip
 #
 # - name: pm2 start
 #   run: sudo pm2 start app.js
