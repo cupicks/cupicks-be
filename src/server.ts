@@ -33,7 +33,5 @@ export default (async () => {
 
     const appInstance = new App(MODE, env.PORT, env.URL.CORS_URL_LIST_WITHOUT_PORT);
 
-    console.log(env);
-
     return appInstance.app;
 })();
