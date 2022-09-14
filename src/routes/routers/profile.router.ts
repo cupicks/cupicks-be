@@ -11,7 +11,7 @@ profileRotuer.patch(
     "",
     /* formDataFilter */
     preventUnLoginUserGuard,
-    MulterProvider.uploadSingle,
+    MulterProvider.uploadImageProfile,
     new ProfileController().editProfile,
 );
 

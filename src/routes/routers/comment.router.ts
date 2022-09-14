@@ -3,7 +3,7 @@ import { Router } from "express";
 import { CommentController } from "../controllers/_.exporter";
 import { formDataFilter, applicationJsonFilter } from "../../middlewares/filters/_.exporter";
 import { preventUnLoginUserGuard } from "../../middlewares/guards/_.exporter";
-import { multerMiddleware } from "../../middlewares/multer.middleware";
+import { multerMiddlewareForProfile, multerMiddlewareForComment } from "../../middlewares/multer.middleware";
 
 const commentRouter: Router = Router();
 
@@ -13,7 +13,7 @@ commentRouter.post(
     "/",
     /** formDataFilter */
     preventUnLoginUserGuard,
-    multerMiddleware,
+    multerMiddlewareForComment,
     new CommentController().createComment,
 );
 
@@ -28,7 +28,7 @@ commentRouter.put(
     "/:commentId",
     /** formDataFilter, */
     preventUnLoginUserGuard,
-    multerMiddleware,
+    multerMiddlewareForComment,
     new CommentController().updateComment,
 );
 
