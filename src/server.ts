@@ -33,41 +33,5 @@ export default (async () => {
 
     const appInstance = new App(MODE, env.PORT, env.URL.CORS_URL_LIST_WITHOUT_PORT);
 
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-    console.log(`CI/CD, try 1`);
-
     return appInstance.app;
 })();

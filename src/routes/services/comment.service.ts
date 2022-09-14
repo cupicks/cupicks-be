@@ -72,7 +72,10 @@ export class CommentService {
             const findCommentById = await this.commentRepository.findCommentByCommentId(conn, commentId);
             const findCommentResult = findCommentById[0].image_url;
             const imageValue = findCommentResult !== null ? findCommentResult?.split("/")[4] : null;
-            if (imageValue !== null && imageValue === "undefined") MulterProvider.deleteImage(imageValue);
+
+            if (imageValue !== null && imageValue !== "undefined" && typeof imageValue === "string") {
+                MulterProvider.deleteImage(imageValue, "comment");
+            }
 
             await this.commentRepository.deleteComment(conn, commentId);
 
@@ -109,7 +112,10 @@ export class CommentService {
             );
             const findCommentResult = findCommentById;
             const imageValue = findCommentResult !== null ? findCommentResult[0].image_url?.split("/")[4] : null;
-            if (imageValue !== null && imageValue === "undefined") MulterProvider.deleteImage(imageValue);
+
+            if (imageValue !== null && imageValue !== "undefined" && typeof imageValue === "string") {
+                MulterProvider.deleteImage(imageValue, "comment");
+            }
 
             const updateComment = await this.commentRepository.updateComment(conn, comment, imageLocation, commentId);
 

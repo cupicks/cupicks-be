@@ -18,7 +18,7 @@ authRouter.post(
      *
      * 이 자리에 유저가 존재하는지 확인하는 미들웨어를 만들어 봅시다.
      */
-    MulterProvider.uploadSingle,
+    MulterProvider.uploadImageProfile,
     new AuthController().signup,
 );
 authRouter.post(
