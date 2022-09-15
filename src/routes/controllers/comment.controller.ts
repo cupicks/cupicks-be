@@ -27,6 +27,9 @@ export default class CommentController {
             const resizedUrl =
                 imageLocation === null ? null : imageLocation.replace(/\/comment\//, `/comment-resized/`);
 
+            console.log(imageLocation);
+            console.log(resizedUrl);
+
             const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
                 new CreateCommentDto({
                     userId: res.locals.userId,
