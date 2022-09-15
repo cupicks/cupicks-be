@@ -1,5 +1,5 @@
 import { AuthRepository } from "../repositories/auth.repository";
-import { BcryptProvider, MysqlProvider } from "../../modules/_.loader";
+import { BcryptProvider, MulterProvider, MysqlProvider } from "../../modules/_.loader";
 import { EditProfileDto, IUserPacket, NotFoundException } from "../../models/_.loader";
 
 export class ProfileService {
@@ -30,6 +30,13 @@ export class ProfileService {
 
             const isExists = await this.authRepository.isExistsById(conn, editDto.userId);
             if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+
+            if (editDto.imageUrl && editDto.resizedUrl) {
+                const imageKey = editDto.imageUrl.split("/")[4];
+                const resizedKey = imageKey;
+                MulterProvider.deleteImage(imageKey, "profile");
+                MulterProvider.deleteImage(resizedKey, "profile-resized");
+            }
 
             await this.authRepository.updateUserProfile(conn, editDto);
 

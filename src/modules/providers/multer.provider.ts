@@ -8,6 +8,10 @@ import * as multerS3 from "multer-s3";
 import { IS3ConfigEnv } from "models/_.loader";
 import { CustomException, UnkownTypeError } from "../../models/_.loader";
 
+type ProfileImagePath = "profile" | "profile-resized";
+type CommentImagePath = "comment" | "comment-resized";
+type ImagePath = ProfileImagePath | CommentImagePath;
+
 export class MulterProvider {
     static isInit = false;
     static S3_ACCESS_KEY: string;
@@ -70,7 +74,7 @@ export class MulterProvider {
         });
     };
 
-    static deleteImage = async (targetImageValue: string, path: string) => {
+    static deleteImage = async (targetImageValue: string, path: ImagePath) => {
         const s3 = new S3Client({
             credentials: {
                 accessKeyId: MulterProvider.S3_ACCESS_KEY,

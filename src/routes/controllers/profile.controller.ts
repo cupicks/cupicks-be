@@ -39,10 +39,12 @@ export default class ProfileController {
 
             const editDto = await this.joiValidator.validateAsync<EditProfileDto>(
                 new EditProfileDto({
-                    imageUrl: file.location,
                     userId: res.locals.userId,
                     nickname: req.query.nickname,
                     password: req.query.password,
+
+                    imageUrl: file?.location,
+                    resizedUrl: file?.location,
                 }),
             );
             await this.profileService.editProfile(editDto);
@@ -50,6 +52,7 @@ export default class ProfileController {
             return res.json({
                 isSuccess: true,
                 message: "프로필 수정에 성공하셨습니다.",
+                userId: editDto.userId,
             });
         } catch (err) {
             console.log(err);

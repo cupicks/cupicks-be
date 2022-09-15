@@ -109,7 +109,7 @@ export class AuthService {
 
             // const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
-            await conn.rollback();
+            await conn.commit();
 
             return new UserDto({
                 userId: 1,

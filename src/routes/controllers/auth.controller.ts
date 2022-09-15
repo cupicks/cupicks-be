@@ -52,8 +52,6 @@ export default class AuthController {
 
             const result = await this.authService.signup(signupUserDto);
 
-            console.log(result);
-
             return res.json({
                 isSuccess: true,
                 message: "회원가입에 성공하셨습니다.",

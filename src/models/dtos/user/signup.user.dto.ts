@@ -27,8 +27,8 @@ export class SignupUserDto
         password,
         imageUrl,
         resizedUrl,
-        nicknameVerifyToken,
         emailVerifyToken,
+        nicknameVerifyToken,
     }: {
         password: string | string[] | ParsedQs | ParsedQs[] | undefined;
         imageUrl: string | undefined;
@@ -38,12 +38,11 @@ export class SignupUserDto
     }) {
         super();
         this.password = this.validateType(password, "password");
+        this.emailVerifyToken = this.validateType(emailVerifyToken, "emailVerifyToken");
+        this.nicknameVerifyToken = this.validateType(nicknameVerifyToken, "nicknameVerifyToken");
 
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
-
-        this.nicknameVerifyToken = this.validateType(nicknameVerifyToken, "nicknameVerifyToken");
-        this.emailVerifyToken = this.validateType(emailVerifyToken, "emailVerifyToken");
     }
 
     getJoiInstance(): ObjectSchema<SignupUserDto> {

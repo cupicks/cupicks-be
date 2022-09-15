@@ -239,7 +239,7 @@ export class AuthRepository {
     // update
 
     private getUpdateUserQuery = (editDto: EditProfileDto): string => {
-        const { userId, nickname, password, imageUrl } = editDto;
+        const { userId, nickname, password, imageUrl, resizedUrl } = editDto;
         if (!nickname && !password && !imageUrl)
             throw new BadRequestException(`회원 정보 수정을 위한 값이 하나도 들어있지 않습니다.`);
 
@@ -247,6 +247,7 @@ export class AuthRepository {
         if (nickname) queryString += ` nickname =  "${nickname}",`;
         if (password) queryString += ` password = "${password}",`;
         if (imageUrl) queryString += ` image_url = "${imageUrl}",`;
+        if (resizedUrl) queryString += ` resized_url = "${resizedUrl}",`;
 
         queryString = queryString.slice(0, queryString.length - 1);
         queryString += ` WHERE user_id = ${userId};`;
