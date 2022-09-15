@@ -321,4 +321,33 @@ export class RecipeRepository {
 
         return iRecipePacket;
     };
+
+    public getLikeRecipeByUserid = async (
+        conn: PoolConnection,
+        userId: number,
+        page: number,
+        pageCount: number,
+    ): Promise<IRecipePacket[]> => {
+        const selectQuery = `SELECT
+                recipe.recipe_id as recipeId,
+                title,
+                content,
+                is_iced as isIced,
+                cup_size as cupSize,
+                created_at as createdAt,
+                updated_at as updatedAt
+            FROM (
+                SELECT recipe_id FROM user_like_recipe WHERE user_id = ? LIMIT ? OFFSET ?
+            ) user_like_recipe LEFT OUTER JOIN recipe
+            ON user_like_recipe.recipe_id = recipe.recipe_id;`;
+        const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
+            userId,
+            pageCount,
+            (page - 1) * pageCount,
+        ]);
+
+        const [iRecipePacket, _] = selectResult;
+
+        return iRecipePacket;
+    };
 }

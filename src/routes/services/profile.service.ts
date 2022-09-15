@@ -10,6 +10,7 @@ import {
     RecipeDto,
 } from "../../models/_.loader";
 import { RecipeRepository, RecipeIngredientRepository } from "../repositories/_.exporter";
+import { GetLikeRecipeDto } from "models/dtos/profile/get.like.recipe.dto";
 
 export class ProfileService {
     private mysqlProvider: MysqlProvider;
@@ -76,6 +77,63 @@ export class ProfileService {
                 geMyRecipeDto.userId,
                 geMyRecipeDto.page,
                 geMyRecipeDto.count,
+            );
+            const myRecipeIdList = myRecipeList.map(({ recipeId }) => recipeId);
+
+            const myRecipeIngredientList: IRecipeIngredientPacket[][] = await Promise.all(
+                myRecipeIdList.map(
+                    async (recipeId) =>
+                        await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(conn, recipeId),
+                ),
+            );
+
+            const loopLength = myRecipeIdList.length;
+            const recipeDtoList = new Array<RecipeDto>();
+            for (let i = 0; i < loopLength; i++) {
+                const recipeDto = new RecipeDto({
+                    recipeId: myRecipeList[i].recipeId,
+                    title: myRecipeList[i].title,
+                    content: myRecipeList[i].content,
+                    isIced: myRecipeList[i].isIced,
+                    cupSize: myRecipeList[i].cupSize,
+                    createdAt: myRecipeList[i].createdAt,
+                    updatedAt: myRecipeList[i].updatedAt,
+                    ingredientList: myRecipeIngredientList[i].map((ingredient): IIngredientDto => {
+                        return {
+                            ingredientName: ingredient.ingredientName,
+                            ingredientAmount: ingredient.ingredientAmount,
+                            ingredientColor: ingredient.ingredientColor,
+                        };
+                    }),
+                });
+
+                recipeDtoList.push(recipeDto);
+            }
+
+            await conn.commit();
+            return recipeDtoList;
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public getLikeRecipe = async (getLikeRecipeDto: GetLikeRecipeDto): Promise<RecipeDto[]> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const isExists = await this.authRepository.isExistsById(conn, getLikeRecipeDto.userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+
+            const myRecipeList = await this.recipeRepository.getLikeRecipeByUserid(
+                conn,
+                getLikeRecipeDto.userId,
+                getLikeRecipeDto.page,
+                getLikeRecipeDto.count,
             );
             const myRecipeIdList = myRecipeList.map(({ recipeId }) => recipeId);
 
