@@ -268,7 +268,7 @@ export class AuthService {
                 // 일일 이메일 발송 제한 초과의 경우
                 if (
                     findedUserVerifyList.isExeededOfEmailSent === 1 ||
-                    findedUserVerifyList.currentEmailSentCount >= 5
+                    findedUserVerifyList.currentEmailSentCount >= 4
                 ) {
                     const diffMilliSeconds = this.dayjsProvider.getDiffMIlliSeconds(
                         findedUserVerifyList.emailSentExceedingDate,
@@ -536,7 +536,7 @@ export class AuthService {
             const nowDaysDbString = this.dayjsProvider.changeToProvidedFormat(nowDaysInstance, "YYYY-MM-DD hh:mm:ss");
 
             console.log(findedUser);
-            if (findedUser.isExeededOfPasswordSent === 1 || findedUser.currentPasswordSentCount >= 5) {
+            if (findedUser.isExeededOfPasswordSent === 1 || findedUser.currentPasswordSentCount >= 4) {
                 await this.authRepository.exceedOfResetPasswordSent(conn, findedUser.userId, nowDaysDbString);
 
                 await conn.commit();
