@@ -1,5 +1,5 @@
 import { JoiValidator } from "../../modules/_.loader";
-import { CustomException, UnkownTypeError, UnkownError, EditProfileDto } from "../../models/_.loader";
+import { CustomException, UnkownTypeError, UnkownError, EditProfileDto, GetMyRecipeDto } from "../../models/_.loader";
 
 import { Request, RequestHandler, Response } from "express";
 import { ProfileService } from "../services/profile.service";
@@ -53,6 +53,34 @@ export default class ProfileController {
                 isSuccess: true,
                 message: "프로필 수정에 성공하셨습니다.",
                 userId: editDto.userId,
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public getMyRecipe: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const getMyRecipeDto = await this.joiValidator.validateAsync<GetMyRecipeDto>(
+                new GetMyRecipeDto({
+                    userId: res.locals.userId,
+                    count: req?.query["count"],
+                    page: req?.query["page"],
+                }),
+            );
+
+            const recipeDtoList = await this.profileService.getMyRecipe(getMyRecipeDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "레시피 조회에성공하셨습니다.",
+                recipeList: recipeDtoList,
             });
         } catch (err) {
             console.log(err);

@@ -52,11 +52,17 @@ import { DeleteCommentDto } from "./dtos/comment/delete.comment.dto";
 import { UpdateCommentDto } from "./dtos/comment/update.comment.dto";
 import { GetCommentDto } from "./dtos/comment/get.comment.dto";
 
+// PACKET - USER
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
 import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
+
+// PACKET - RECIPE
+import { IRecipePacket } from "./packets/i.recipe.packet";
 import { IRecipeCombinedPacket } from "./packets/i.recipe.combined.packet";
 import { IRecipeIngredientPacket } from "./packets/i.recipe.ingredient.packet";
 import { IRecipeIngredientListPacket } from "./packets/i.recipe.ingredient.list.packet";
+
+// PACKET - COMMENT
 import { ICommentPacket } from "./packets/i.comment.packet";
 
 export {
@@ -69,10 +75,12 @@ export {
     IUserPacket,
     IUserRefresthTokenPacket,
     IUserVerifyListPacket,
+    IRecipePacket,
     IRecipeCombinedPacket,
     IRecipeIngredientPacket,
     IRecipeIngredientListPacket,
     ICommentPacket,
+
     // BaseDtos
     IBaseDto,
     // USER
