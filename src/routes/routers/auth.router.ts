@@ -7,6 +7,7 @@ import { preventLoginUserGuard, preventUnLoginUserGuard } from "../../middleware
 // } from "../../middlewares/filters/_.exporter";
 import { AuthController } from "../controllers/_.exporter";
 import { MulterProvider } from "../../modules/_.loader";
+import { multerMiddlewareForProfile } from "../../middlewares/multer.middleware";
 
 const authRouter: Router = Router();
 authRouter.post(
@@ -18,7 +19,7 @@ authRouter.post(
      *
      * 이 자리에 유저가 존재하는지 확인하는 미들웨어를 만들어 봅시다.
      */
-    MulterProvider.uploadImageProfile,
+    multerMiddlewareForProfile,
     new AuthController().signup,
 );
 authRouter.post(
