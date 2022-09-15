@@ -24,6 +24,8 @@ export default class CommentController {
             const file = req.file as Express.MulterS3.File;
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
+            const resizedUrl =
+                imageLocation === null ? null : imageLocation.replace(/\/comment\//, `/comment-resized/`);
 
             const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
                 new CreateCommentDto({
@@ -38,7 +40,7 @@ export default class CommentController {
                 validator,
                 validator.userId,
                 validator.recipeId,
-                imageLocation,
+                resizedUrl,
             );
 
             return res.status(201).json({
@@ -50,7 +52,7 @@ export default class CommentController {
                     recipeId: validator.recipeId,
                     commentId: createComment.commentId,
                     imageUrl: imageLocation,
-                    resizedUrl: null,
+                    resizedUrl: resizedUrl,
                     createdAt: createComment.createdAt,
                     updatedAt: createComment.updatedAt,
                 },
@@ -94,6 +96,8 @@ export default class CommentController {
             const file = req.file as Express.MulterS3.File;
 
             const imageLocation = file?.location.length > 0 ? file.location : null;
+            const resizedUrl =
+                imageLocation === null ? null : imageLocation.replace(/\/comment\//, `/comment-resized/`);
 
             const validator = await new JoiValidator().validateAsync<UpdateCommentDto>(
                 new UpdateCommentDto({
@@ -107,7 +111,7 @@ export default class CommentController {
             const updateComment: ICommentPacket[] = await this.commentService.updateComment(
                 validator.userId,
                 validator.comment,
-                imageLocation,
+                resizedUrl,
                 validator.commentId,
             );
 
