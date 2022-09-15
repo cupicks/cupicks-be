@@ -1,4 +1,10 @@
-import { CreateCommentDto, UnkownError, UpdateCommentDto, DeleteCommentDto } from "../../models/_.loader";
+import {
+    CreateCommentDto,
+    UnkownError,
+    UpdateCommentDto,
+    DeleteCommentDto,
+    GetCommentDto,
+} from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { ICommentPacket } from "../../models/_.loader";
 
@@ -122,12 +128,7 @@ export class CommentRepository {
         return result;
     };
 
-    public getComments = async (
-        conn: PoolConnection,
-        recipeId: number,
-        page: number,
-        count: number,
-    ): Promise<ICommentPacket[]> => {
+    public getComments = async (conn: PoolConnection, getCommentDto: GetCommentDto): Promise<ICommentPacket[]> => {
         const query = `
         SELECT
             R.user_id AS userId, U.nickname AS nickname, U.image_url AS userImageUrl, U.resized_url AS userResizedUrl, R.recipe_id AS recipeId,
@@ -141,7 +142,11 @@ export class CommentRepository {
         LIMIT ?, ?;
         `;
 
-        const [result] = await conn.query<ICommentPacket[]>(query, [recipeId, page, count]);
+        const [result] = await conn.query<ICommentPacket[]>(query, [
+            getCommentDto.recipeId,
+            getCommentDto.page,
+            getCommentDto.count,
+        ]);
 
         return result;
     };
