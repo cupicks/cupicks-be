@@ -10,6 +10,8 @@ interface ICreateComment {
     nickname: string;
     recipeId: number;
     comment: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
 }
 
 export class CreateCommentDto
@@ -20,23 +22,32 @@ export class CreateCommentDto
     nickname: string;
     recipeId: number;
     comment: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
 
     constructor({
         userId,
         nickname,
         recipeId,
         comment,
+        imageUrl,
+        resizedUrl,
     }: {
         userId: number;
         nickname: string;
         recipeId: string | string[] | ParsedQs | ParsedQs[] | undefined;
         comment: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
     }) {
         super();
         this.userId = userId;
         this.nickname = nickname;
         this.recipeId = +this.validateType(recipeId, "recipeId");
         this.comment = this.validateType(comment, "comment");
+
+        this.imageUrl = imageUrl;
+        this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/comment\//, `/comment-resized/`) : undefined;
     }
 
     getJoiInstance(): ObjectSchema<CreateCommentDto> {
@@ -45,6 +56,8 @@ export class CreateCommentDto
             nickname: joi.string().required(),
             recipeId: joi.number().required(),
             comment: joi.string().min(1).max(150).required(),
+            imageUrl: joi.string().max(255),
+            resizedUrl: joi.string().max(255),
         });
     }
 }
