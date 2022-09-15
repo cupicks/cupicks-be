@@ -3,6 +3,7 @@ import { CustomException, UnkownTypeError, UnkownError, EditProfileDto, GetMyRec
 
 import { Request, RequestHandler, Response } from "express";
 import { ProfileService } from "../services/profile.service";
+import { GetLikeRecipeDto } from "models/dtos/profile/get.like.recipe.dto";
 
 export default class ProfileController {
     private joiValidator: JoiValidator;
@@ -76,6 +77,34 @@ export default class ProfileController {
             );
 
             const recipeDtoList = await this.profileService.getMyRecipe(getMyRecipeDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "레시피 조회에성공하셨습니다.",
+                recipeList: recipeDtoList,
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    public getLikeRecipe: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const getLikeRecipeDto = await this.joiValidator.validateAsync<GetLikeRecipeDto>(
+                new GetMyRecipeDto({
+                    userId: res.locals.userId,
+                    count: req?.query["count"],
+                    page: req?.query["page"],
+                }),
+            );
+
+            const recipeDtoList = await this.profileService.getLikeRecipe(getLikeRecipeDto);
 
             return res.json({
                 isSuccess: true,
