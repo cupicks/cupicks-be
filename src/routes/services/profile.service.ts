@@ -87,7 +87,7 @@ export class ProfileService {
             );
 
             const loopLength = myRecipeIdList.length;
-            const recipeDtoList = new Array<RecipeDto>(loopLength);
+            const recipeDtoList = new Array<RecipeDto>();
             for (let i = 0; i < loopLength; i++) {
                 const recipeDto = new RecipeDto({
                     recipeId: myRecipeList[i].recipeId,
