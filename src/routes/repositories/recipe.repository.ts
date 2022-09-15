@@ -1,4 +1,10 @@
-import { CreateRecipeDto, IngredientDto, IRecipePacket, UnkownError, UpdateRecipeDto } from "../../models/_.loader";
+import {
+    CreateRecipeDto,
+    IngredientDto,
+    IRecipeCombinedPacket,
+    UnkownError,
+    UpdateRecipeDto,
+} from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
 import { IRecipeResponseCustom } from "../../constants/_.loader";
 
@@ -159,7 +165,7 @@ export class RecipeRepository {
         return insertId;
     };
 
-    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipePacket[]> => {
+    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
         const query = `
         SELECT 
             R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
@@ -178,12 +184,12 @@ export class RecipeRepository {
         WHERE R.recipe_id = ?
         `;
 
-        const [result] = await conn.query<IRecipePacket[]>(query, recipeId);
+        const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
 
         return result;
     };
 
-    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipePacket[]> => {
+    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipeCombinedPacket[]> => {
         const selectQuery = `SELECT
             recipe_id as recipeId,
             cup_size as cupSize,
@@ -195,7 +201,7 @@ export class RecipeRepository {
             updated_at as updatedAt
         FROM recipe
         LIMIT ${count} OFFSET ${(page - 1) * count};`;
-        const selectResult = await conn.query<IRecipePacket[]>(selectQuery);
+        const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
         const [recipePackets, _] = selectResult;
 
         return recipePackets;

@@ -1,6 +1,6 @@
 import { RowDataPacket } from "mysql2/promise";
 
-export interface IRecipePacket extends RowDataPacket {
+export interface IRecipeCombinedPacket extends RowDataPacket {
     recipeId: number;
     cupSize: string;
     title: string;
