@@ -42,7 +42,8 @@ export default class AuthController {
              */
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
-                    imageUrl: file.location,
+                    imageUrl: file?.location,
+                    resizedUrl: file?.location,
                     password: req?.query["password"],
                     emailVerifyToken: req?.query["emailVerifyToken"],
                     nicknameVerifyToken: req?.query["nicknameVerifyToken"],
@@ -51,12 +52,15 @@ export default class AuthController {
 
             const result = await this.authService.signup(signupUserDto);
 
+            console.log(result);
+
             return res.json({
                 isSuccess: true,
                 message: "회원가입에 성공하셨습니다.",
                 user: result,
             });
         } catch (err) {
+            console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({

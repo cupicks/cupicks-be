@@ -98,7 +98,10 @@ export class AuthService {
                     email: emailVerifyTokenPayload.email,
                     nickname: nicknameVerifyTokenPayload.nickname,
                     password: userDto.password,
-                    imageUrl: userDto.imageUrl,
+                    imageGroup: {
+                        imageUrl: userDto.imageUrl,
+                        resizedUrl: userDto.resizedUrl,
+                    },
                 },
                 date,
                 finededVerifyList.userVerifyListId,
@@ -106,7 +109,7 @@ export class AuthService {
 
             // const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
-            await conn.commit();
+            await conn.rollback();
 
             return new UserDto({
                 userId: 1,
@@ -115,6 +118,7 @@ export class AuthService {
                 email: emailVerifyTokenPayload.email,
                 nickname: nicknameVerifyTokenPayload.nickname,
                 imageUrl: userDto.imageUrl,
+                resizedUrl: userDto.resizedUrl,
             });
         } catch (err) {
             await conn.rollback();

@@ -1,4 +1,4 @@
-import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { FieldPacket, PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
     SignupUserDto,
     IUserPacket,
@@ -144,19 +144,47 @@ export class AuthRepository {
             email: string;
             nickname: string;
             password: string;
-            imageUrl?: string;
+            imageGroup: {
+                imageUrl: string | undefined;
+                resizedUrl: string | undefined;
+            };
         },
         date: string,
         userVerifyListId: number,
     ): Promise<number> => {
-        const createUserQuery = userDto.imageUrl
-            ? `INSERT INTO user (email, nickname, password, image_url, created_at, updated_at, user_verify_list_id)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}", "${date}", "${date}", ${userVerifyListId});`
-            : `INSERT INTO user (email, nickname, password, created_at, updated_at, user_verify_list_id)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${date}", "${date}", ${userVerifyListId});`;
-        const createdUserResult = await conn.query<ResultSetHeader>(createUserQuery);
+        const {
+            email,
+            imageGroup: { imageUrl, resizedUrl },
+            nickname,
+            password,
+        } = userDto;
 
-        const [resultSetHeader, _] = createdUserResult;
+        let insertReuslt: [ResultSetHeader, FieldPacket[]];
+        if (userDto.imageGroup) {
+            const insertQuery = `INSERT INTO user (email, nickname, password, image_url, resized_url, created_at, updated_at, user_verify_list_id) VALUES (?,?,?,?,?,?,?,?)`;
+            insertReuslt = await conn.query<ResultSetHeader>(insertQuery, [
+                email,
+                nickname,
+                password,
+                imageUrl,
+                resizedUrl,
+                date,
+                date,
+                userVerifyListId,
+            ]);
+        } else {
+            const insertQuery = `INSERT INTO user (email, nickname, password, created_at, updated_at, user_verify_list_id) VALUES (?,?,?,?,?,?)`;
+            insertReuslt = await conn.query<ResultSetHeader>(insertQuery, [
+                email,
+                nickname,
+                password,
+                date,
+                date,
+                userVerifyListId,
+            ]);
+        }
+
+        const [resultSetHeader] = insertReuslt;
         const { affectedRows, insertId } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
