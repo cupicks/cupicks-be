@@ -17,4 +17,6 @@ profileRotuer.patch(
     new ProfileController().editProfile,
 );
 
+profileRotuer.get("/my-recipe", preventUnLoginUserGuard, new ProfileController().getMyRecipe);
+
 export default profileRotuer;

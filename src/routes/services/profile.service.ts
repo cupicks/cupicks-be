@@ -1,16 +1,29 @@
 import { AuthRepository } from "../repositories/auth.repository";
 import { BcryptProvider, MulterProvider, MysqlProvider } from "../../modules/_.loader";
-import { EditProfileDto, IUserPacket, NotFoundException } from "../../models/_.loader";
+import {
+    EditProfileDto,
+    GetMyRecipeDto,
+    IIngredientDto,
+    IRecipeIngredientPacket,
+    IUserPacket,
+    NotFoundException,
+    RecipeDto,
+} from "../../models/_.loader";
+import { RecipeRepository, RecipeIngredientRepository } from "../repositories/_.exporter";
 
 export class ProfileService {
     private mysqlProvider: MysqlProvider;
     private bcryptProvider: BcryptProvider;
     private authRepository: AuthRepository;
+    private recipeRepository: RecipeRepository;
+    private recipeIngredientRepository: RecipeIngredientRepository;
 
     constructor() {
         this.authRepository = new AuthRepository();
         this.bcryptProvider = new BcryptProvider();
         this.mysqlProvider = new MysqlProvider();
+        this.recipeRepository = new RecipeRepository();
+        this.recipeIngredientRepository = new RecipeIngredientRepository();
     }
 
     public getAllProfile = async (): Promise<IUserPacket[]> => {
@@ -41,6 +54,63 @@ export class ProfileService {
             await this.authRepository.updateUserProfile(conn, editDto);
 
             await conn.commit();
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public getMyRecipe = async (geMyRecipeDto: GetMyRecipeDto): Promise<RecipeDto[]> => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            await conn.beginTransaction();
+
+            const isExists = await this.authRepository.isExistsById(conn, geMyRecipeDto.userId);
+            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+
+            const myRecipeList = await this.recipeRepository.getMyRecipeByUserid(
+                conn,
+                geMyRecipeDto.userId,
+                geMyRecipeDto.page,
+                geMyRecipeDto.count,
+            );
+            const myRecipeIdList = myRecipeList.map(({ recipeId }) => recipeId);
+
+            const myRecipeIngredientList: IRecipeIngredientPacket[][] = await Promise.all(
+                myRecipeIdList.map(
+                    async (recipeId) =>
+                        await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(conn, recipeId),
+                ),
+            );
+
+            const loopLength = myRecipeIdList.length;
+            const recipeDtoList = new Array<RecipeDto>();
+            for (let i = 0; i < loopLength; i++) {
+                const recipeDto = new RecipeDto({
+                    recipeId: myRecipeList[i].recipeId,
+                    title: myRecipeList[i].title,
+                    content: myRecipeList[i].content,
+                    isIced: myRecipeList[i].isIced,
+                    cupSize: myRecipeList[i].cupSize,
+                    createdAt: myRecipeList[i].createdAt,
+                    updatedAt: myRecipeList[i].updatedAt,
+                    ingredientList: myRecipeIngredientList[i].map((ingredient): IIngredientDto => {
+                        return {
+                            ingredientName: ingredient.ingredientName,
+                            ingredientAmount: ingredient.ingredientAmount,
+                            ingredientColor: ingredient.ingredientColor,
+                        };
+                    }),
+                });
+
+                recipeDtoList.push(recipeDto);
+            }
+
+            await conn.commit();
+            return recipeDtoList;
         } catch (err) {
             await conn.rollback();
             throw err;

@@ -4,7 +4,7 @@ import {
     IIngredientDto,
     IngredientDto,
     IRecipeIngredientPacket,
-    IRecipePacket,
+    IRecipeCombinedPacket,
     NotFoundException,
     RecipeDto,
     UpdateRecipeDto,
@@ -58,7 +58,7 @@ export class RecipeService {
         }
     };
 
-    getRecipe = async (recipeId: number): Promise<IRecipePacket[]> => {
+    getRecipe = async (recipeId: number): Promise<IRecipeCombinedPacket[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
@@ -85,7 +85,7 @@ export class RecipeService {
             await conn.beginTransaction();
 
             if (filterOptions === undefined) {
-                const recipeList: IRecipePacket[] = await this.recipeRepository.getRecipes(conn, page, count);
+                const recipeList: IRecipeCombinedPacket[] = await this.recipeRepository.getRecipes(conn, page, count);
 
                 const recipeIdList = recipeList.map(({ recipeId }) => recipeId);
 
