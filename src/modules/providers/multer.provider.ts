@@ -39,7 +39,7 @@ export class MulterProvider {
      * 그런 방식은 존재하지 않고 요청 헤더의 ***KEY*** 가 변경되는 것이 문제라면 여러 upload 메서드를 많이 만들어도 될 것 같습니다.
      */
     static uploadImageProfile: RequestHandler = (req, res, next) => {
-        return this.uploadImage("profile").single("imageValue")(req, res, next);
+        return this.uploadImage("lee").single("imageValue")(req, res, next);
     };
 
     static uploadImageComment: RequestHandler = (req, res, next) => {
