@@ -3,6 +3,10 @@ name: Automated-Jest
 on:
   pull_request:
     branches:
+      - 'develop'
+
+  push:  
+    branches:
       - 'test/**'
 
 jobs:
