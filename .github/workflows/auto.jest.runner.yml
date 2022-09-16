@@ -18,6 +18,9 @@ jobs:
 
       - name: Prepare Dependencies
         run:  npm ci
+
+      - name: Run Test Code
+        run: npm run test
       
       - name: Automate Run Test Code with jest
         uses: actions/github-script@0.2.0
@@ -37,4 +40,4 @@ jobs:
               pull_number,
               state: "closed"
             })
-        if: failure()                       
+        if: failure()
