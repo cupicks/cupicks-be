@@ -168,21 +168,31 @@ export class RecipeRepository {
 
     public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
         const query = `
-        SELECT 
+        SELECT
             R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
-            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount"
+            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount",
+            R.nickname, R.image_url as 'imageUrl', R.resized_url as 'resizedUrl'
         FROM 
             (
-                SELECT *
-                FROM recipe R
+                SELECT 
+                    recipe.*,
+                    user.nickname,
+                    user.image_url,
+                    user.resized_url
+                FROM (
+                    SELECT user_id, recipe_id FROM user_recipe WHERE recipe_id = ?
+                ) user_recipe
+                LEFT OUTER JOIN user
+                ON user_recipe.user_id = user.user_id
+                LEFT OUTER JOIN recipe
+                ON user_recipe.recipe_id = recipe.recipe_id
             ) R
-        RIGHT JOIN
+        LEFT OUTER JOIN
             (
                 SELECT *
                 FROM recipe_ingredient I
             ) I
         ON R.recipe_id = I.recipe_id
-        WHERE R.recipe_id = ?
         `;
 
         const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
