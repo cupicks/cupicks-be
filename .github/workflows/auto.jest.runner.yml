@@ -2,7 +2,7 @@ name: Automated-Jest
 
 on:
   pull_request:
-    branches: []
+    branches:
       - 'test/**'
 
 jobs:
