@@ -19,7 +19,7 @@ jobs:
       - name: Prepare Dependencies
         run:  npm ci
       
-      - name: npm run test
+      - name: Automate Run Test Code with jest
         uses: actions/github-script@0.2.0
         with:
           github-token: ${{github.token}}
