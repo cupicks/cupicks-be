@@ -83,4 +83,8 @@ describe("EnvSystem's using Env and EnvProvider", () => {
     //         expect(env.SES).not.toBeUndefined();
     //     });
     // });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 });
