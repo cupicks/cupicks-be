@@ -5,8 +5,8 @@ import { IIngredientDto } from "./ingredient.dto";
 export interface IRecipeDto {
     recipeId: number;
     nickname: string;
-    imageUrl: string;
-    resizedUrl: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
     title: string;
     content: string;
     isIced: 0 | 1;
@@ -19,8 +19,8 @@ export interface IRecipeDto {
 export class RecipeDto implements IRecipeDto {
     recipeId: number;
     nickname: string;
-    imageUrl: string;
-    resizedUrl: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
     title: string;
     content: string;
     isIced: 0 | 1;
