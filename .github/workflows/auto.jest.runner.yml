@@ -4,11 +4,11 @@ on:
   push:
     bracnehs: ['test/*']
 
-  pll_request:
+  pull_request:
     branches: ['test/*']
 
 jobs:
-  Run Jest:
+  jest_runner:
     runs-on: ubuntu-20.04
 
     strategy:
