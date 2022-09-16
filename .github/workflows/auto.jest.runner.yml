@@ -62,7 +62,7 @@ jobs:
             await github.pulls.createReview({
               ...context.repo,
               pull_number,
-              body:"테스트코드를 다시 확인해주세요. ",
+              body:"테스트 코드 실행 간에 에러가 발생하였습니다.\n테스트 코드를 확인 후 수정해주세요.",
               event: "REQUEST_CHANGES"
             })
             await github.pulls.update({
