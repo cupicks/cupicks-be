@@ -115,7 +115,7 @@ export class CommentRepository {
         const query = `
             UPDATE comment
             SET 
-                comment = ?, image_url = ?, resized_url = ?,
+                comment = ?, image_url = ?, resized_url = ?
             WHERE comment_id = ?;
         `;
 
