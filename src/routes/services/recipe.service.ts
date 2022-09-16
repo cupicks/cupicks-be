@@ -120,6 +120,9 @@ export class RecipeService {
                                 ingredientColor: ingredient.ingredientColor,
                             };
                         }),
+                        nickname: recipeList[i].nickname,
+                        imageUrl: recipeList[i].imageUrl,
+                        resizedUrl: recipeList[i].resizedUrl,
                     });
                     recipeDtoList.push(recipeDto);
                 }

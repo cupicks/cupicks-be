@@ -5,7 +5,8 @@ export interface IUserPacket extends RowDataPacket {
     email: string;
     nickname: string;
     password: string;
-    imageUrl?: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
 
     resetPasswordToken: string;
     resetPasswordDate: string;

@@ -60,7 +60,7 @@ export class AuthRepository {
     // find
 
     public findUserById = async (conn: PoolConnection, userId: number): Promise<IUserPacket | null> => {
-        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE user_id = ${userId} LIMIT 1;`;
+        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl, resized_url as resizedUrl FROM user WHERE user_id = ${userId} LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
 
         const userDataPacket = findResult[0];
@@ -76,6 +76,7 @@ export class AuthRepository {
                 nickname,
                 password,
                 image_url as imageUrl,
+                resized_url as resizedUrl,
                 reset_password_token as resetPasswordToken,
                 reset_password_date as resetPasswordDate,
                 current_password_sent_count as currentPasswordSentCount,
@@ -92,7 +93,7 @@ export class AuthRepository {
     };
 
     public findUserByNickname = async (conn: PoolConnection, nickname: string): Promise<IUserPacket | null> => {
-        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE nickname = "${nickname}" LIMIT 1;`;
+        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl, resized_url as resizedUrl FROM user WHERE nickname = "${nickname}" LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
 
         const userDataPacket = findResult[0];
