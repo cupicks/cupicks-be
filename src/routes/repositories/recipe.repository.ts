@@ -208,6 +208,7 @@ export class RecipeRepository {
             SELECT
                 recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
             FROM recipe
+            ORDER BY recipe_id desc
             LIMIT ${count} OFFSET ${(page - 1) * count}
         ) recipe
         LEFT OUTER JOIN user_recipe
@@ -322,7 +323,10 @@ export class RecipeRepository {
                 created_at as createdAt,
                 updated_at as updatedAt
             FROM (
-                SELECT recipe_id FROM user_recipe WHERE user_id = ? LIMIT ? OFFSET ?
+                SELECT recipe_id FROM user_recipe
+                WHERE user_id = ?
+                ORDER BY recipe_id desc
+                LIMIT ? OFFSET ?
             ) user_recipe LEFT OUTER JOIN recipe
             ON user_recipe.recipe_id = recipe.recipe_id;`;
         const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
@@ -351,7 +355,10 @@ export class RecipeRepository {
                 created_at as createdAt,
                 updated_at as updatedAt
             FROM (
-                SELECT recipe_id FROM user_like_recipe WHERE user_id = ? LIMIT ? OFFSET ?
+                SELECT recipe_id FROM user_like_recipe
+                WHERE user_id = ?
+                ORDER BY recipe_id desc
+                LIMIT ? OFFSET ?
             ) user_like_recipe LEFT OUTER JOIN recipe
             ON user_like_recipe.recipe_id = recipe.recipe_id;`;
         const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
