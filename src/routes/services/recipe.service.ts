@@ -120,6 +120,9 @@ export class RecipeService {
                                 ingredientColor: ingredient.ingredientColor,
                             };
                         }),
+                        nickname: "더미",
+                        imageUrl: "더미",
+                        resizedUrl: "더미",
                     });
                     recipeDtoList.push(recipeDto);
                 }

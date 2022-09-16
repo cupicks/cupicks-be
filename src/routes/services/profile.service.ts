@@ -105,6 +105,9 @@ export class ProfileService {
                             ingredientColor: ingredient.ingredientColor,
                         };
                     }),
+                    nickname: "더미",
+                    imageUrl: "더미",
+                    resizedUrl: "더미",
                 });
 
                 recipeDtoList.push(recipeDto);
@@ -162,6 +165,9 @@ export class ProfileService {
                             ingredientColor: ingredient.ingredientColor,
                         };
                     }),
+                    nickname: "더미",
+                    imageUrl: "더미",
+                    resizedUrl: "더미",
                 });
 
                 recipeDtoList.push(recipeDto);
