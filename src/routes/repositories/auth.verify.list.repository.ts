@@ -187,8 +187,9 @@ export class AuthVerifyListRepository {
         conn: PoolConnection,
         userVerifyListId: number,
         emailSentExceedingDate: string,
-    ) => {
-        const exceedQuery = `UPDATE user_verify_list
+    ): Promise<void> => {
+        const exceedQuery = `UPDATE
+                user_verify_list
             SET
                 current_email_sent_count = 0,
                 email_sent_exceeding_date = "${emailSentExceedingDate}",
@@ -196,9 +197,24 @@ export class AuthVerifyListRepository {
             WHERE user_verify_list_id = ${userVerifyListId};`;
         const exceedResult = await conn.query<ResultSetHeader>(exceedQuery);
 
-        const [resultSetHeader, _] = exceedResult;
+        const [resultSetHeader] = exceedResult;
         const { affectedRows } = resultSetHeader;
 
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+    };
+
+    public disableExceedOfEmailSent = async (conn: PoolConnection, userVerifyListId: number): Promise<void> => {
+        const exceedQuery = `UPDATE
+                user_verify_list
+            SET
+                current_email_sent_count = 0,
+                email_sent_exceeding_date = ?,
+                is_exeeded_of_email_sent = ?
+            WHERE user_verify_list_id = ?;`;
+        const exceedResult = await conn.query<ResultSetHeader>(exceedQuery, [null, false, userVerifyListId]);
+
+        const [resultSetHeader] = exceedResult;
+        const { affectedRows } = resultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
     };
 }
