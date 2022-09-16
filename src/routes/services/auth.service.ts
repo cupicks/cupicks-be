@@ -253,10 +253,10 @@ export class AuthService {
                 console.log("1 depth 조건문 A : 신규 인증처리자 -> pass");
                 await this.authVerifyListRepository.createVerifyListByEmailAndCode(conn, email, emailVerifyCode);
             } else {
+                // 일일 이메일 발송 제한 초과의 경우
                 console.log("1 depth 조건문 B : 중복 인증처리자 -> pass");
                 const { userVerifyListId, isExeededOfEmailSent, currentEmailSentCount, emailSentExceedingDate } =
                     userVerifyList;
-
                 const lastSendDate = this.dayjsProvider.changeToProvidedFormat(
                     emailSentExceedingDate ?? nowDayjsInstance,
                     "YYYY년 MM월 DD일 hh:mm",
@@ -525,7 +525,7 @@ export class AuthService {
             const nowDaysDbString = this.dayjsProvider.changeToProvidedFormat(nowDaysInstance, "YYYY-MM-DD hh:mm:ss");
 
             console.log(findedUser);
-            if (findedUser.isExeededOfPasswordSent === 1 || findedUser.currentPasswordSentCount >= 5) {
+            if (findedUser.isExeededOfPasswordSent === 1 || findedUser.currentPasswordSentCount >= 4) {
                 await this.authRepository.exceedOfResetPasswordSent(conn, findedUser.userId, nowDaysDbString);
 
                 await conn.commit();

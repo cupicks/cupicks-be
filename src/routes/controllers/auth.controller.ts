@@ -157,8 +157,8 @@ export default class AuthController {
             const result = await this.authService.sendEmail(sendEmailDto);
 
             if (result.isExceeded) {
-                return res.status(201).json({
-                    isSuccess: true,
+                return res.status(400).json({
+                    isSuccess: false,
                     message: `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
                     date: result.date,
                     exceededDate: result.exceededDate,
@@ -247,8 +247,8 @@ export default class AuthController {
             const result = await this.authService.sendPassword(snedPasswordDto);
 
             if (result.isExceeded) {
-                return res.status(201).json({
-                    isSuccess: true,
+                return res.status(400).json({
+                    isSuccess: false,
                     message: `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
                     date: result.date,
                     exceededDate: result.exceededDate,

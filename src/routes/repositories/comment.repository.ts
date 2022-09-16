@@ -7,6 +7,7 @@ import {
 } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { ICommentPacket } from "../../models/_.loader";
+import { count } from "console";
 
 export class CommentRepository {
     public isAuthenticated = async (
@@ -114,7 +115,7 @@ export class CommentRepository {
         const query = `
             UPDATE comment
             SET 
-                comment = ?, image_url = ?, resized_url = ?,
+                comment = ?, image_url = ?, resized_url = ?
             WHERE comment_id = ?;
         `;
 
@@ -139,14 +140,13 @@ export class CommentRepository {
         RIGHT JOIN user U
         ON R.user_id = U.user_id
         WHERE R.recipe_id = ?
-        LIMIT ?, ?;
+        LIMIT ? OFFSET ?
         `;
 
-        const [result] = await conn.query<ICommentPacket[]>(query, [
-            getCommentDto.recipeId,
-            getCommentDto.page,
-            getCommentDto.count,
-        ]);
+        const LIMIT = getCommentDto.count;
+        const OFFSET = (getCommentDto.page - 1) * LIMIT;
+
+        const [result] = await conn.query<ICommentPacket[]>(query, [getCommentDto.recipeId, LIMIT, OFFSET]);
 
         return result;
     };

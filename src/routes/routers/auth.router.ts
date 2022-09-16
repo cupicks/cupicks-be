@@ -30,7 +30,7 @@ authRouter.post(
 
 authRouter.patch(
     "/logout",
-    /* applicationXWwwFormUrlencodedFilter */ preventLoginUserGuard,
+    /* applicationXWwwFormUrlencodedFilter */ preventUnLoginUserGuard,
     new AuthController().logout,
 );
 

@@ -10,8 +10,13 @@ export interface IRecipeCombinedPacket extends RowDataPacket {
 
     createdAt: string;
     updatedAt: string;
+
     ingredientName: string;
     ingredientColor: string;
     ingredientAmount: string;
     isPublic: 0 | 1;
+
+    nickname: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
 }
