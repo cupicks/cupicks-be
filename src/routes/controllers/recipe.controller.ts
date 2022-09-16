@@ -57,6 +57,9 @@ export default class RecipeController {
                 message: "레시피 조회에성공하셨습니다.",
                 recipe: {
                     recipeId: getRecipe[0].recipeId,
+                    nickname: getRecipe[0].nickname,
+                    imageUrl: getRecipe[0].imageUrl,
+                    resizedUrl: getRecipe[0].resizedUrl,
                     title: getRecipe[0].title,
                     content: getRecipe[0].content,
                     isIced: getRecipe[0].isIced,
