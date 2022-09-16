@@ -69,9 +69,9 @@ export class AuthService {
                 throw new BadRequestException(`${email} 이메일 및 닉네임 인증 절차를 진행하지 않은 사용자입니다.`);
             else {
                 const { emailVerifiedToken: dbEmailToken, nicknameVerifiedToken: dbNicknameToken } = userVerifyList;
-                if (dbEmailToken === emailVerifyToken)
+                if (dbEmailToken !== emailVerifyToken)
                     throw new BadRequestException(`등록되지 않은 emailVerifyToken 입니다.`);
-                if (dbNicknameToken === nicknameVerifyToken)
+                if (dbNicknameToken !== nicknameVerifyToken)
                     throw new BadRequestException(`등록되지 않은 nicnameVerifyToken 입니다.`);
             }
 
