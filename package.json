@@ -11,7 +11,7 @@
     "prestart": "npm run build",
     "start": "pm2 start ecosystem.config.js --env production",
     "start:dev": "cross-env NODE_ENV=dev tsc-watch --onSuccess \"node dist/server.js\"",
-    "test": "cross-env NODE_ENV=test jest --findRelatedTests ./test/ --silent",
+    "test": "cross-env NODE_ENV=test jest --findRelatedTests --silent",
     "test:watch": "cross-env NODE_ENV=test jest --findRelatedTests ./test/unit/ --runInBand --silent --watch",
     "test:unit": "cross-env NODE_ENV=test jest --findRelatedTests ./test/unit/ --silent",
     "test:unit:watch": "cross-env NODE_ENV=test jest --findRelatedTests ./test/unit/ --silent --watch",
