@@ -21,66 +21,66 @@ describe("EnvSystem's using Env and EnvProvider", () => {
      *   - key === 'prod' : pm2 가 process.env 안에 key-value 를 넣어줍니다.
      *   - 테스트는 pm2 를 사용하지않아서0, prod 는 무조건 에러가 발생합니다.
      */
-    describe("EnvProvider.prototype.getEnvInstance should return Env.prototype", () => {
-        let sutEnvConstructor: jest.SpyInstance<EnvFile.Env>;
+    // describe("EnvProvider.prototype.getEnvInstance should return Env.prototype", () => {
+    //     let sutEnvConstructor: jest.SpyInstance<EnvFile.Env>;
 
-        beforeEach(() => {
-            sutEnvConstructor = jest.spyOn(EnvFile, "Env");
-        });
+    //     beforeEach(() => {
+    //         sutEnvConstructor = jest.spyOn(EnvFile, "Env");
+    //     });
 
-        it("When 'dev', EnvSystem should return Env.prototype", () => {
-            EnvProvider.init("dev");
+    //     it("When 'dev', EnvSystem should return Env.prototype", () => {
+    //         EnvProvider.init("dev");
 
-            const envProvider: EnvProvider = new EnvProvider();
-            const sutEnv: EnvFile.Env = envProvider.getEnvInstance();
+    //         const envProvider: EnvProvider = new EnvProvider();
+    //         const sutEnv: EnvFile.Env = envProvider.getEnvInstance();
 
-            expect(sutEnvConstructor).toBeCalled();
-            expect(sutEnvConstructor).toBeCalledTimes(1);
+    //         expect(sutEnvConstructor).toBeCalled();
+    //         expect(sutEnvConstructor).toBeCalledTimes(1);
 
-            expect(sutEnv).toBeInstanceOf(EnvFile.Env);
-        });
+    //         expect(sutEnv).toBeInstanceOf(EnvFile.Env);
+    //     });
 
-        it("When 'test', EnvSystem should return Env.prototype", () => {
-            EnvProvider.init("test");
+    //     it("When 'test', EnvSystem should return Env.prototype", () => {
+    //         EnvProvider.init("test");
 
-            const envProvider: EnvProvider = new EnvProvider();
-            const sutEnv: EnvFile.Env = envProvider.getEnvInstance();
+    //         const envProvider: EnvProvider = new EnvProvider();
+    //         const sutEnv: EnvFile.Env = envProvider.getEnvInstance();
 
-            expect(sutEnvConstructor).toBeCalled();
-            expect(sutEnvConstructor).toBeCalledTimes(1);
+    //         expect(sutEnvConstructor).toBeCalled();
+    //         expect(sutEnvConstructor).toBeCalledTimes(1);
 
-            expect(sutEnv).toBeInstanceOf(EnvFile.Env);
-        });
+    //         expect(sutEnv).toBeInstanceOf(EnvFile.Env);
+    //     });
 
-        afterEach(() => {
-            jest.clearAllMocks();
-        });
-    });
+    //     afterEach(() => {
+    //         jest.clearAllMocks();
+    //     });
+    // });
 
     /**
      * Env 프로토타입은 11 개의 프로퍼티를 가지고 있습니다.
      *
      * - 전제조건 : EnvProvider.init(key: NODE_ENV) 호출이 전제되어야 합니다.
      */
-    describe("Env.prototype should return 11 prototype", () => {
-        //
+    // describe("Env.prototype should return 11 prototype", () => {
+    //     //
 
-        beforeEach(() => {
-            EnvProvider.init("test");
-        });
+    //     beforeEach(() => {
+    //         EnvProvider.init("test");
+    //     });
 
-        it("When 'test', Env.prototpye", () => {
-            const env = new EnvFile.Env();
+    //     it("When 'test', Env.prototpye", () => {
+    //         const env = new EnvFile.Env();
 
-            expect(Object.keys(env).length).toBe(11);
-            expect(env.PORT).not.toBeUndefined();
-            expect(env.SALT).not.toBeUndefined();
+    //         expect(Object.keys(env).length).toBe(11);
+    //         expect(env.PORT).not.toBeUndefined();
+    //         expect(env.SALT).not.toBeUndefined();
 
-            expect(env.URL).not.toBeUndefined();
-            expect(env.JWT).not.toBeUndefined();
-            expect(env.MYSQL).not.toBeUndefined();
-            expect(env.S3).not.toBeUndefined();
-            expect(env.SES).not.toBeUndefined();
-        });
-    });
+    //         expect(env.URL).not.toBeUndefined();
+    //         expect(env.JWT).not.toBeUndefined();
+    //         expect(env.MYSQL).not.toBeUndefined();
+    //         expect(env.S3).not.toBeUndefined();
+    //         expect(env.SES).not.toBeUndefined();
+    //     });
+    // });
 });
