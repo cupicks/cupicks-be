@@ -52,37 +52,31 @@ export class AuthService {
     public signup = async (userDto: SignupUserDto): Promise<UserDto> => {
         const conn = await this.mysqlProvider.getConnection();
 
+        userDto.password = this.bcryptProvider.hashPassword(userDto.password);
+        const { emailVerifyToken, nicknameVerifyToken, password, imageUrl, resizedUrl } = userDto;
         try {
             await conn.beginTransaction();
-            userDto.password = this.bcryptProvider.hashPassword(userDto.password);
 
-            const emailVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(
-                userDto.emailVerifyToken,
-            );
-            const nicknameVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.INicknameVerifyToken>(
-                userDto.nicknameVerifyToken,
-            );
+            const emailVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(emailVerifyToken);
+            const nicknameVerifyTokenPayload =
+                this.jwtProvider.verifyToken<jwtLib.INicknameVerifyToken>(nicknameVerifyToken);
 
-            const isExistsUser = await this.authRepository.isExistsByEmail(conn, emailVerifyTokenPayload.email);
-            if (isExistsUser === true)
-                throw new ConflictException(`${emailVerifyTokenPayload.email} 은 사용 중입니다.`);
+            const { email } = emailVerifyTokenPayload;
+            const { nickname } = nicknameVerifyTokenPayload;
 
-            const finededVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
-                conn,
-                emailVerifyTokenPayload.email,
-            );
+            const userVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, email);
+            if (userVerifyList === null)
+                throw new BadRequestException(`${email} 이메일 및 닉네임 인증 절차를 진행하지 않은 사용자입니다.`);
+            else {
+                const { emailVerifiedToken: dbEmailToken, nicknameVerifiedToken: dbNicknameToken } = userVerifyList;
+                if (dbEmailToken === emailVerifyToken)
+                    throw new BadRequestException(`등록되지 않은 emailVerifyToken 입니다.`);
+                if (dbNicknameToken === nicknameVerifyToken)
+                    throw new BadRequestException(`등록되지 않은 nicnameVerifyToken 입니다.`);
+            }
 
-            if (finededVerifyList === null)
-                throw new NotFoundException(
-                    `해당 이메일과 닉네임의 요청은 이미 만료되었습니다. 회원가입 절차를 다시 실행해주세요.`,
-                );
-            else if (
-                finededVerifyList.emailVerifiedToken !== userDto.emailVerifyToken ||
-                finededVerifyList.nicknameVerifiedToken !== userDto.nicknameVerifyToken
-            )
-                throw new BadRequestException(
-                    `서버에 등록되어 있지 않은 EmailVerifyToken 혹은 NicknameVerifyToken 을 제출하였습니다.`,
-                );
+            const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
+            if (isExistsUser === true) throw new ConflictException(`${email} 은 사용 중입니다.`);
 
             const date = this.dayjsProvider.changeToProvidedFormat(
                 this.dayjsProvider.getDayjsInstance(),
@@ -90,20 +84,10 @@ export class AuthService {
             );
             await this.authRepository.createUser(
                 conn,
-                {
-                    email: emailVerifyTokenPayload.email,
-                    nickname: nicknameVerifyTokenPayload.nickname,
-                    password: userDto.password,
-                    imageGroup: {
-                        imageUrl: userDto.imageUrl,
-                        resizedUrl: userDto.resizedUrl,
-                    },
-                },
+                { email, nickname, password, imageGroup: { imageUrl, resizedUrl } },
                 date,
-                finededVerifyList.userVerifyListId,
+                userVerifyList.userVerifyListId,
             );
-
-            // const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
             await conn.commit();
 
@@ -111,7 +95,7 @@ export class AuthService {
                 userId: 1,
                 createdAt: date,
                 updatedAt: date,
-                email: emailVerifyTokenPayload.email,
+                email: email,
                 nickname: nicknameVerifyTokenPayload.nickname,
                 imageUrl: userDto.imageUrl,
                 resizedUrl: userDto.resizedUrl,
