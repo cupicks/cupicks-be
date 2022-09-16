@@ -5,6 +5,7 @@ export interface IJwtEnv {
     ACCESS_EXPIRED_IN: string;
     REFRESH_EXPIRED_IN: string;
     VERIFY_EXPIRED_IN: string;
+    RESET_EXPIRED_IN: string;
 
     HASH_ALGOIRHTM: TALGORITHM;
 
@@ -36,13 +37,18 @@ export interface ISesConfigEnv {
     SES_SENDER_EMAIL: string;
 }
 
+export interface IUrlEnv {
+    CORS_URL_LIST_WITHOUT_PORT: string[];
+    FROTN_REDIRECT_URL_WITHOUT_PORT: string;
+    SERVER_URL_WITH_PORT: string;
+}
+
 export class Env {
     PORT;
 
     SALT;
 
-    CORS_ORIGIN_LIST: string[];
-
+    URL: IUrlEnv;
     JWT: IJwtEnv;
     MYSQL: IMysqlEnv;
     S3: IS3ConfigEnv;
@@ -53,12 +59,22 @@ export class Env {
 
         this.SALT = this.getEnvNumberValue("SALT");
 
-        this.CORS_ORIGIN_LIST = [this.getEnvStringValue("CORS_ORIGIN_ONE"), this.getEnvStringValue("CORS_ORIGIN_TWO")];
+        this.URL = {
+            CORS_URL_LIST_WITHOUT_PORT: [
+                this.getEnvStringValue("CORS_URL_ONE_WITHOUT_PORT"),
+                this.getEnvStringValue("CORS_URL_TWO_WITHOUT_PORT"),
+                this.getEnvStringValue("CORS_URL_THREE_WITHOUT_PORT"),
+                this.getEnvStringValue("CORS_URL_FOUR_WITHOUT_PORT"),
+            ],
+            FROTN_REDIRECT_URL_WITHOUT_PORT: this.getEnvStringValue("FROTN_REDIRECT_URL_WITHOUT_PORT"),
+            SERVER_URL_WITH_PORT: this.getEnvStringValue("SERVER_URL_WITH_PORT"),
+        };
 
         this.JWT = {
             ACCESS_EXPIRED_IN: this.getEnvStringValue("JWT_ACCESS_EXPIRED_IN"),
             REFRESH_EXPIRED_IN: this.getEnvStringValue("JWT_REFRESH_EXPIRED_IN"),
             VERIFY_EXPIRED_IN: this.getEnvStringValue("JWT_VERIFY_EXPIRED_IN"),
+            RESET_EXPIRED_IN: this.getEnvStringValue("JWT_RESET_EXPIRED_IN"),
 
             HASH_ALGOIRHTM: this.getEnvLiteralTypeValue("JWT_HASH_ALGOIRHTM"),
             HASH_PRIVATE_PEM_KEY: this.getPemKey("private"),

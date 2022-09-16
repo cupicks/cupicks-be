@@ -8,6 +8,10 @@ import * as multerS3 from "multer-s3";
 import { IS3ConfigEnv } from "models/_.loader";
 import { CustomException, UnkownTypeError } from "../../models/_.loader";
 
+type ProfileImagePath = "profile" | "profile-resized";
+type CommentImagePath = "comment" | "comment-resized";
+type ImagePath = ProfileImagePath | CommentImagePath;
+
 export class MulterProvider {
     static isInit = false;
     static S3_ACCESS_KEY: string;
@@ -34,15 +38,15 @@ export class MulterProvider {
      *
      * 그런 방식은 존재하지 않고 요청 헤더의 ***KEY*** 가 변경되는 것이 문제라면 여러 upload 메서드를 많이 만들어도 될 것 같습니다.
      */
-    static uploadSingle: RequestHandler = (req, res, next) => {
-        return this.test().single("imageValue")(req, res, next);
+    static uploadImageProfile: RequestHandler = (req, res, next) => {
+        return this.uploadImage("profile").single("imageValue")(req, res, next);
     };
 
-    static uploadNone: RequestHandler = (req, res, next) => {
-        return this.test().none()(req, res, next);
+    static uploadImageComment: RequestHandler = (req, res, next) => {
+        return this.uploadImage("comment").single("imageValue")(req, res, next);
     };
 
-    static test = () => {
+    static uploadImage = (path: string) => {
         const s3 = new S3Client({
             credentials: {
                 accessKeyId: MulterProvider.S3_ACCESS_KEY,
@@ -56,22 +60,21 @@ export class MulterProvider {
                 s3,
                 bucket: MulterProvider.BUCKET,
                 key(req, file, done) {
-                    done(null, `profile/${Date.now()}${file.originalname}`);
+                    done(null, `${path}/${Date.now()}${file.originalname}`);
                 },
             }),
             fileFilter(req, file, done) {
                 if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
                     done(null, true);
                 } else {
-                    return done(new Error("error"));
+                    return done(new Error("Image type error"));
                 }
             },
             limits: { fileSize: 5 * 1024 * 1024 },
         });
     };
 
-    static deleteImage = async (targetImageValue: string) => {
-        // test 메서드 코드와 중복 객체!
+    static deleteImage = async (targetImageValue: string, path: ImagePath) => {
         const s3 = new S3Client({
             credentials: {
                 accessKeyId: MulterProvider.S3_ACCESS_KEY,
@@ -80,11 +83,13 @@ export class MulterProvider {
             region: MulterProvider.REGION,
         });
 
-        return await s3.send(
-            new DeleteObjectCommand({
-                Bucket: MulterProvider.BUCKET,
-                Key: `profile/${targetImageValue}`,
-            }),
-        );
+        // path: profile || comment 폴더
+        // targetImageValue = 삭제될 이미지 값 || 수정 후 기존 이미지 값
+        const bucketParams = {
+            Bucket: MulterProvider.BUCKET,
+            Key: `${path}/${targetImageValue}`,
+        };
+
+        return await s3.send(new DeleteObjectCommand(bucketParams));
     };
 }

@@ -1,4 +1,4 @@
-import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { FieldPacket, PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
     SignupUserDto,
     IUserPacket,
@@ -60,7 +60,7 @@ export class AuthRepository {
     // find
 
     public findUserById = async (conn: PoolConnection, userId: number): Promise<IUserPacket | null> => {
-        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE user_id = ${userId} LIMIT 1;`;
+        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl, resized_url as resizedUrl FROM user WHERE user_id = ${userId} LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
 
         const userDataPacket = findResult[0];
@@ -70,7 +70,20 @@ export class AuthRepository {
     };
 
     public findUserByEmail = async (conn: PoolConnection, email: string): Promise<IUserPacket | null> => {
-        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE email = "${email}" LIMIT 1;`;
+        const findQuery = `SELECT
+                user_id as userId,
+                email,
+                nickname,
+                password,
+                image_url as imageUrl,
+                resized_url as resizedUrl,
+                reset_password_token as resetPasswordToken,
+                reset_password_date as resetPasswordDate,
+                current_password_sent_count as currentPasswordSentCount,
+                password_sent_exceeding_date as passwordSentExceedingDate,
+                is_exeeded_of_password_sent as isExeededOfPasswordSent
+            FROM user
+            WHERE email = "${email}" LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
 
         const userDataPacket = findResult[0];
@@ -80,7 +93,7 @@ export class AuthRepository {
     };
 
     public findUserByNickname = async (conn: PoolConnection, nickname: string): Promise<IUserPacket | null> => {
-        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl FROM user WHERE nickname = "${nickname}" LIMIT 1;`;
+        const findQuery = `SELECT user_id as userId, email, nickname, password, image_url as imageUrl, resized_url as resizedUrl FROM user WHERE nickname = "${nickname}" LIMIT 1;`;
         const findResult = await conn.query<IUserPacket[]>(findQuery);
 
         const userDataPacket = findResult[0];
@@ -128,18 +141,51 @@ export class AuthRepository {
 
     public createUser = async (
         conn: PoolConnection,
-        userDto: SignupUserDto,
+        userDto: {
+            email: string;
+            nickname: string;
+            password: string;
+            imageGroup: {
+                imageUrl: string | undefined;
+                resizedUrl: string | undefined;
+            };
+        },
         date: string,
         userVerifyListId: number,
     ): Promise<number> => {
-        const createUserQuery = userDto.imageUrl
-            ? `INSERT INTO user (email, nickname, password, image_url, created_at, updated_at, user_verify_list_id)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}", "${date}", "${date}", ${userVerifyListId});`
-            : `INSERT INTO user (email, nickname, password, created_at, updated_at, user_verify_list_id)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${date}", "${date}", ${userVerifyListId});`;
-        const createdUserResult = await conn.query<ResultSetHeader>(createUserQuery);
+        const {
+            email,
+            imageGroup: { imageUrl, resizedUrl },
+            nickname,
+            password,
+        } = userDto;
 
-        const [resultSetHeader, _] = createdUserResult;
+        let insertReuslt: [ResultSetHeader, FieldPacket[]];
+        if (userDto.imageGroup) {
+            const insertQuery = `INSERT INTO user (email, nickname, password, image_url, resized_url, created_at, updated_at, user_verify_list_id) VALUES (?,?,?,?,?,?,?,?)`;
+            insertReuslt = await conn.query<ResultSetHeader>(insertQuery, [
+                email,
+                nickname,
+                password,
+                imageUrl,
+                resizedUrl,
+                date,
+                date,
+                userVerifyListId,
+            ]);
+        } else {
+            const insertQuery = `INSERT INTO user (email, nickname, password, created_at, updated_at, user_verify_list_id) VALUES (?,?,?,?,?,?)`;
+            insertReuslt = await conn.query<ResultSetHeader>(insertQuery, [
+                email,
+                nickname,
+                password,
+                date,
+                date,
+                userVerifyListId,
+            ]);
+        }
+
+        const [resultSetHeader] = insertReuslt;
         const { affectedRows, insertId } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
@@ -147,7 +193,15 @@ export class AuthRepository {
     };
 
     /** @deprecated */
-    public createUserLegacy = async (conn: PoolConnection, userDto: SignupUserDto): Promise<number> => {
+    public createUserLegacy = async (
+        conn: PoolConnection,
+        userDto: {
+            email: string;
+            nickname: string;
+            password: string;
+            imageUrl: string;
+        },
+    ): Promise<number> => {
         const createUserQuery = userDto.imageUrl
             ? `INSERT INTO user (email, nickname, password, image_url) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}");`
             : `INSERT INTO user (email, nickname, password) VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}");`;
@@ -186,7 +240,7 @@ export class AuthRepository {
     // update
 
     private getUpdateUserQuery = (editDto: EditProfileDto): string => {
-        const { userId, nickname, password, imageUrl } = editDto;
+        const { userId, nickname, password, imageUrl, resizedUrl } = editDto;
         if (!nickname && !password && !imageUrl)
             throw new BadRequestException(`회원 정보 수정을 위한 값이 하나도 들어있지 않습니다.`);
 
@@ -194,6 +248,7 @@ export class AuthRepository {
         if (nickname) queryString += ` nickname =  "${nickname}",`;
         if (password) queryString += ` password = "${password}",`;
         if (imageUrl) queryString += ` image_url = "${imageUrl}",`;
+        if (resizedUrl) queryString += ` resized_url = "${resizedUrl}",`;
 
         queryString = queryString.slice(0, queryString.length - 1);
         queryString += ` WHERE user_id = ${userId};`;
@@ -210,13 +265,76 @@ export class AuthRepository {
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
     };
 
-    public updateUserRefreshToken = async (conn: PoolConnection, userId: number, refreshToken: string) => {
-        const updateQuery = `UPDATE user SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
+    public updateUserRefreshToken = async (
+        conn: PoolConnection,
+        userId: number,
+        refreshToken: string | null,
+    ): Promise<void> => {
+        const updateQuery =
+            refreshToken === null
+                ? `UPDATE user SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`
+                : `UPDATE user SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
         const [ResultSetHeader, _] = updateResult;
         const { affectedRows } = ResultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
+
+    public updateUserPassword = async (conn: PoolConnection, email: string, hashedPassword: string): Promise<void> => {
+        const updateQuery = `UPDATE user SET password = "${hashedPassword}" WHERE email = "${email}";`;
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [ResultSetHeader, _] = updateResult;
+        const { affectedRows } = ResultSetHeader;
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
+
+    public updateUserResetPassword = async (
+        conn: PoolConnection,
+        userId: number,
+        resetPasswordToken: string,
+        resetPasswordDate: string,
+    ) => {
+        const updateQuery = `UPDATE
+            user
+        SET
+            reset_password_token = "${resetPasswordToken}",
+            reset_password_date = "${resetPasswordDate}",
+            current_password_sent_count = current_password_sent_count + 1,
+            password_sent_exceeding_date = null,
+            is_exeeded_of_password_sent = null
+        WHERE
+            user_id = ${userId};`;
+        const updateResult = await conn.query<ResultSetHeader>(updateQuery);
+
+        const [ResultSetHeader, _] = updateResult;
+        const { affectedRows } = ResultSetHeader;
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+    };
+
+    // exipre
+    public exceedOfResetPasswordSent = async (
+        conn: PoolConnection,
+        userId: number,
+        passwordSentExceedingDate: string | null,
+    ) => {
+        const exceedQuery = `UPDATE
+            user
+        SET
+            reset_password_token = null,
+            reset_password_date = null,
+            current_password_sent_count = 0,
+            password_sent_exceeding_date = "${passwordSentExceedingDate}",
+            is_exeeded_of_password_sent = 1
+        WHERE
+            user_id = ${userId};`;
+        const exceedResult = await conn.query<ResultSetHeader>(exceedQuery);
+
+        const [resultSetHeader, _] = exceedResult;
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
     };
 
     /** @deprecated */

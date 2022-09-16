@@ -5,7 +5,14 @@ export interface IUserPacket extends RowDataPacket {
     email: string;
     nickname: string;
     password: string;
-    imageUrl?: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
+
+    resetPasswordToken: string;
+    resetPasswordDate: string;
+    currentPasswordSentCount: number;
+    passwordSentExceedingDate: string | null;
+    isExeededOfPasswordSent: 0 | 1;
 }
 
 export interface IUserRefresthTokenPacket extends RowDataPacket {

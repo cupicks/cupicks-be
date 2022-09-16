@@ -1,5 +1,3 @@
-//* https://www.staging-typescript.org/tsconfig
-
 {
     "compilerOptions": {
       "strict": true,
@@ -15,7 +13,17 @@
       "baseUrl": "./src",
       "incremental": true,
       "moduleResolution": "node",
+      "downlevelIteration": true
     },
-    "include": ["src/**/*"]
+    "include": ["src"],
+    "exclude": [
+      "**/node_module",
+      ".github",
+      ".husky",
+      "coverage",
+      "dist",
+      "key",
+      "sql"
+    ]
   }
   

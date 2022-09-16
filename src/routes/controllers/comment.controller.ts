@@ -1,9 +1,16 @@
 import { RequestHandler, Request, Response } from "express";
 
 import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
-import { CreateCommentDto, DeleteCommentDto, UpdateCommentDto, GetCommentDto } from "../../models/_.loader";
+import {
+    CreateCommentDto,
+    DeleteCommentDto,
+    UpdateCommentDto,
+    GetCommentDto,
+    ICommentPacket,
+} from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { CommentService } from "../services/_.exporter";
+import { ICommentResponse } from "../../constants/_.loader";
 
 export default class CommentController {
     private commentService: CommentService;
@@ -16,25 +23,18 @@ export default class CommentController {
         try {
             const file = req.file as Express.MulterS3.File;
 
-            const imageLocation = file?.location.length > 0 ? file.location : null;
-
             const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
                 new CreateCommentDto({
                     userId: res.locals.userId,
                     nickname: res.locals.nickname,
                     recipeId: req.query.recipeId,
                     comment: req.query.comment,
+                    imageUrl: file?.location,
+                    resizedUrl: file?.location,
                 }),
             );
 
-            console.log(typeof validator.recipeId);
-
-            const createComment = await this.commentService.createComment(
-                validator,
-                validator.userId,
-                validator.recipeId,
-                imageLocation,
-            );
+            const createComment: ICommentResponse = await this.commentService.createComment(validator);
 
             return res.status(201).json({
                 isSuccess: false,
@@ -44,8 +44,8 @@ export default class CommentController {
                     nickname: validator.nickname,
                     recipeId: validator.recipeId,
                     commentId: createComment.commentId,
-                    imageUrl: imageLocation,
-                    resizedUrl: null,
+                    imageUrl: validator.imageUrl ? validator.imageUrl : null,
+                    resizedUrl: validator.resizedUrl ? validator.recipeId : null,
                     createdAt: createComment.createdAt,
                     updatedAt: createComment.updatedAt,
                 },
@@ -61,20 +61,21 @@ export default class CommentController {
 
     public deleteComment: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const validator = await new JoiValidator().validateAsync<DeleteCommentDto>(
+            const validator: DeleteCommentDto = await new JoiValidator().validateAsync<DeleteCommentDto>(
                 new DeleteCommentDto({
                     userId: res.locals.userId,
                     commentId: Number(req.params.commentId),
                 }),
             );
 
-            await this.commentService.deleteComment(validator.userId, validator.commentId);
+            await this.commentService.deleteComment(validator);
 
             return res.status(200).json({
                 isSuccess: true,
                 message: "댓글 삭제에 성공하였습니다.",
             });
         } catch (err) {
+            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -87,23 +88,18 @@ export default class CommentController {
         try {
             const file = req.file as Express.MulterS3.File;
 
-            const imageLocation = file?.location.length > 0 ? file.location : null;
-
-            const validator = await new JoiValidator().validateAsync<UpdateCommentDto>(
+            const validator: UpdateCommentDto = await new JoiValidator().validateAsync<UpdateCommentDto>(
                 new UpdateCommentDto({
                     userId: res.locals.userId,
                     nickname: res.locals.nickname,
                     commentId: Number(req.params.commentId),
                     comment: req.query.comment,
+                    imageUrl: file?.location,
+                    resizedUrl: file?.location,
                 }),
             );
 
-            const updateComment = await this.commentService.updateComment(
-                validator.userId,
-                validator.comment,
-                imageLocation,
-                validator.commentId,
-            );
+            const updateComment: ICommentPacket[] = await this.commentService.updateComment(validator);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -111,12 +107,12 @@ export default class CommentController {
                 comment: {
                     userId: validator.userId,
                     nickname: validator.nickname,
-                    commentId: validator.commentId,
-                    imageUrl: imageLocation,
+                    commentId: updateComment[0].commentId,
+                    imageUrl: updateComment[0].image_url,
                     resizedUrl: null,
-                    comment: validator.comment,
-                    createdAt: updateComment.createdAt,
-                    updatedAt: updateComment.updatedAt,
+                    comment: updateComment[0].comment,
+                    createdAt: updateComment[0].createdAt,
+                    updatedAt: updateComment[0].updatedAt,
                 },
             });
         } catch (err) {
@@ -138,11 +134,7 @@ export default class CommentController {
                 }),
             );
 
-            const getComments = await this.commentService.getComments(
-                validator.recipeId,
-                validator.page,
-                validator.count,
-            );
+            const getComments: ICommentPacket[] = await this.commentService.getComments(validator);
 
             return res.status(200).json({
                 isSuccess: true,

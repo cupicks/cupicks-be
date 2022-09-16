@@ -12,7 +12,7 @@ export interface IPublishTokenDto {
 export class PublishTokenDto extends RequestQueryExtractor<"refreshToken"> implements IBaseDto, IPublishTokenDto {
     refreshToken: string;
 
-    constructor(refreshToken: string | string[] | ParsedQs | ParsedQs[] | undefined) {
+    constructor({ refreshToken }: { refreshToken: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
         super();
         this.refreshToken = this.validateType(refreshToken, "refreshToken");
     }
