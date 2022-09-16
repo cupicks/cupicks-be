@@ -75,12 +75,12 @@ describe("EnvSystem's using Env and EnvProvider", () => {
             expect(Object.keys(env).length).toBe(11);
             expect(env.PORT).not.toBeUndefined();
             expect(env.SALT).not.toBeUndefined();
-            expect(env.CORS_ORIGIN_LIST).not.toBeUndefined();
 
-            expect(env.S3).not.toBeUndefined();
-            expect(env.SES).not.toBeUndefined();
+            expect(env.URL).not.toBeUndefined();
             expect(env.JWT).not.toBeUndefined();
             expect(env.MYSQL).not.toBeUndefined();
+            expect(env.S3).not.toBeUndefined();
+            expect(env.SES).not.toBeUndefined();
         });
     });
 });
