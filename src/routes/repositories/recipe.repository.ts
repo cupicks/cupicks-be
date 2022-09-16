@@ -191,19 +191,33 @@ export class RecipeRepository {
     };
 
     public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipeCombinedPacket[]> => {
-        const selectQuery = `SELECT
-            recipe_id as recipeId,
-            cup_size as cupSize,
-            title as title,
-            content as content,
-            is_iced as isIced,
-            is_public as isPublic,
-            created_at as createdAt,
-            updated_at as updatedAt
-        FROM recipe
-        LIMIT ${count} OFFSET ${(page - 1) * count};`;
+        const selectQuery = `
+        SELECT    
+            recipe.recipe_id as recipeId,
+            recipe.cup_size as cupSize,
+            recipe.title as title,
+            recipe.content as content,
+            recipe.is_iced as isIced,
+            recipe.is_public as isPublic,
+            recipe.created_at as createdAt,
+            recipe.updated_at as updatedAt,
+            user.nickname as nickname,
+            user.image_url as imageUrl,
+            user.resized_url as resizedUrl
+        FROM (
+            SELECT
+                recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
+            FROM recipe
+            LIMIT ${count} OFFSET ${(page - 1) * count}
+        ) recipe
+        LEFT OUTER JOIN user_recipe
+            ON recipe.recipe_id = user_recipe.recipe_id
+        LEFT OUTER JOIN user
+            ON user_recipe.user_id = user.user_id;`;
         const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
         const [recipePackets, _] = selectResult;
+
+        console.log(recipePackets);
 
         return recipePackets;
     };
