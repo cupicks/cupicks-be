@@ -17,10 +17,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Prepare Dependencies
-        run:  npm ci
-
-      - name: Run Test Code
-        run: npm test
+        run:  |
+          npm ci
+          npm test
       
       - name: Automate Run Test Code with jest
         uses: actions/github-script@0.2.0
