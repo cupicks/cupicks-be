@@ -69,8 +69,8 @@ export class ProfileService {
         try {
             await conn.beginTransaction();
 
-            const isExists = await this.authRepository.isExistsById(conn, geMyRecipeDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            const user = await this.authRepository.findUserById(conn, geMyRecipeDto.userId);
+            if (user === null) throw new NotFoundException("이미 탈퇴한 사용자의 토큰입니다.");
 
             const myRecipeList = await this.recipeRepository.getMyRecipeByUserid(
                 conn,
@@ -105,6 +105,9 @@ export class ProfileService {
                             ingredientColor: ingredient.ingredientColor,
                         };
                     }),
+                    nickname: user.nickname,
+                    imageUrl: user.imageUrl,
+                    resizedUrl: user.resizedUrl,
                 });
 
                 recipeDtoList.push(recipeDto);
@@ -126,8 +129,8 @@ export class ProfileService {
         try {
             await conn.beginTransaction();
 
-            const isExists = await this.authRepository.isExistsById(conn, getLikeRecipeDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            const user = await this.authRepository.findUserById(conn, getLikeRecipeDto.userId);
+            if (user === null) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
 
             const myRecipeList = await this.recipeRepository.getLikeRecipeByUserid(
                 conn,
@@ -162,6 +165,9 @@ export class ProfileService {
                             ingredientColor: ingredient.ingredientColor,
                         };
                     }),
+                    nickname: user.nickname,
+                    imageUrl: user.imageUrl,
+                    resizedUrl: user.resizedUrl,
                 });
 
                 recipeDtoList.push(recipeDto);
