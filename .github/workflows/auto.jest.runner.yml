@@ -1,11 +1,9 @@
 name: Automated-Jest
 
 on:
-  push:
-    bracnehs: ['test/*']
-
   pull_request:
-    branches: ['test/*']
+    branches: []
+      - 'test/**'
 
 jobs:
   jest_runner:
