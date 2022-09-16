@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS user (
     nickname                                VARCHAR(10)     NOT NULL    UNIQUE,
     password                                VARCHAR(255)    NOT NULL,
     image_url                               VARCHAR(255)    NULL,
+    resized_url                             VARCHAR(255)    NULL,
     refresh_token                           VARCHAR(1000)   NULL,
     created_at                              DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     updated_at                              DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
@@ -67,7 +68,6 @@ CREATE TABLE IF NOT EXISTS user (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS recipe (
     recipe_id   INT                 NOT NULL    PRIMARY KEY AUTO_INCREMENT,
@@ -147,9 +147,10 @@ CREATE TABLE IF NOT EXISTS user_disfavor_recipe (
 -- comment 관련
 
 CREATE TABLE IF NOT EXISTS comment (
-    comment_id  INT                 NOT NULL    PRIMARY KEY AUTO_INCREMENT,
-    comment     VARCHAR(150)        NOT NULL,
-    image_url   VARCHAR(255)             NULL,
+    comment_id  INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    comment     VARCHAR(150)    NOT NULL,
+    image_url   VARCHAR(255)    NULL,
+    resized_url VARCHAR(255)    NULL,
     created_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );

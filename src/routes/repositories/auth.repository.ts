@@ -1,4 +1,4 @@
-import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { FieldPacket, PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
     SignupUserDto,
     IUserPacket,
@@ -144,19 +144,47 @@ export class AuthRepository {
             email: string;
             nickname: string;
             password: string;
-            imageUrl?: string;
+            imageGroup: {
+                imageUrl: string | undefined;
+                resizedUrl: string | undefined;
+            };
         },
         date: string,
         userVerifyListId: number,
     ): Promise<number> => {
-        const createUserQuery = userDto.imageUrl
-            ? `INSERT INTO user (email, nickname, password, image_url, created_at, updated_at, user_verify_list_id)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${userDto.imageUrl}", "${date}", "${date}", ${userVerifyListId});`
-            : `INSERT INTO user (email, nickname, password, created_at, updated_at, user_verify_list_id)
-                VALUES ("${userDto.email}", "${userDto.nickname}", "${userDto.password}", "${date}", "${date}", ${userVerifyListId});`;
-        const createdUserResult = await conn.query<ResultSetHeader>(createUserQuery);
+        const {
+            email,
+            imageGroup: { imageUrl, resizedUrl },
+            nickname,
+            password,
+        } = userDto;
 
-        const [resultSetHeader, _] = createdUserResult;
+        let insertReuslt: [ResultSetHeader, FieldPacket[]];
+        if (userDto.imageGroup) {
+            const insertQuery = `INSERT INTO user (email, nickname, password, image_url, resized_url, created_at, updated_at, user_verify_list_id) VALUES (?,?,?,?,?,?,?,?)`;
+            insertReuslt = await conn.query<ResultSetHeader>(insertQuery, [
+                email,
+                nickname,
+                password,
+                imageUrl,
+                resizedUrl,
+                date,
+                date,
+                userVerifyListId,
+            ]);
+        } else {
+            const insertQuery = `INSERT INTO user (email, nickname, password, created_at, updated_at, user_verify_list_id) VALUES (?,?,?,?,?,?)`;
+            insertReuslt = await conn.query<ResultSetHeader>(insertQuery, [
+                email,
+                nickname,
+                password,
+                date,
+                date,
+                userVerifyListId,
+            ]);
+        }
+
+        const [resultSetHeader] = insertReuslt;
         const { affectedRows, insertId } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
@@ -211,7 +239,7 @@ export class AuthRepository {
     // update
 
     private getUpdateUserQuery = (editDto: EditProfileDto): string => {
-        const { userId, nickname, password, imageUrl } = editDto;
+        const { userId, nickname, password, imageUrl, resizedUrl } = editDto;
         if (!nickname && !password && !imageUrl)
             throw new BadRequestException(`회원 정보 수정을 위한 값이 하나도 들어있지 않습니다.`);
 
@@ -219,6 +247,7 @@ export class AuthRepository {
         if (nickname) queryString += ` nickname =  "${nickname}",`;
         if (password) queryString += ` password = "${password}",`;
         if (imageUrl) queryString += ` image_url = "${imageUrl}",`;
+        if (resizedUrl) queryString += ` resized_url = "${resizedUrl}",`;
 
         queryString = queryString.slice(0, queryString.length - 1);
         queryString += ` WHERE user_id = ${userId};`;

@@ -98,7 +98,10 @@ export class AuthService {
                     email: emailVerifyTokenPayload.email,
                     nickname: nicknameVerifyTokenPayload.nickname,
                     password: userDto.password,
-                    imageUrl: userDto.imageUrl,
+                    imageGroup: {
+                        imageUrl: userDto.imageUrl,
+                        resizedUrl: userDto.resizedUrl,
+                    },
                 },
                 date,
                 finededVerifyList.userVerifyListId,
@@ -115,6 +118,7 @@ export class AuthService {
                 email: emailVerifyTokenPayload.email,
                 nickname: nicknameVerifyTokenPayload.nickname,
                 imageUrl: userDto.imageUrl,
+                resizedUrl: userDto.resizedUrl,
             });
         } catch (err) {
             await conn.rollback();
