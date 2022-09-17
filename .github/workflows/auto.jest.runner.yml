@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Prepare Environment and Dependencies
+      - name: Prepare Environment and Dependencies, and then Run Jest
         run:  |
           pwd
             touch .env.test
@@ -52,7 +52,7 @@ jobs:
           npm ci
           npm test
       
-      - name: Automate Run Test Code with jest
+      - name: IF Failure and Close PR
         uses: actions/github-script@0.2.0
         with:
           github-token: ${{github.token}}
