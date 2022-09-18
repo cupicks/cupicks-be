@@ -45,7 +45,7 @@ export default class CommentController {
                     recipeId: validator.recipeId,
                     commentId: createComment.commentId,
                     imageUrl: validator.imageUrl ? validator.imageUrl : null,
-                    resizedUrl: validator.resizedUrl ? validator.recipeId : null,
+                    resizedUrl: validator.resizedUrl ? validator.resizedUrl : null,
                     createdAt: createComment.createdAt,
                     updatedAt: createComment.updatedAt,
                 },
