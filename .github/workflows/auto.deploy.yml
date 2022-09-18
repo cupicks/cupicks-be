@@ -2,7 +2,8 @@ name: CI
 
 on:
   pull_request:
-    branches: ['main']
+    branches:
+      - 'main'
 
 #  workflow_dispatch:
 
@@ -27,11 +28,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_CUPICK_S3_CODEDEPLOY_SECRET_KEY }}
           aws-region: ap-northeast-2
 
-      - name: upload to S3
+      - name: Automated Upload to S3
         run: aws s3 cp --region ap-northeast-2 ./${{github.event.pull_request.timestamp}}_server.zip s3://cupick-s3-codedeploy
         # https://isntyet.tistory.com/126
 
-      - name: deploy with AWS codeDeploy
+      - name: Automated Deployment to EC2 with CodeDeploy
         run: aws deploy create-deployment
           --application-name cupick-codedeploy
           --deployment-config-name CodeDeployDefault.AllAtOnce

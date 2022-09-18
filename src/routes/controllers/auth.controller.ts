@@ -42,7 +42,8 @@ export default class AuthController {
              */
             const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
                 new SignupUserDto({
-                    imageUrl: file.location,
+                    imageUrl: file?.location,
+                    resizedUrl: file?.location,
                     password: req?.query["password"],
                     emailVerifyToken: req?.query["emailVerifyToken"],
                     nicknameVerifyToken: req?.query["nicknameVerifyToken"],
@@ -57,6 +58,7 @@ export default class AuthController {
                 user: result,
             });
         } catch (err) {
+            console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
@@ -155,8 +157,8 @@ export default class AuthController {
             const result = await this.authService.sendEmail(sendEmailDto);
 
             if (result.isExceeded) {
-                return res.status(201).json({
-                    isSuccess: true,
+                return res.status(400).json({
+                    isSuccess: false,
                     message: `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
                     date: result.date,
                     exceededDate: result.exceededDate,
@@ -245,8 +247,8 @@ export default class AuthController {
             const result = await this.authService.sendPassword(snedPasswordDto);
 
             if (result.isExceeded) {
-                return res.status(201).json({
-                    isSuccess: true,
+                return res.status(400).json({
+                    isSuccess: false,
                     message: `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
                     date: result.date,
                     exceededDate: result.exceededDate,

@@ -95,6 +95,7 @@ export class AwsSesProvider {
                 },
             });
         } catch (err) {
+            console.log(err);
             if (err instanceof MessageRejected)
                 throw new BadRequestException(`${toEmail} 은 메일 수신이 불가능한 이메일입니다.`);
             else if (err instanceof Error) throw new UnkownError(`${err.name}, ${err.message}`);

@@ -14,6 +14,9 @@ import {
 } from "./exceptions/custom.exception";
 
 import { IBaseDto } from "./dtos/i.base.dto";
+
+// USER
+
 import { UserDto, IUserDto } from "./dtos/user/user.dto";
 import { SignupUserDto, ISignupUserDto } from "./dtos/user/signup.user.dto";
 import { SigninUserDto, ISigninUserDto } from "./dtos/user/singin.user.dto";
@@ -27,7 +30,12 @@ import { ResetPasswordDto, IResetPasswordDto } from "./dtos/user/reset.password.
 
 import { SendEmailDto, ISendEmailDto } from "./dtos/user/send.email.dto";
 
-import { EditProfileDto, IEditProfileDto } from "./dtos/user/edit.profile.dto";
+// PROFILE
+
+import { EditProfileDto, IEditProfileDto } from "./dtos/profile/edit.profile.dto";
+import { GetMyRecipeDto } from "./dtos/profile/get.my.recipe.dto";
+
+// RECIPE
 
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
@@ -44,11 +52,17 @@ import { DeleteCommentDto } from "./dtos/comment/delete.comment.dto";
 import { UpdateCommentDto } from "./dtos/comment/update.comment.dto";
 import { GetCommentDto } from "./dtos/comment/get.comment.dto";
 
+// PACKET - USER
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
 import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
+
+// PACKET - RECIPE
 import { IRecipePacket } from "./packets/i.recipe.packet";
+import { IRecipeCombinedPacket } from "./packets/i.recipe.combined.packet";
 import { IRecipeIngredientPacket } from "./packets/i.recipe.ingredient.packet";
 import { IRecipeIngredientListPacket } from "./packets/i.recipe.ingredient.list.packet";
+
+// PACKET - COMMENT
 import { ICommentPacket } from "./packets/i.comment.packet";
 
 export {
@@ -62,12 +76,14 @@ export {
     IUserRefresthTokenPacket,
     IUserVerifyListPacket,
     IRecipePacket,
+    IRecipeCombinedPacket,
     IRecipeIngredientPacket,
     IRecipeIngredientListPacket,
     ICommentPacket,
+
     // BaseDtos
     IBaseDto,
-    // Dtos
+    // USER
     UserDto,
     IUserDto,
     SignupUserDto,
@@ -98,6 +114,7 @@ export {
     IIngredientDto,
     CommonRecipeDto,
     DeleteRecipeDto,
+    GetMyRecipeDto,
     GetRecipeDto,
     RecipeDto,
     IRecipeDto,

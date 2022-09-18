@@ -1,4 +1,11 @@
-import { CreateRecipeDto, IngredientDto, IRecipePacket, UnkownError, UpdateRecipeDto } from "../../models/_.loader";
+import {
+    CreateRecipeDto,
+    IngredientDto,
+    IRecipeCombinedPacket,
+    IRecipePacket,
+    UnkownError,
+    UpdateRecipeDto,
+} from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
 import { IRecipeResponseCustom } from "../../constants/_.loader";
 
@@ -159,44 +166,69 @@ export class RecipeRepository {
         return insertId;
     };
 
-    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipePacket[]> => {
+    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
         const query = `
-        SELECT 
+        SELECT
             R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
-            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount"
+            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount",
+            R.nickname, R.image_url as 'imageUrl', R.resized_url as 'resizedUrl'
         FROM 
             (
-                SELECT *
-                FROM recipe R
+                SELECT 
+                    recipe.*,
+                    user.nickname,
+                    user.image_url,
+                    user.resized_url
+                FROM (
+                    SELECT user_id, recipe_id FROM user_recipe WHERE recipe_id = ?
+                ) user_recipe
+                LEFT OUTER JOIN user
+                ON user_recipe.user_id = user.user_id
+                LEFT OUTER JOIN recipe
+                ON user_recipe.recipe_id = recipe.recipe_id
             ) R
-        RIGHT JOIN
+        LEFT OUTER JOIN
             (
                 SELECT *
                 FROM recipe_ingredient I
             ) I
         ON R.recipe_id = I.recipe_id
-        WHERE R.recipe_id = ?
         `;
 
-        const [result] = await conn.query<IRecipePacket[]>(query, recipeId);
+        const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
 
         return result;
     };
 
-    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipePacket[]> => {
-        const selectQuery = `SELECT
-            recipe_id as recipeId,
-            cup_size as cupSize,
-            title as title,
-            content as content,
-            is_iced as isIced,
-            is_public as isPublic,
-            created_at as createdAt,
-            updated_at as updatedAt
-        FROM recipe
-        LIMIT ${count} OFFSET ${(page - 1) * count};`;
-        const selectResult = await conn.query<IRecipePacket[]>(selectQuery);
+    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipeCombinedPacket[]> => {
+        const selectQuery = `
+        SELECT    
+            recipe.recipe_id as recipeId,
+            recipe.cup_size as cupSize,
+            recipe.title as title,
+            recipe.content as content,
+            recipe.is_iced as isIced,
+            recipe.is_public as isPublic,
+            recipe.created_at as createdAt,
+            recipe.updated_at as updatedAt,
+            user.nickname as nickname,
+            user.image_url as imageUrl,
+            user.resized_url as resizedUrl
+        FROM (
+            SELECT
+                recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
+            FROM recipe
+            ORDER BY recipe_id desc
+            LIMIT ${count} OFFSET ${(page - 1) * count}
+        ) recipe
+        LEFT OUTER JOIN user_recipe
+            ON recipe.recipe_id = user_recipe.recipe_id
+        LEFT OUTER JOIN user
+            ON user_recipe.user_id = user.user_id;`;
+        const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
         const [recipePackets, _] = selectResult;
+
+        console.log(recipePackets);
 
         return recipePackets;
     };
@@ -284,5 +316,69 @@ export class RecipeRepository {
         const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
 
         return true;
+    };
+
+    public getMyRecipeByUserid = async (
+        conn: PoolConnection,
+        userId: number,
+        page: number,
+        pageCount: number,
+    ): Promise<IRecipePacket[]> => {
+        const selectQuery = `SELECT
+                recipe.recipe_id as recipeId,
+                title,
+                content,
+                is_iced as isIced,
+                cup_size as cupSize,
+                created_at as createdAt,
+                updated_at as updatedAt
+            FROM (
+                SELECT recipe_id FROM user_recipe
+                WHERE user_id = ?
+                ORDER BY recipe_id desc
+                LIMIT ? OFFSET ?
+            ) user_recipe LEFT OUTER JOIN recipe
+            ON user_recipe.recipe_id = recipe.recipe_id;`;
+        const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
+            userId,
+            pageCount,
+            (page - 1) * pageCount,
+        ]);
+
+        const [iRecipePacket, _] = selectResult;
+
+        return iRecipePacket;
+    };
+
+    public getLikeRecipeByUserid = async (
+        conn: PoolConnection,
+        userId: number,
+        page: number,
+        pageCount: number,
+    ): Promise<IRecipePacket[]> => {
+        const selectQuery = `SELECT
+                recipe.recipe_id as recipeId,
+                title,
+                content,
+                is_iced as isIced,
+                cup_size as cupSize,
+                created_at as createdAt,
+                updated_at as updatedAt
+            FROM (
+                SELECT recipe_id FROM user_like_recipe
+                WHERE user_id = ?
+                ORDER BY recipe_id desc
+                LIMIT ? OFFSET ?
+            ) user_like_recipe LEFT OUTER JOIN recipe
+            ON user_like_recipe.recipe_id = recipe.recipe_id;`;
+        const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
+            userId,
+            pageCount,
+            (page - 1) * pageCount,
+        ]);
+
+        const [iRecipePacket, _] = selectResult;
+
+        return iRecipePacket;
     };
 }
