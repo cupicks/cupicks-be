@@ -10,41 +10,34 @@ import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mys
 import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeRepository {
-    public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<boolean> => {
+    // IsExists
+
+    public isAuthenticatedByUserId = async (
+        conn: PoolConnection,
+        recipeId: number,
+        userId: number,
+    ): Promise<boolean> => {
         const query = `
             SELECT 
                 *
             FROM
                 (
-                SELECT R.recipe_id
-                FROM recipe R
-                ) R
+                SELECT recipe.recipe_id
+                FROM recipe
+                ) recipe
             LEFT JOIN 
                 (
-                SELECT U.recipe_id, U.user_id
-                FROM user_recipe U
-                ) U
-            ON R.recipe_id = U.recipe_id AND R.recipe_id = ?
-            WHERE U.user_id = ?
+                SELECT user_recipe.recipe_id, user_recipe.user_id
+                FROM user_recipe
+                ) user_recipe
+            ON recipe.recipe_id = user_recipe.recipe_id AND recipe.recipe_id = ?
+            WHERE user_recipe.user_id = ?
         `;
 
         const [selectResult] = await conn.query<RowDataPacket[]>(query, [recipeId, userId]);
         const [recipePackets, _] = selectResult;
 
         return recipePackets ? true : false;
-    };
-
-    public findRecipeById = async (conn: PoolConnection, recipeId: number): Promise<boolean> => {
-        const query = `
-            SELECT *
-            FROM recipe
-            WHERE recipe_id = ?
-        `;
-
-        const selectResult = await conn.query<RowDataPacket[]>(query, recipeId);
-        const [recipePackets, _] = selectResult;
-
-        return recipePackets.length !== 0 ? true : false;
     };
 
     public existLikeRecipeById = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
@@ -59,6 +52,172 @@ export class RecipeRepository {
 
         return recipePackets.length !== 0 ? true : false;
     };
+
+    // Find
+
+    public findRecipeById = async (conn: PoolConnection, recipeId: number): Promise<boolean> => {
+        const query = `
+            SELECT *
+            FROM recipe
+            WHERE recipe_id = ?
+        `;
+
+        const selectResult = await conn.query<RowDataPacket[]>(query, recipeId);
+        const [recipePackets, _] = selectResult;
+
+        return recipePackets.length !== 0 ? true : false;
+    };
+
+    // Get
+
+    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
+        const query = `
+        SELECT
+            recipe.recipe_id AS "recipeId", recipe.title, recipe.content, recipe.is_iced AS "isIced", recipe.cup_size AS "cupSize", recipe.created_at AS "createdAt", recipe.updated_at AS "updatedAt",
+            recipe_ingredient.ingredient_name AS "ingredientName", recipe_ingredient.ingredient_color AS "ingredientColor", recipe_ingredient.ingredient_amount AS "ingredientAmount",
+            recipe.nickname, recipe.image_url AS 'imageUrl', recipe.resized_url AS 'resizedUrl'
+        FROM 
+            (
+                SELECT 
+                    recipe.*,
+                    user.nickname,
+                    user.image_url,
+                    user.resized_url
+                FROM (
+                    SELECT user_id, recipe_id FROM user_recipe WHERE recipe_id = ?
+                ) user_recipe
+                LEFT OUTER JOIN user
+                ON user_recipe.user_id = user.user_id
+                LEFT OUTER JOIN recipe
+                ON user_recipe.recipe_id = recipe.recipe_id
+            ) recipe
+        LEFT OUTER JOIN
+            (
+                SELECT *
+                FROM recipe_ingredient recipe_ingredient
+            ) recipe_ingredient
+        ON recipe.recipe_id = recipe_ingredient.recipe_id
+        `;
+
+        const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
+
+        return result;
+    };
+
+    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipeCombinedPacket[]> => {
+        const selectQuery = `
+        SELECT    
+            recipe.recipe_id as recipeId,
+            recipe.cup_size as cupSize,
+            recipe.title as title,
+            recipe.content as content,
+            recipe.is_iced as isIced,
+            recipe.is_public as isPublic,
+            recipe.created_at as createdAt,
+            recipe.updated_at as updatedAt,
+            user.nickname as nickname,
+            user.image_url as imageUrl,
+            user.resized_url as resizedUrl
+        FROM (
+            SELECT
+                recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
+            FROM recipe
+            ORDER BY recipe_id desc
+            LIMIT ${count} OFFSET ${(page - 1) * count}
+        ) recipe
+        LEFT OUTER JOIN user_recipe
+            ON recipe.recipe_id = user_recipe.recipe_id
+        LEFT OUTER JOIN user
+            ON user_recipe.user_id = user.user_id;`;
+        const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
+        const [recipePackets, _] = selectResult;
+
+        console.log(recipePackets);
+
+        return recipePackets;
+    };
+
+    /** @deprecated */
+    public getRecipesLegacy = async (conn: PoolConnection, page: number, count: number): Promise<any> => {
+        const query = `
+        SELECT
+            R.recipe_id AS recipeId, R.title, R.content,
+            RIL.recipe_ingredient_list AS ingredientList
+        FROM recipe R
+        JOIN recipe_ingredient_list RIL
+        ON R.recipe_id = RIL.recipe_id
+        `;
+
+        const [result] = await conn.query(query, [page, count]);
+
+        return result;
+    };
+
+    public getMyRecipeByUserId = async (
+        conn: PoolConnection,
+        userId: number,
+        page: number,
+        pageCount: number,
+    ): Promise<IRecipePacket[]> => {
+        const selectQuery = `SELECT
+                recipe.recipe_id as recipeId,
+                title,
+                content,
+                is_iced as isIced,
+                cup_size as cupSize,
+                created_at as createdAt,
+                updated_at as updatedAt
+            FROM (
+                SELECT recipe_id FROM user_recipe
+                WHERE user_id = ?
+                ORDER BY recipe_id desc
+                LIMIT ? OFFSET ?
+            ) user_recipe LEFT OUTER JOIN recipe
+            ON user_recipe.recipe_id = recipe.recipe_id;`;
+        const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
+            userId,
+            pageCount,
+            (page - 1) * pageCount,
+        ]);
+
+        const [iRecipePacket, _] = selectResult;
+
+        return iRecipePacket;
+    };
+
+    public getLikeRecipeByUserid = async (
+        conn: PoolConnection,
+        userId: number,
+        page: number,
+        pageCount: number,
+    ): Promise<IRecipePacket[]> => {
+        const selectQuery = `SELECT
+                recipe.recipe_id as recipeId,
+                title,
+                content,
+                is_iced as isIced,
+                cup_size as cupSize,
+                created_at as createdAt,
+                updated_at as updatedAt
+            FROM (
+                SELECT recipe_id FROM user_like_recipe
+                WHERE user_id = ?
+                ORDER BY recipe_id desc
+                LIMIT ? OFFSET ?
+            ) user_like_recipe LEFT OUTER JOIN recipe
+            ON user_like_recipe.recipe_id = recipe.recipe_id;`;
+        const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
+            userId,
+            pageCount,
+            (page - 1) * pageCount,
+        ]);
+
+        const [iRecipePacket, _] = selectResult;
+
+        return iRecipePacket;
+    };
+
+    // Create
 
     public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
         const query = `
@@ -166,112 +325,9 @@ export class RecipeRepository {
         return insertId;
     };
 
-    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
-        const query = `
-        SELECT
-            R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
-            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount",
-            R.nickname, R.image_url as 'imageUrl', R.resized_url as 'resizedUrl'
-        FROM 
-            (
-                SELECT 
-                    recipe.*,
-                    user.nickname,
-                    user.image_url,
-                    user.resized_url
-                FROM (
-                    SELECT user_id, recipe_id FROM user_recipe WHERE recipe_id = ?
-                ) user_recipe
-                LEFT OUTER JOIN user
-                ON user_recipe.user_id = user.user_id
-                LEFT OUTER JOIN recipe
-                ON user_recipe.recipe_id = recipe.recipe_id
-            ) R
-        LEFT OUTER JOIN
-            (
-                SELECT *
-                FROM recipe_ingredient I
-            ) I
-        ON R.recipe_id = I.recipe_id
-        `;
+    // Update
 
-        const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
-
-        return result;
-    };
-
-    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipeCombinedPacket[]> => {
-        const selectQuery = `
-        SELECT    
-            recipe.recipe_id as recipeId,
-            recipe.cup_size as cupSize,
-            recipe.title as title,
-            recipe.content as content,
-            recipe.is_iced as isIced,
-            recipe.is_public as isPublic,
-            recipe.created_at as createdAt,
-            recipe.updated_at as updatedAt,
-            user.nickname as nickname,
-            user.image_url as imageUrl,
-            user.resized_url as resizedUrl
-        FROM (
-            SELECT
-                recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
-            FROM recipe
-            ORDER BY recipe_id desc
-            LIMIT ${count} OFFSET ${(page - 1) * count}
-        ) recipe
-        LEFT OUTER JOIN user_recipe
-            ON recipe.recipe_id = user_recipe.recipe_id
-        LEFT OUTER JOIN user
-            ON user_recipe.user_id = user.user_id;`;
-        const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
-        const [recipePackets, _] = selectResult;
-
-        console.log(recipePackets);
-
-        return recipePackets;
-    };
-
-    /** @deprecated */
-    public getRecipesLegacy = async (conn: PoolConnection, page: number, count: number): Promise<any> => {
-        const query = `
-        SELECT
-            R.recipe_id AS recipeId, R.title, R.content,
-            RIL.recipe_ingredient_list AS ingredientList
-        FROM recipe R
-        JOIN recipe_ingredient_list RIL
-        ON R.recipe_id = RIL.recipe_id
-        `;
-
-        const [result] = await conn.query(query, [page, count]);
-
-        return result;
-    };
-
-    public deleteRecipe = async (conn: PoolConnection, recipeId: number): Promise<object> => {
-        const query = `
-            DELETE FROM recipe
-            WHERE recipe_id = ?;
-        `;
-
-        const [result] = await conn.query(query, recipeId);
-
-        return result;
-    };
-
-    public deleteRecipeIngredient = async (conn: PoolConnection, recipeId: number) => {
-        const query = `
-            DELETE FROM recipe_ingredient
-            WHERE recipe_id = ?;
-        `;
-
-        const [result] = await conn.query(query, recipeId);
-
-        return result;
-    };
-
-    public updateRecipe = async (
+    public updateRecipeById = async (
         conn: PoolConnection,
         updateRecipeDto: UpdateRecipeDto,
         recipeId: number,
@@ -294,6 +350,32 @@ export class RecipeRepository {
         return result;
     };
 
+    // Delete
+
+    public deleteRecipeById = async (conn: PoolConnection, recipeId: number): Promise<object> => {
+        const query = `
+            DELETE FROM recipe
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
+
+        return result;
+    };
+
+    public deleteRecipeIngredientById = async (conn: PoolConnection, recipeId: number) => {
+        const query = `
+            DELETE FROM recipe_ingredient
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
+
+        return result;
+    };
+
+    // Special
+
     public likeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
         const query = `
             INSERT INTO user_like_recipe
@@ -307,7 +389,7 @@ export class RecipeRepository {
         return true;
     };
 
-    public disRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+    public disLikeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
         const query = `
             DELETE FROM user_like_recipe
             WHERE user_id = ? AND recipe_id = ?
@@ -316,69 +398,5 @@ export class RecipeRepository {
         const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
 
         return true;
-    };
-
-    public getMyRecipeByUserid = async (
-        conn: PoolConnection,
-        userId: number,
-        page: number,
-        pageCount: number,
-    ): Promise<IRecipePacket[]> => {
-        const selectQuery = `SELECT
-                recipe.recipe_id as recipeId,
-                title,
-                content,
-                is_iced as isIced,
-                cup_size as cupSize,
-                created_at as createdAt,
-                updated_at as updatedAt
-            FROM (
-                SELECT recipe_id FROM user_recipe
-                WHERE user_id = ?
-                ORDER BY recipe_id desc
-                LIMIT ? OFFSET ?
-            ) user_recipe LEFT OUTER JOIN recipe
-            ON user_recipe.recipe_id = recipe.recipe_id;`;
-        const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
-            userId,
-            pageCount,
-            (page - 1) * pageCount,
-        ]);
-
-        const [iRecipePacket, _] = selectResult;
-
-        return iRecipePacket;
-    };
-
-    public getLikeRecipeByUserid = async (
-        conn: PoolConnection,
-        userId: number,
-        page: number,
-        pageCount: number,
-    ): Promise<IRecipePacket[]> => {
-        const selectQuery = `SELECT
-                recipe.recipe_id as recipeId,
-                title,
-                content,
-                is_iced as isIced,
-                cup_size as cupSize,
-                created_at as createdAt,
-                updated_at as updatedAt
-            FROM (
-                SELECT recipe_id FROM user_like_recipe
-                WHERE user_id = ?
-                ORDER BY recipe_id desc
-                LIMIT ? OFFSET ?
-            ) user_like_recipe LEFT OUTER JOIN recipe
-            ON user_like_recipe.recipe_id = recipe.recipe_id;`;
-        const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
-            userId,
-            pageCount,
-            (page - 1) * pageCount,
-        ]);
-
-        const [iRecipePacket, _] = selectResult;
-
-        return iRecipePacket;
     };
 }

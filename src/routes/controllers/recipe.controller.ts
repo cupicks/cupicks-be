@@ -18,6 +18,7 @@ export default class RecipeController {
     constructor() {
         this.recipeService = new RecipeService();
     }
+    // Create
 
     public createRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
@@ -41,6 +42,8 @@ export default class RecipeController {
             });
         }
     };
+
+    // Get
 
     public getRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
@@ -111,6 +114,33 @@ export default class RecipeController {
         }
     };
 
+    // Update
+
+    public updatedRecipe: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const validator: UpdateRecipeDto = await new JoiValidator().validateAsync<UpdateRecipeDto>(
+                new UpdateRecipeDto(req.body, res.locals.userId, Number(req.params.recipeId)),
+            );
+
+            await this.recipeService.updateRecipe(validator, validator.recipeId, validator.userId);
+
+            return res.status(200).json({
+                isSuccess: true,
+                message: "레시피 수정에 성공하셨습니다.",
+                recipeId: validator.recipeId,
+            });
+        } catch (err) {
+            console.log(err);
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+            });
+        }
+    };
+
+    // Delete
+
     public deleteRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
             const validator: DeleteRecipeDto = await new JoiValidator().validateAsync<DeleteRecipeDto>(
@@ -136,28 +166,7 @@ export default class RecipeController {
         }
     };
 
-    public updatedRecipe: RequestHandler = async (req: Request, res: Response) => {
-        try {
-            const validator: UpdateRecipeDto = await new JoiValidator().validateAsync<UpdateRecipeDto>(
-                new UpdateRecipeDto(req.body, res.locals.userId, Number(req.params.recipeId)),
-            );
-
-            await this.recipeService.updateRecipe(validator, validator.recipeId, validator.userId);
-
-            return res.status(200).json({
-                isSuccess: true,
-                message: "레시피 수정에 성공하셨습니다.",
-                recipeId: validator.recipeId,
-            });
-        } catch (err) {
-            console.log(err);
-            const exception = this.errorHandler(err);
-            return res.status(exception.statusCode).json({
-                isSuccess: false,
-                message: exception.message,
-            });
-        }
-    };
+    // Special
 
     public likeRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {

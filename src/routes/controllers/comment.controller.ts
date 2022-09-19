@@ -18,10 +18,18 @@ export default class CommentController {
     constructor() {
         this.commentService = new CommentService();
     }
+    // Create
 
     public createComment: RequestHandler = async (req: Request, res: Response) => {
         try {
             const file = req.file as Express.MulterS3.File;
+
+            const imageLocation = file?.location.length > 0 ? file.location : null;
+            const resizedUrl =
+                imageLocation === null ? null : imageLocation.replace(/\/comment\//, `/comment-resized/`);
+
+            console.log(imageLocation);
+            console.log(resizedUrl);
 
             const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
                 new CreateCommentDto({
@@ -45,7 +53,7 @@ export default class CommentController {
                     recipeId: validator.recipeId,
                     commentId: createComment.commentId,
                     imageUrl: validator.imageUrl ? validator.imageUrl : null,
-                    resizedUrl: validator.resizedUrl ? validator.recipeId : null,
+                    resizedUrl: validator.resizedUrl ? validator.resizedUrl : null,
                     createdAt: createComment.createdAt,
                     updatedAt: createComment.updatedAt,
                 },
@@ -59,23 +67,26 @@ export default class CommentController {
         }
     };
 
-    public deleteComment: RequestHandler = async (req: Request, res: Response) => {
+    // Get
+
+    public getComments: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const validator: DeleteCommentDto = await new JoiValidator().validateAsync<DeleteCommentDto>(
-                new DeleteCommentDto({
-                    userId: res.locals.userId,
-                    commentId: Number(req.params.commentId),
+            const validator = await new JoiValidator().validateAsync<GetCommentDto>(
+                new GetCommentDto({
+                    recipeId: Number(req.query.recipeId),
+                    page: Number(req.query.page),
+                    count: Number(req.query.count),
                 }),
             );
 
-            await this.commentService.deleteComment(validator);
+            const getComments: ICommentPacket[] = await this.commentService.getComments(validator);
 
             return res.status(200).json({
                 isSuccess: true,
-                message: "댓글 삭제에 성공하였습니다.",
+                message: "댓글 전체 조회에 성공했습니다.",
+                commentList: getComments,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -83,6 +94,8 @@ export default class CommentController {
             });
         }
     };
+
+    // Update
 
     public updateComment: RequestHandler = async (req: Request, res: Response) => {
         try {
@@ -124,24 +137,25 @@ export default class CommentController {
         }
     };
 
-    public getComments: RequestHandler = async (req: Request, res: Response) => {
+    // Delete
+
+    public deleteComment: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const validator = await new JoiValidator().validateAsync<GetCommentDto>(
-                new GetCommentDto({
-                    recipeId: Number(req.query.recipeId),
-                    page: Number(req.query.page),
-                    count: Number(req.query.count),
+            const validator: DeleteCommentDto = await new JoiValidator().validateAsync<DeleteCommentDto>(
+                new DeleteCommentDto({
+                    userId: res.locals.userId,
+                    commentId: Number(req.params.commentId),
                 }),
             );
 
-            const getComments: ICommentPacket[] = await this.commentService.getComments(validator);
+            await this.commentService.deleteComment(validator);
 
             return res.status(200).json({
                 isSuccess: true,
-                message: "댓글 전체 조회에 성공했습니다.",
-                commentList: getComments,
+                message: "댓글 삭제에 성공하였습니다.",
             });
         } catch (err) {
+            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,

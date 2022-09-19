@@ -10,25 +10,26 @@ import { ICommentPacket } from "../../models/_.loader";
 import { count } from "console";
 
 export class CommentRepository {
+    // IsExists
     public isAuthenticated = async (
         conn: PoolConnection,
         updateAndDeleteCommentDto: UpdateCommentDto | DeleteCommentDto,
     ): Promise<boolean> => {
         const query = `
         SELECT 
-        R.user_id AS userId
+        recipe_comment.user_id AS userId
         FROM 
             (
-            SELECT C.comment_id
-            FROM comment C
-            ) C
+            SELECT comment.comment_id
+            FROM comment
+            ) comment
         RIGHT JOIN
             (
-            SELECT R.user_id, R.comment_id
-            FROM recipe_comment R
-            ) R
-        ON C.comment_id = R.comment_id
-        WHERE R.user_id = ? AND C.comment_id = ? 
+            SELECT recipe_comment.user_id, recipe_comment.comment_id
+            FROM recipe_comment
+            ) recipe_comment
+        ON comment.comment_id = recipe_comment.comment_id
+        WHERE recipe_comment.user_id = ? AND comment.comment_id = ?
         `;
 
         const [selectResult] = await conn.query<RowDataPacket[]>(query, [
@@ -39,6 +40,8 @@ export class CommentRepository {
 
         return commentPackets ? true : false;
     };
+
+    // Find
 
     public findCommentByCommentId = async (conn: PoolConnection, commentId: number): Promise<ICommentPacket[]> => {
         const query = `
@@ -52,6 +55,32 @@ export class CommentRepository {
 
         return commentPackets;
     };
+
+    // Get
+
+    public getComments = async (conn: PoolConnection, getCommentDto: GetCommentDto): Promise<ICommentPacket[]> => {
+        const query = `
+        SELECT
+            recipe_comment.user_id AS userId, user.nickname AS nickname, user.image_url AS userImageUrl, user.resized_url AS userResizedUrl, recipe_comment.recipe_id AS recipeId,
+            comment.comment_id AS commentId, comment.comment, comment.image_url AS imageUrl, comment.resized_url AS resizedUrl , comment.created_at AS createdAt, comment.updated_at AS updatedAt
+        FROM recipe_comment
+        JOIN comment
+        ON recipe_comment.comment_id = comment.comment_id
+        RIGHT JOIN user
+        ON recipe_comment.user_id = user.user_id
+        WHERE recipe_comment.recipe_id = ?
+        LIMIT ? OFFSET ?
+        `;
+
+        const LIMIT = getCommentDto.count;
+        const OFFSET = (getCommentDto.page - 1) * LIMIT;
+
+        const [result] = await conn.query<ICommentPacket[]>(query, [getCommentDto.recipeId, LIMIT, OFFSET]);
+
+        return result;
+    };
+
+    // Create
 
     public createComment = async (conn: PoolConnection, commentDto: CreateCommentDto): Promise<number> => {
         const query = `
@@ -100,18 +129,9 @@ export class CommentRepository {
         return insertId;
     };
 
-    public deleteComment = async (conn: PoolConnection, commentId: number): Promise<ResultSetHeader | null> => {
-        const query = `
-            DELETE FROM comment
-            WHERE comment_id = ?;
-        `;
+    // Update
 
-        const [result] = await conn.query<ResultSetHeader>(query, [commentId]);
-
-        return result;
-    };
-
-    public updateComment = async (conn: PoolConnection, updateCommentDto: UpdateCommentDto): Promise<object> => {
+    public updateCommentById = async (conn: PoolConnection, updateCommentDto: UpdateCommentDto): Promise<object> => {
         const query = `
             UPDATE comment
             SET 
@@ -129,24 +149,15 @@ export class CommentRepository {
         return result;
     };
 
-    public getComments = async (conn: PoolConnection, getCommentDto: GetCommentDto): Promise<ICommentPacket[]> => {
+    // Delete
+
+    public deleteCommentById = async (conn: PoolConnection, commentId: number): Promise<ResultSetHeader | null> => {
         const query = `
-        SELECT
-            R.user_id AS userId, U.nickname AS nickname, U.image_url AS userImageUrl, U.resized_url AS userResizedUrl, R.recipe_id AS recipeId,
-            C.comment_id AS commentId, C.comment, C.image_url AS imageUrl, C.resized_url AS resizedUrl , C.created_at AS createdAt, C.updated_at AS updatedAt
-        FROM recipe_comment R
-        JOIN comment C
-        ON R.comment_id = C.comment_id
-        RIGHT JOIN user U
-        ON R.user_id = U.user_id
-        WHERE R.recipe_id = ?
-        LIMIT ? OFFSET ?
+            DELETE FROM comment
+            WHERE comment_id = ?;
         `;
 
-        const LIMIT = getCommentDto.count;
-        const OFFSET = (getCommentDto.page - 1) * LIMIT;
-
-        const [result] = await conn.query<ICommentPacket[]>(query, [getCommentDto.recipeId, LIMIT, OFFSET]);
+        const [result] = await conn.query<ResultSetHeader>(query, [commentId]);
 
         return result;
     };
