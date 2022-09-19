@@ -64,11 +64,13 @@ export class MulterProvider {
                 },
             }),
             fileFilter(req, file, done) {
-                if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
-                    done(null, true);
-                } else {
-                    return done(new Error("Image type error"));
+                const ext = file.mimetype.split("/")[1];
+
+                if (!["jpg", "jpeg", "png"].includes(ext)) {
+                    return done(new Error("image type error"));
                 }
+
+                done(null, true);
             },
             limits: { fileSize: 5 * 1024 * 1024 },
         });

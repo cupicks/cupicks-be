@@ -23,6 +23,13 @@ export default class CommentController {
         try {
             const file = req.file as Express.MulterS3.File;
 
+            const imageLocation = file?.location.length > 0 ? file.location : null;
+            const resizedUrl =
+                imageLocation === null ? null : imageLocation.replace(/\/comment\//, `/comment-resized/`);
+
+            console.log(imageLocation);
+            console.log(resizedUrl);
+
             const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
                 new CreateCommentDto({
                     userId: res.locals.userId,
@@ -45,7 +52,7 @@ export default class CommentController {
                     recipeId: validator.recipeId,
                     commentId: createComment.commentId,
                     imageUrl: validator.imageUrl ? validator.imageUrl : null,
-                    resizedUrl: validator.resizedUrl ? validator.recipeId : null,
+                    resizedUrl: validator.resizedUrl ? validator.resizedUrl : null,
                     createdAt: createComment.createdAt,
                     updatedAt: createComment.updatedAt,
                 },
