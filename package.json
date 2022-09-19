@@ -54,6 +54,8 @@
     "@types/node": "^15.14.9",
     "@types/prettier": "^2.7.0",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "artillery": "^2.0.0-23",
+    "artillery-pro": "^3.0.0-19",
     "eslint": "^8.22.0",
     "husky": "^8.0.1",
     "jest": "^28.1.3",
