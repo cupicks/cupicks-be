@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import {
     UnkownError,
     UnkownTypeError,
@@ -31,7 +31,7 @@ export default class AuthController {
         this.joiValidator = new JoiValidator();
     }
 
-    public signup: RequestHandler = async (req: Request, res: Response) => {
+    public signup: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const file = req.file as Express.MulterS3.File;
 
