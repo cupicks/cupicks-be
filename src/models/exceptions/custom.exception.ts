@@ -36,17 +36,6 @@ export class BadRequestException extends CustomException {
     }
 }
 
-export class ConflictException extends CustomException {
-    name: string;
-    statusCode: number;
-    constructor(message: string) {
-        super(message);
-
-        this.name = "ConflictException";
-        this.statusCode = 409;
-    }
-}
-
 export class JwtAuthorizationException extends CustomException {
     name: string;
     statusCode: number;
@@ -57,6 +46,7 @@ export class JwtAuthorizationException extends CustomException {
         this.statusCode = 401;
     }
 }
+
 export class ForBiddenException extends CustomException {
     name: string;
     statusCode: number;
@@ -76,6 +66,16 @@ export class NotFoundException extends CustomException {
 
         this.name = "NotFoundException";
         this.statusCode = 404;
+    }
+}
+export class ConflictException extends CustomException {
+    name: string;
+    statusCode: number;
+    constructor(message: string) {
+        super(message);
+
+        this.name = "ConflictException";
+        this.statusCode = 409;
     }
 }
 

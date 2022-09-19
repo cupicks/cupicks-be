@@ -10,7 +10,7 @@ import {
 } from "../../models/_.loader";
 import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
-import { IRecipePacket } from "../../models/_.loader";
+import { IRecipeCombinedPacket } from "../../models/_.loader";
 
 export default class RecipeController {
     private recipeService: RecipeService;
@@ -50,13 +50,16 @@ export default class RecipeController {
                 }),
             );
 
-            const getRecipe: IRecipePacket[] = await this.recipeService.getRecipe(validator.recipeId);
+            const getRecipe: IRecipeCombinedPacket[] = await this.recipeService.getRecipe(validator.recipeId);
 
             return res.status(200).json({
                 isSuccess: true,
                 message: "레시피 조회에성공하셨습니다.",
                 recipe: {
                     recipeId: getRecipe[0].recipeId,
+                    nickname: getRecipe[0].nickname,
+                    imageUrl: getRecipe[0].imageUrl,
+                    resizedUrl: getRecipe[0].resizedUrl,
                     title: getRecipe[0].title,
                     content: getRecipe[0].content,
                     isIced: getRecipe[0].isIced,

@@ -63,6 +63,8 @@ export class Env {
             CORS_URL_LIST_WITHOUT_PORT: [
                 this.getEnvStringValue("CORS_URL_ONE_WITHOUT_PORT"),
                 this.getEnvStringValue("CORS_URL_TWO_WITHOUT_PORT"),
+                this.getEnvStringValue("CORS_URL_THREE_WITHOUT_PORT"),
+                this.getEnvStringValue("CORS_URL_FOUR_WITHOUT_PORT"),
             ],
             FROTN_REDIRECT_URL_WITHOUT_PORT: this.getEnvStringValue("FROTN_REDIRECT_URL_WITHOUT_PORT"),
             SERVER_URL_WITH_PORT: this.getEnvStringValue("SERVER_URL_WITH_PORT"),

@@ -4,6 +4,9 @@ import { IIngredientDto } from "./ingredient.dto";
 
 export interface IRecipeDto {
     recipeId: number;
+    nickname: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
     title: string;
     content: string;
     isIced: 0 | 1;
@@ -15,6 +18,9 @@ export interface IRecipeDto {
 
 export class RecipeDto implements IRecipeDto {
     recipeId: number;
+    nickname: string;
+    imageUrl: string | undefined;
+    resizedUrl: string | undefined;
     title: string;
     content: string;
     isIced: 0 | 1;
@@ -23,8 +29,25 @@ export class RecipeDto implements IRecipeDto {
     updatedAt: string;
     ingredientList: IIngredientDto[];
 
-    constructor({ recipeId, title, content, isIced, cupSize, createdAt, updatedAt, ingredientList }: IRecipeDto) {
+    constructor({
+        recipeId,
+        nickname,
+        imageUrl,
+        resizedUrl,
+        title,
+        content,
+        isIced,
+        cupSize,
+        createdAt,
+        updatedAt,
+        ingredientList,
+    }: IRecipeDto) {
         this.recipeId = recipeId;
+
+        this.nickname = nickname;
+        this.imageUrl = imageUrl;
+        this.resizedUrl = resizedUrl;
+
         this.title = title;
         this.content = content;
         this.isIced = isIced;

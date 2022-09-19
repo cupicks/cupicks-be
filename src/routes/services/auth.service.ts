@@ -3,7 +3,6 @@ import { AuthRepository, AuthVerifyListRepository } from "../repositories/_.expo
 import {
     AwsSesProvider,
     BcryptProvider,
-    DateProvider,
     DayjsProvider,
     JwtProvider,
     MysqlProvider,
@@ -24,7 +23,6 @@ import {
     BadRequestException,
     SendPasswordDto,
     ResetPasswordDto,
-    UnkownError,
 } from "../../models/_.loader";
 import { Dayjs } from "dayjs";
 
@@ -33,7 +31,6 @@ export class AuthService {
     private mysqlProvider: MysqlProvider;
     private sesProvider: AwsSesProvider;
     private bcryptProvider: BcryptProvider;
-    private dateProvider: DateProvider;
     private dayjsProvider: DayjsProvider;
     private randomGenerator: RandomGenerator;
 
@@ -45,7 +42,6 @@ export class AuthService {
         this.mysqlProvider = new MysqlProvider();
         this.sesProvider = new AwsSesProvider();
         this.bcryptProvider = new BcryptProvider();
-        this.dateProvider = new DateProvider();
         this.dayjsProvider = new DayjsProvider();
 
         this.authRepository = new AuthRepository();
@@ -56,37 +52,31 @@ export class AuthService {
     public signup = async (userDto: SignupUserDto): Promise<UserDto> => {
         const conn = await this.mysqlProvider.getConnection();
 
+        userDto.password = this.bcryptProvider.hashPassword(userDto.password);
+        const { emailVerifyToken, nicknameVerifyToken, password, imageUrl, resizedUrl } = userDto;
         try {
             await conn.beginTransaction();
-            userDto.password = this.bcryptProvider.hashPassword(userDto.password);
 
-            const emailVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(
-                userDto.emailVerifyToken,
-            );
-            const nicknameVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.INicknameVerifyToken>(
-                userDto.nicknameVerifyToken,
-            );
+            const emailVerifyTokenPayload = this.jwtProvider.verifyToken<jwtLib.IEmailVerifyToken>(emailVerifyToken);
+            const nicknameVerifyTokenPayload =
+                this.jwtProvider.verifyToken<jwtLib.INicknameVerifyToken>(nicknameVerifyToken);
 
-            const isExistsUser = await this.authRepository.isExistsByEmail(conn, emailVerifyTokenPayload.email);
-            if (isExistsUser === true)
-                throw new ConflictException(`${emailVerifyTokenPayload.email} 은 사용 중입니다.`);
+            const { email } = emailVerifyTokenPayload;
+            const { nickname } = nicknameVerifyTokenPayload;
 
-            const finededVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
-                conn,
-                emailVerifyTokenPayload.email,
-            );
+            const userVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, email);
+            if (userVerifyList === null)
+                throw new BadRequestException(`${email} 이메일 및 닉네임 인증 절차를 진행하지 않은 사용자입니다.`);
+            else {
+                const { emailVerifiedToken: dbEmailToken, nicknameVerifiedToken: dbNicknameToken } = userVerifyList;
+                if (dbEmailToken !== emailVerifyToken)
+                    throw new BadRequestException(`등록되지 않은 emailVerifyToken 입니다.`);
+                if (dbNicknameToken !== nicknameVerifyToken)
+                    throw new BadRequestException(`등록되지 않은 nicnameVerifyToken 입니다.`);
+            }
 
-            if (finededVerifyList === null)
-                throw new NotFoundException(
-                    `해당 이메일과 닉네임의 요청은 이미 만료되었습니다. 회원가입 절차를 다시 실행해주세요.`,
-                );
-            else if (
-                finededVerifyList.emailVerifiedToken !== userDto.emailVerifyToken ||
-                finededVerifyList.nicknameVerifiedToken !== userDto.nicknameVerifyToken
-            )
-                throw new BadRequestException(
-                    `서버에 등록되어 있지 않은 EmailVerifyToken 혹은 NicknameVerifyToken 을 제출하였습니다.`,
-                );
+            const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
+            if (isExistsUser === true) throw new ConflictException(`${email} 은 사용 중입니다.`);
 
             const date = this.dayjsProvider.changeToProvidedFormat(
                 this.dayjsProvider.getDayjsInstance(),
@@ -94,17 +84,10 @@ export class AuthService {
             );
             await this.authRepository.createUser(
                 conn,
-                {
-                    email: emailVerifyTokenPayload.email,
-                    nickname: nicknameVerifyTokenPayload.nickname,
-                    password: userDto.password,
-                    imageUrl: userDto.imageUrl,
-                },
+                { email, nickname, password, imageGroup: { imageUrl, resizedUrl } },
                 date,
-                finededVerifyList.userVerifyListId,
+                userVerifyList.userVerifyListId,
             );
-
-            // const createdUserId = await this.authRepository.createUser(conn, userDto, date);
 
             await conn.commit();
 
@@ -112,9 +95,10 @@ export class AuthService {
                 userId: 1,
                 createdAt: date,
                 updatedAt: date,
-                email: emailVerifyTokenPayload.email,
+                email: email,
                 nickname: nicknameVerifyTokenPayload.nickname,
                 imageUrl: userDto.imageUrl,
+                resizedUrl: userDto.resizedUrl,
             });
         } catch (err) {
             await conn.rollback();
@@ -245,100 +229,109 @@ export class AuthService {
         try {
             await conn.beginTransaction();
 
-            const isExistsUser = await this.authRepository.isExistsByEmail(conn, sendEmailDto.email);
+            const { email } = sendEmailDto;
+            const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
             if (isExistsUser) throw new ConflictException(`${sendEmailDto.email} 은 이미 가입한 이메일입니다.`);
 
-            const emailVerifyCode = this.randomGenerator.getRandomVerifyCode();
-
-            const findedUserVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
-                conn,
-                sendEmailDto.email,
+            const nowDayjsInstance: Dayjs = this.dayjsProvider.getDayjsInstance();
+            const nowDbDate: string = this.dayjsProvider.changeToProvidedFormat(
+                nowDayjsInstance,
+                "YYYY-MM-DD hh:mm:ss",
+            );
+            const nowClientDate: string = this.dayjsProvider.changeToProvidedFormat(
+                nowDayjsInstance,
+                "YYYY년 MM월 DD일 hh:mm",
             );
 
-            const nowDayjsInstance: Dayjs = this.dayjsProvider.getDayjsInstance();
-            const nowDateString = this.dayjsProvider.changeToProvidedFormat(nowDayjsInstance, "YYYY년 MM월 DD일 hh:mm");
+            const emailVerifyCode = this.randomGenerator.getRandomVerifyCode();
+            const userVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, email);
 
-            if (findedUserVerifyList === null) {
-                await this.authVerifyListRepository.createVerifyListByEmailAndCode(
-                    conn,
-                    sendEmailDto.email,
-                    emailVerifyCode,
-                );
+            // step 2
+            const isFirstVerifiedEMail = userVerifyList === null;
+            if (isFirstVerifiedEMail) {
+                // 신규 인증 진입
+                console.log("1 depth 조건문 A : 신규 인증처리자 -> pass");
+                await this.authVerifyListRepository.createVerifyListByEmailAndCode(conn, email, emailVerifyCode);
             } else {
                 // 일일 이메일 발송 제한 초과의 경우
-                if (
-                    findedUserVerifyList.isExeededOfEmailSent === 1 ||
-                    findedUserVerifyList.currentEmailSentCount >= 5
-                ) {
-                    const diffMilliSeconds = this.dayjsProvider.getDiffMIlliSeconds(
-                        findedUserVerifyList.emailSentExceedingDate,
-                        nowDayjsInstance,
-                        {
-                            limitCount: 2,
-                            limitType: "day",
-                        },
-                    );
+                console.log("1 depth 조건문 B : 중복 인증처리자 -> pass");
+                const { userVerifyListId, isExeededOfEmailSent, currentEmailSentCount, emailSentExceedingDate } =
+                    userVerifyList;
+                const lastSendDate = this.dayjsProvider.changeToProvidedFormat(
+                    emailSentExceedingDate ?? nowDayjsInstance,
+                    "YYYY년 MM월 DD일 hh:mm",
+                );
+                const accessibleDate = this.dayjsProvider.changeToProvidedFormat(
+                    this.dayjsProvider.getAddTime(nowDayjsInstance, {
+                        limitCount: 1,
+                        limitType: "day",
+                    }),
+                    "YYYY년 MM월 DD일 hh:mm",
+                );
 
-                    const lastSentDateString = this.dayjsProvider.changeToProvidedFormat(
-                        findedUserVerifyList.emailSentExceedingDate ?? nowDayjsInstance,
-                        "YYYY년 MM월 DD일 hh:mm",
-                    );
-                    const accessibleDateString = this.dayjsProvider.changeToProvidedFormat(
-                        this.dayjsProvider.getAddTime(nowDayjsInstance, {
-                            limitCount: 2,
-                            limitType: "day",
-                        }),
-                        "YYYY년 MM월 DD일 hh:mm",
-                    );
+                const isExeededLast = isExeededOfEmailSent === 1;
+                if (isExeededLast) {
+                    console.log("2 depth 조건문 B-a : 제한일까지 사용 금지");
+                    const banDate = this.dayjsProvider.getDiffMIlliSeconds(emailSentExceedingDate, nowDayjsInstance, {
+                        limitCount: 1,
+                        limitType: "day",
+                    });
+                    console.log(banDate);
 
-                    if (diffMilliSeconds < 0)
+                    const isAlreadyBanned = banDate > 0;
+                    if (isAlreadyBanned) {
                         return {
                             isExceeded: true,
                             exceededDate: {
-                                lastSentDate: lastSentDateString,
-                                accessibleDate: accessibleDateString,
+                                lastSentDate: lastSendDate,
+                                accessibleDate,
                             },
-                            email: sendEmailDto.email,
-                            date: nowDateString,
+                            email,
+                            date: nowClientDate,
                         };
+                    }
 
-                    const nowDateDbString = this.dayjsProvider.changeToProvidedFormat(
-                        nowDayjsInstance,
-                        "YYYY-MM-DD hh:mm:ss",
-                    );
+                    await this.authVerifyListRepository.disableExceedOfEmailSent(conn, userVerifyListId);
+                }
+
+                // 일일 이메일 발송 제한 초과의 경우
+                const isExceededNow = currentEmailSentCount >= 5;
+                if (isExceededNow) {
+                    console.log("2 depth 조건문 B-b : 제한일까지 사용 금지");
                     await this.authVerifyListRepository.exceedOfEmailSent(
                         conn,
-                        findedUserVerifyList.userVerifyListId,
-                        nowDateDbString,
+                        userVerifyList.userVerifyListId,
+                        nowDbDate,
                     );
-
                     return {
                         isExceeded: true,
                         exceededDate: {
-                            lastSentDate: lastSentDateString,
-                            accessibleDate: accessibleDateString,
+                            lastSentDate: lastSendDate,
+                            accessibleDate,
                         },
-                        email: sendEmailDto.email,
-                        date: nowDateString,
+                        email,
+                        date: nowClientDate,
                     };
                 }
 
                 // 일일 이메일 발송 제한 초과의 X 경우
-                if (findedUserVerifyList.isVerifiedEmail === 1) {
-                    // 회원가입 직전 까지 인증 절차를 따라간 사용자
-                    await this.authVerifyListRepository.reUpdateVerifyListByIdAndCode(
-                        conn,
-                        findedUserVerifyList.userVerifyListId,
-                        emailVerifyCode,
-                    );
-                } else {
-                    // 최초 인증을 진행하는 사용자
-                    await this.authVerifyListRepository.updateVerifyListByIdAndCode(
-                        conn,
-                        findedUserVerifyList.userVerifyListId,
-                        emailVerifyCode,
-                    );
-                }
+                // 회원가입 직전 까지 인증 절차를 따라간 사용자
+                // if (isVerifiedEmail === 1) {
+                //     console.log('2 depth 조건문-c');
+                //     await this.authVerifyListRepository.reUpdateVerifyListByIdAndCode(
+                //         conn,
+                //         userVerifyListId,
+                //         emailVerifyCode,
+                //     );
+                // } else {
+                console.log("2 depth 조건문 B-c");
+                // 최초 인증을 진행하는 사용자
+                await this.authVerifyListRepository.updateVerifyListByIdAndCode(
+                    conn,
+                    userVerifyListId,
+                    emailVerifyCode,
+                );
+                // }
             }
 
             const expiredDateString = this.dayjsProvider.changeToProvidedFormat(
@@ -348,10 +341,9 @@ export class AuthService {
                 }),
                 "YYYY년 MM월 DD일 hh:mm",
             );
-
-            const remainingEmailSentChance = 5 - (findedUserVerifyList?.currentEmailSentCount ?? 0 + 1);
-            await this.sesProvider.sendVerifyCode(sendEmailDto.email, emailVerifyCode, remainingEmailSentChance, {
-                publishedDate: nowDateString,
+            const remainingEmailSendChance = 5 - (userVerifyList?.currentEmailSentCount ?? 0 + 1);
+            await this.sesProvider.sendVerifyCode(email, emailVerifyCode, remainingEmailSendChance, {
+                publishedDate: nowClientDate,
                 expiredDate: expiredDateString,
             });
 
@@ -359,8 +351,8 @@ export class AuthService {
             return {
                 isExceeded: false,
                 exceededDate: undefined,
-                email: sendEmailDto.email,
-                date: nowDateString,
+                email,
+                date: nowClientDate,
             };
         } catch (err) {
             await conn.rollback();
@@ -377,46 +369,43 @@ export class AuthService {
     }> => {
         const conn = await this.mysqlProvider.getConnection();
 
+        const { email, emailVerifyCode } = confirmEmailDto;
+
         try {
             await conn.beginTransaction();
 
-            const isExistsUser = await this.authRepository.isExistsByEmail(conn, confirmEmailDto.email);
-            if (isExistsUser) throw new ConflictException(`${confirmEmailDto.email} 은 이미 가입한 이메일입니다.`);
+            const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
+            if (isExistsUser) throw new ConflictException(`${email} 은 이미 가입한 이메일입니다.`);
 
-            const findedVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
-                conn,
-                confirmEmailDto.email,
-            );
+            const userVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, email);
 
-            if (findedVerifyList === null) {
-                throw new BadRequestException(`${confirmEmailDto.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
+            const isPassedSendEmailProcess = userVerifyList === null;
+            if (isPassedSendEmailProcess) {
+                console.log("1 depth 조건문 A : 이메일 미발송자 -> throw Error");
+                throw new BadRequestException(`${email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
             } else {
-                if (findedVerifyList.emailVerifiedCode !== confirmEmailDto.emailVerifyCode)
-                    throw new BadRequestException(`인증 번호가 틀렸습니다.`);
+                console.log("1 depth 조건문 B : 이메일 발송자 -> pass");
+                const { emailVerifiedCode: dbEmailVerifiedCode, isVerifiedEmail } = userVerifyList;
 
-                const nowDayjsInstance = this.dayjsProvider.getDayjsInstance();
+                if (dbEmailVerifiedCode !== emailVerifyCode) throw new BadRequestException(`인증 번호가 틀렸습니다.`);
 
-                const emailVerifyToken = this.jwtProvider.signEmailVerifyToken({
-                    type: "EmailVerifyToken",
-                    email: findedVerifyList.email,
-                });
+                const nowDayjs = this.dayjsProvider.getDayjsInstance();
+                const emailVerifyToken = this.jwtProvider.signEmailVerifyToken({ type: "EmailVerifyToken", email });
+                const nowDayjsDbString = this.dayjsProvider.changeToProvidedFormat(nowDayjs, "YYYY-MM-DD hh:mm:ss");
 
-                const nowDayjsDbString = this.dayjsProvider.changeToProvidedFormat(
-                    nowDayjsInstance,
-                    "YYYY-MM-DD hh:mm:ss",
-                );
-
-                if (findedVerifyList.isVerifiedNickname === 1) {
+                if (isVerifiedEmail === 1) {
+                    console.log("2 depth 조건문 B-a : 닉네임 중복확인 진행자 -> 닉네임 중복확인 부분 초기화");
                     await this.authVerifyListRepository.reUpdateVerifyListByEmailAndEmailVerifyToken(
                         conn,
-                        confirmEmailDto.email,
+                        email,
                         nowDayjsDbString,
                         emailVerifyToken,
                     );
                 } else {
+                    console.log("2 depth 조건문 B-a : 닉네임 중복확인 미진행자 -> pass");
                     await this.authVerifyListRepository.updateVerifyListByEmailAndEmailVerifyToken(
                         conn,
-                        findedVerifyList.email,
+                        email,
                         nowDayjsDbString,
                         emailVerifyToken,
                     );
@@ -536,7 +525,7 @@ export class AuthService {
             const nowDaysDbString = this.dayjsProvider.changeToProvidedFormat(nowDaysInstance, "YYYY-MM-DD hh:mm:ss");
 
             console.log(findedUser);
-            if (findedUser.isExeededOfPasswordSent === 1 || findedUser.currentPasswordSentCount >= 5) {
+            if (findedUser.isExeededOfPasswordSent === 1 || findedUser.currentPasswordSentCount >= 4) {
                 await this.authRepository.exceedOfResetPasswordSent(conn, findedUser.userId, nowDaysDbString);
 
                 await conn.commit();

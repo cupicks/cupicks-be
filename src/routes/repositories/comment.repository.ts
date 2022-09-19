@@ -1,9 +1,19 @@
-import { CreateCommentDto, UnkownError } from "../../models/_.loader";
+import {
+    CreateCommentDto,
+    UnkownError,
+    UpdateCommentDto,
+    DeleteCommentDto,
+    GetCommentDto,
+} from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { ICommentPacket } from "../../models/_.loader";
+import { count } from "console";
 
 export class CommentRepository {
-    public isAuthenticated = async (conn: PoolConnection, userId: number, commentId: number): Promise<boolean> => {
+    public isAuthenticated = async (
+        conn: PoolConnection,
+        updateAndDeleteCommentDto: UpdateCommentDto | DeleteCommentDto,
+    ): Promise<boolean> => {
         const query = `
         SELECT 
         R.user_id AS userId
@@ -21,7 +31,10 @@ export class CommentRepository {
         WHERE R.user_id = ? AND C.comment_id = ? 
         `;
 
-        const [selectResult] = await conn.query<RowDataPacket[]>(query, [userId, commentId]);
+        const [selectResult] = await conn.query<RowDataPacket[]>(query, [
+            updateAndDeleteCommentDto.userId,
+            updateAndDeleteCommentDto.commentId,
+        ]);
         const [commentPackets, _] = selectResult;
 
         return commentPackets ? true : false;
@@ -40,22 +53,20 @@ export class CommentRepository {
         return commentPackets;
     };
 
-    public createComment = async (
-        conn: PoolConnection,
-        commentDto: CreateCommentDto,
-        imageLocation: string | null,
-    ): Promise<number> => {
+    public createComment = async (conn: PoolConnection, commentDto: CreateCommentDto): Promise<number> => {
         const query = `
             INSERT INTO comment
-                (comment, image_url)
+                (comment, image_url, resized_url)
             VALUES
-                (?, ?);
+                (?, ?, ?);
         `;
 
         const insertResult = await conn.query<ResultSetHeader>(query, [
             commentDto.comment,
-            imageLocation === null ? null : imageLocation,
+            commentDto.imageUrl,
+            commentDto.resizedUrl,
         ]);
+
         const [resultSetHeader, _] = insertResult;
         const { affectedRows, insertId } = resultSetHeader;
 
@@ -66,8 +77,7 @@ export class CommentRepository {
 
     public createRecipeComment = async (
         conn: PoolConnection,
-        userId: number,
-        recipeId: number,
+        commentDto: CreateCommentDto,
         commentId: number,
     ): Promise<number> => {
         const query = `
@@ -77,7 +87,11 @@ export class CommentRepository {
                 (?, ?, ?);
         `;
 
-        const insertResult = await conn.query<ResultSetHeader>(query, [userId, recipeId, commentId]);
+        const insertResult = await conn.query<ResultSetHeader>(query, [
+            commentDto.userId,
+            commentDto.recipeId,
+            commentId,
+        ]);
         const [resultSetHeader, _] = insertResult;
         const { affectedRows, insertId } = resultSetHeader;
 
@@ -97,44 +111,42 @@ export class CommentRepository {
         return result;
     };
 
-    public updateComment = async (
-        conn: PoolConnection,
-        comment: string,
-        imageLocation: string | null,
-        commentId: number,
-    ): Promise<object> => {
+    public updateComment = async (conn: PoolConnection, updateCommentDto: UpdateCommentDto): Promise<object> => {
         const query = `
             UPDATE comment
             SET 
-                comment = ?, image_url = ?
+                comment = ?, image_url = ?, resized_url = ?
             WHERE comment_id = ?;
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [comment, imageLocation, commentId]);
+        const [result] = await conn.query<ResultSetHeader>(query, [
+            updateCommentDto.comment,
+            updateCommentDto.imageUrl,
+            updateCommentDto.resizedUrl,
+            updateCommentDto.commentId,
+        ]);
 
         return result;
     };
 
-    public getComments = async (
-        conn: PoolConnection,
-        recipeId: number,
-        page: number,
-        count: number,
-    ): Promise<ICommentPacket[]> => {
+    public getComments = async (conn: PoolConnection, getCommentDto: GetCommentDto): Promise<ICommentPacket[]> => {
         const query = `
-        SELECT 
-            R.user_id AS userId, U.nickname AS nickname, R.recipe_id AS recipeId,
-            C.comment_id AS commentId, C.comment, C.image_url AS imageUrl , C.created_at AS createdAt, C.updated_at AS updatedAt
+        SELECT
+            R.user_id AS userId, U.nickname AS nickname, U.image_url AS userImageUrl, U.resized_url AS userResizedUrl, R.recipe_id AS recipeId,
+            C.comment_id AS commentId, C.comment, C.image_url AS imageUrl, C.resized_url AS resizedUrl , C.created_at AS createdAt, C.updated_at AS updatedAt
         FROM recipe_comment R
         JOIN comment C
         ON R.comment_id = C.comment_id
-        LEFT JOIN user U
+        RIGHT JOIN user U
         ON R.user_id = U.user_id
         WHERE R.recipe_id = ?
-        LIMIT ?, ?
+        LIMIT ? OFFSET ?
         `;
 
-        const [result] = await conn.query<ICommentPacket[]>(query, [recipeId, page, count]);
+        const LIMIT = getCommentDto.count;
+        const OFFSET = (getCommentDto.page - 1) * LIMIT;
+
+        const [result] = await conn.query<ICommentPacket[]>(query, [getCommentDto.recipeId, LIMIT, OFFSET]);
 
         return result;
     };
