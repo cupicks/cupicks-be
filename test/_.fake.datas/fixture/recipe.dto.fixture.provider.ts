@@ -20,17 +20,15 @@ export class RecipeDtoFixtureProvider {
         ingredientList?: IngredientDto[],
         userId?: number,
     ): CreateRecipeDto {
-        return new CreateRecipeDto(
-            {
-                title: title ?? faker.word.noun(),
-                content: content ?? faker.word.noun(),
-                isIced: isIced ?? faker.datatype.boolean(),
-                cupSize: cupSize ?? faker.datatype.number(355),
-                isPublic: isPublic ?? faker.datatype.boolean(),
-                ingredientList: ingredientList ?? faker.datatype.array(3),
-            },
-            faker.random.numeric(5),
-        );
+        return new CreateRecipeDto({
+            title: title ?? faker.word.noun(),
+            content: content ?? faker.word.noun(),
+            isIced: isIced ?? faker.datatype.boolean(),
+            cupSize: cupSize ?? faker.datatype.number(355),
+            isPublic: isPublic ?? faker.datatype.boolean(),
+            ingredientList: ingredientList ?? faker.datatype.array(3),
+            userId: userId ?? faker.datatype.number(5),
+        });
     }
 
     public getRecipeDto(page?: number, count?: number): GetRecipeDto {
@@ -50,18 +48,16 @@ export class RecipeDtoFixtureProvider {
         userId?: number,
         recipeId?: number,
     ): UpdateRecipeDto {
-        return new UpdateRecipeDto(
-            {
-                title: title ?? faker.word.noun(),
-                content: content ?? faker.word.noun(),
-                isIced: isIced ?? faker.datatype.boolean(),
-                cupSize: cupSize ?? faker.datatype.number(355),
-                isPublic: isPublic ?? faker.datatype.boolean(),
-                ingredientList: ingredientList ?? faker.datatype.array(3),
-            },
-            faker.datatype.number(10),
-            faker.datatype.number(55),
-        );
+        return new UpdateRecipeDto({
+            title: title ?? faker.word.noun(),
+            content: content ?? faker.word.noun(),
+            isIced: isIced ?? faker.datatype.boolean(),
+            cupSize: cupSize ?? faker.datatype.number(355),
+            isPublic: isPublic ?? faker.datatype.boolean(),
+            ingredientList: ingredientList ?? faker.datatype.array(3),
+            userId: userId ?? faker.datatype.number(3),
+            recipeId: recipeId ?? faker.datatype.number(55),
+        });
     }
 
     public getDeleteRecipeDto(userId?: number, recipeId?: number): DeleteRecipeDto {
