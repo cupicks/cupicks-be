@@ -66,17 +66,20 @@ export class AuthService {
 
             const userVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, email);
             if (userVerifyList === null)
-                throw new BadRequestException(`${email} 이메일 및 닉네임 인증 절차를 진행하지 않은 사용자입니다.`);
+                throw new BadRequestException(
+                    `${email} 이메일 및 닉네임 인증 절차를 진행하지 않은 사용자입니다.`,
+                    "AUTH-004",
+                );
             else {
                 const { emailVerifiedToken: dbEmailToken, nicknameVerifiedToken: dbNicknameToken } = userVerifyList;
                 if (dbEmailToken !== emailVerifyToken)
-                    throw new BadRequestException(`등록되지 않은 emailVerifyToken 입니다.`);
+                    throw new BadRequestException(`등록되지 않은 emailVerifyToken 입니다.`, "AUTH-005");
                 if (dbNicknameToken !== nicknameVerifyToken)
-                    throw new BadRequestException(`등록되지 않은 nicnameVerifyToken 입니다.`);
+                    throw new BadRequestException(`등록되지 않은 nicnameVerifyToken 입니다.`, "AUTH-006");
             }
 
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
-            if (isExistsUser === true) throw new ConflictException(`${email} 은 사용 중입니다.`);
+            if (isExistsUser === true) throw new ConflictException(`${email} 은 사용 중입니다.`, "AUTH-001-01");
 
             const date = this.dayjsProvider.changeToProvidedFormat(
                 this.dayjsProvider.getDayjsInstance(),
@@ -120,11 +123,12 @@ export class AuthService {
             await conn.beginTransaction();
 
             const findedUser = await this.authRepository.findUserByEmail(conn, userDto.email);
-            if (findedUser === null) throw new NotFoundException(`${userDto.email} 은 존재하지 않는 이메일입니다.`);
+            if (findedUser === null)
+                throw new NotFoundException(`${userDto.email} 은 존재하지 않는 이메일입니다.`, "AUTH-002");
 
             const isSamePassword = await this.bcryptProvider.comparedPassword(userDto.password, findedUser.password);
             if (isSamePassword === false)
-                throw new ForBiddenException(`${userDto.email} 와 일치하지 않는 비밀번호 입니다.`);
+                throw new ForBiddenException(`${userDto.email} 와 일치하지 않는 비밀번호 입니다.`, "AUTH-003");
 
             const accessToken = this.jwtProvider.signAccessToken({
                 type: "AccessToken",
@@ -164,7 +168,8 @@ export class AuthService {
             const userId = payload.userId;
 
             const findedUser = await this.authRepository.findUserById(conn, userId);
-            if (findedUser === null) throw new NotFoundException(`존재하지 않는 사용자의 토큰을 제출하셨습니다.`);
+            if (findedUser === null)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             await this.authRepository.updateUserRefreshToken(conn, userId, null);
 
@@ -185,15 +190,17 @@ export class AuthService {
 
             const payload = this.jwtProvider.decodeToken<jwtLib.IRefreshTokenPayload>(tokenDto.refreshToken);
             const isExists = await this.authRepository.isExistsById(conn, payload.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const userToken = await this.authRepository.findUserRefreshTokenById(conn, payload.userId);
-            if (userToken === null) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (userToken === null)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const serverToken = userToken.refreshToken;
-            if (serverToken === undefined) throw new NotFoundException(`로그인 기록이 없는 사용자입니다.`);
+            if (serverToken === undefined) throw new NotFoundException(`로그인 기록이 없는 사용자입니다.`, "AUTH-008");
             if (tokenDto.refreshToken !== serverToken)
-                throw new NotFoundException(`등록되지 않은 RefreshToken 입니다.`);
+                throw new NotFoundException(`등록되지 않은 RefreshToken 입니다.`, "AUTH-008");
 
             const accessToken = this.jwtProvider.signAccessToken({
                 type: "AccessToken",
@@ -231,7 +238,8 @@ export class AuthService {
 
             const { email } = sendEmailDto;
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
-            if (isExistsUser) throw new ConflictException(`${sendEmailDto.email} 은 이미 가입한 이메일입니다.`);
+            if (isExistsUser)
+                throw new ConflictException(`${sendEmailDto.email} 은 이미 가입한 이메일입니다.`, "AUTH-001-01");
 
             const nowDayjsInstance: Dayjs = this.dayjsProvider.getDayjsInstance();
             const nowDbDate: string = this.dayjsProvider.changeToProvidedFormat(
@@ -375,19 +383,20 @@ export class AuthService {
             await conn.beginTransaction();
 
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
-            if (isExistsUser) throw new ConflictException(`${email} 은 이미 가입한 이메일입니다.`);
+            if (isExistsUser) throw new ConflictException(`${email} 은 이미 가입한 이메일입니다.`, "AUTH-001-01");
 
             const userVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, email);
 
             const isPassedSendEmailProcess = userVerifyList === null;
             if (isPassedSendEmailProcess) {
                 console.log("1 depth 조건문 A : 이메일 미발송자 -> throw Error");
-                throw new BadRequestException(`${email} 은 인증번호 발송 과정이 진행되지 않았습니다.`);
+                throw new BadRequestException(`${email} 은 인증번호 발송 과정이 진행되지 않았습니다.`, "AUTH-004-01");
             } else {
                 console.log("1 depth 조건문 B : 이메일 발송자 -> pass");
                 const { emailVerifiedCode: dbEmailVerifiedCode, isVerifiedEmail } = userVerifyList;
 
-                if (dbEmailVerifiedCode !== emailVerifyCode) throw new BadRequestException(`인증 번호가 틀렸습니다.`);
+                if (dbEmailVerifiedCode !== emailVerifyCode)
+                    throw new BadRequestException(`인증 번호가 틀렸습니다.`, "AUTH-004-02");
 
                 const nowDayjs = this.dayjsProvider.getDayjsInstance();
                 const emailVerifyToken = this.jwtProvider.signEmailVerifyToken({ type: "EmailVerifyToken", email });
@@ -439,7 +448,11 @@ export class AuthService {
             );
 
             const isExists = await this.authRepository.isExistsByNickname(conn, confirmNicknameDto.nickname);
-            if (isExists) throw new ConflictException(`${confirmNicknameDto.nickname} 은 이미 가입한 닉네임입니다.`);
+            if (isExists)
+                throw new ConflictException(
+                    `${confirmNicknameDto.nickname} 은 이미 가입한 닉네임입니다.`,
+                    "AUTH-001-02",
+                );
 
             const isExistsOthersNickname = await this.authVerifyListRepository.isExistsByNicknameExceptEmail(
                 conn,
@@ -606,7 +619,8 @@ export class AuthService {
             payload.hashedPassword;
 
             const findedUser = await this.authRepository.findUserByEmail(conn, payload.email);
-            if (findedUser === null) throw new NotFoundException(`${payload.email} 은 존재하지 않는 이메일입니다.`);
+            if (findedUser === null)
+                throw new NotFoundException(`${payload.email} 은 존재하지 않는 이메일입니다.`, "AUTH-001-02");
 
             await this.authRepository.updateUserPassword(conn, payload.email, payload.hashedPassword);
 
