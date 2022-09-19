@@ -12,22 +12,26 @@ import { IRecipeResponseCustom } from "../../constants/_.loader";
 export class RecipeRepository {
     // IsExists
 
-    public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<boolean> => {
+    public isAuthenticatedByUserId = async (
+        conn: PoolConnection,
+        recipeId: number,
+        userId: number,
+    ): Promise<boolean> => {
         const query = `
             SELECT 
                 *
             FROM
                 (
-                SELECT R.recipe_id
-                FROM recipe R
-                ) R
+                SELECT recipe.recipe_id
+                FROM recipe
+                ) recipe
             LEFT JOIN 
                 (
-                SELECT U.recipe_id, U.user_id
-                FROM user_recipe U
-                ) U
-            ON R.recipe_id = U.recipe_id AND R.recipe_id = ?
-            WHERE U.user_id = ?
+                SELECT user_recipe.recipe_id, user_recipe.user_id
+                FROM user_recipe
+                ) user_recipe
+            ON recipe.recipe_id = user_recipe.recipe_id AND recipe.recipe_id = ?
+            WHERE user_recipe.user_id = ?
         `;
 
         const [selectResult] = await conn.query<RowDataPacket[]>(query, [recipeId, userId]);
@@ -69,9 +73,9 @@ export class RecipeRepository {
     public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
         const query = `
         SELECT
-            R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
-            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount",
-            R.nickname, R.image_url as 'imageUrl', R.resized_url as 'resizedUrl'
+            recipe.recipe_id AS "recipeId", recipe.title, recipe.content, recipe.is_iced AS "isIced", recipe.cup_size AS "cupSize", recipe.created_at AS "createdAt", recipe.updated_at AS "updatedAt",
+            recipe_ingredient.ingredient_name AS "ingredientName", recipe_ingredient.ingredient_color AS "ingredientColor", recipe_ingredient.ingredient_amount AS "ingredientAmount",
+            recipe.nickname, recipe.image_url AS 'imageUrl', recipe.resized_url AS 'resizedUrl'
         FROM 
             (
                 SELECT 
@@ -86,13 +90,13 @@ export class RecipeRepository {
                 ON user_recipe.user_id = user.user_id
                 LEFT OUTER JOIN recipe
                 ON user_recipe.recipe_id = recipe.recipe_id
-            ) R
+            ) recipe
         LEFT OUTER JOIN
             (
                 SELECT *
-                FROM recipe_ingredient I
-            ) I
-        ON R.recipe_id = I.recipe_id
+                FROM recipe_ingredient recipe_ingredient
+            ) recipe_ingredient
+        ON recipe.recipe_id = recipe_ingredient.recipe_id
         `;
 
         const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
@@ -149,7 +153,7 @@ export class RecipeRepository {
         return result;
     };
 
-    public getMyRecipeByUserid = async (
+    public getMyRecipeByUserId = async (
         conn: PoolConnection,
         userId: number,
         page: number,
@@ -323,7 +327,7 @@ export class RecipeRepository {
 
     // Update
 
-    public updateRecipe = async (
+    public updateRecipeById = async (
         conn: PoolConnection,
         updateRecipeDto: UpdateRecipeDto,
         recipeId: number,
@@ -348,7 +352,7 @@ export class RecipeRepository {
 
     // Delete
 
-    public deleteRecipe = async (conn: PoolConnection, recipeId: number): Promise<object> => {
+    public deleteRecipeById = async (conn: PoolConnection, recipeId: number): Promise<object> => {
         const query = `
             DELETE FROM recipe
             WHERE recipe_id = ?;
@@ -359,7 +363,7 @@ export class RecipeRepository {
         return result;
     };
 
-    public deleteRecipeIngredient = async (conn: PoolConnection, recipeId: number) => {
+    public deleteRecipeIngredientById = async (conn: PoolConnection, recipeId: number) => {
         const query = `
             DELETE FROM recipe_ingredient
             WHERE recipe_id = ?;
@@ -385,7 +389,7 @@ export class RecipeRepository {
         return true;
     };
 
-    public disRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+    public disLikeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
         const query = `
             DELETE FROM user_like_recipe
             WHERE user_id = ? AND recipe_id = ?
