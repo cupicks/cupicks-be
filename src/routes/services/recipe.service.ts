@@ -41,7 +41,8 @@ export class RecipeService {
             await conn.beginTransaction();
 
             const isExists = await this.authRepository.isExistsById(conn, recipeDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const recipeId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
 
@@ -69,7 +70,7 @@ export class RecipeService {
             await conn.beginTransaction();
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, recipeId);
-            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
             const getRecipe = await this.recipeRepository.getRecipe(conn, recipeId);
 
@@ -135,6 +136,7 @@ export class RecipeService {
                 await conn.commit();
                 return recipeDtoList;
             } else {
+                // 이번 주 구현 예정
                 throw new BadRequestException(`필터 기반 검색은 아직 지원하지 않는 도메인입니다.`);
             }
         } catch (err) {
@@ -153,17 +155,18 @@ export class RecipeService {
             await conn.beginTransaction();
 
             const isExists = await this.authRepository.isExistsById(conn, updateRecipeDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, updateRecipeDto.recipeId);
-            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
             const isAuthenticated = await this.recipeRepository.isAuthenticatedByUserId(
                 conn,
                 updateRecipeDto.recipeId,
                 updateRecipeDto.userId,
             );
-            if (!isAuthenticated) throw new Error("내가 작성한 레시피가 아닙니다.");
+            if (!isAuthenticated) throw new NotFoundException("내가 작성한 레시피가 아닙니다.", "RECIPE-002");
 
             const updateRecipe = this.recipeRepository.updateRecipeById(conn, updateRecipeDto);
             const deleteRecipeIngredient = this.recipeRepository.deleteRecipeIngredientById(
@@ -203,17 +206,18 @@ export class RecipeService {
             await conn.beginTransaction();
 
             const isExists = await this.authRepository.isExistsById(conn, deleteRecipeDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, deleteRecipeDto.recipeId);
-            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
             const isAuthenticated = await this.recipeRepository.isAuthenticatedByUserId(
                 conn,
                 deleteRecipeDto.recipeId,
                 deleteRecipeDto.userId,
             );
-            if (!isAuthenticated) throw new Error("내가 작성한 레시피가 아닙니다.");
+            if (!isAuthenticated) throw new NotFoundException("내가 작성한 레시피가 아닙니다.", "RECIPE-002");
 
             await this.recipeRepository.deleteRecipeById(conn, deleteRecipeDto.recipeId);
 
@@ -235,17 +239,18 @@ export class RecipeService {
             await conn.beginTransaction();
 
             const isExists = await this.authRepository.isExistsById(conn, likeRecipeDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, likeRecipeDto.recipeId);
-            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
             const existLikeRecipe = await this.recipeRepository.existLikeRecipeById(
                 conn,
                 likeRecipeDto.userId,
                 likeRecipeDto.recipeId,
             );
-            if (existLikeRecipe) throw new Error("이미 좋아요 누른 레피시입니다.");
+            if (existLikeRecipe) throw new BadRequestException("이미 좋아요를 한 레시피입니다.", "RECIPE-003-01");
 
             await this.recipeRepository.likeRecipe(conn, likeRecipeDto);
 
@@ -264,17 +269,18 @@ export class RecipeService {
             await conn.beginTransaction();
 
             const isExists = await this.authRepository.isExistsById(conn, dislikeRecipeDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, dislikeRecipeDto.recipeId);
-            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
             const existDislikeRecipe = await this.recipeRepository.existLikeRecipeById(
                 conn,
                 dislikeRecipeDto.userId,
                 dislikeRecipeDto.recipeId,
             );
-            if (!existDislikeRecipe) throw new Error("좋아요 누른 레피시가 아닙니다.");
+            if (!existDislikeRecipe) throw new BadRequestException("좋아요를 하지 않은 레시피입니다.", "RECIPE-003-02");
 
             await this.recipeRepository.disLikeRecipe(conn, dislikeRecipeDto);
 

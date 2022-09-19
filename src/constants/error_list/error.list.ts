@@ -21,9 +21,13 @@ const ERROR_CODE_LIST = {
     "프로필 수정을 위한 모든 매개변수 누락": "PROFILE-001",
 
     // RECIPE
+    "존재하지 않는 레시피": "RECIPE-001",
+    "인증절차 - 내가 작성한 레시피에 대한 인증 실패": "RECIPE-002",
+    "좋아요 - 이미 좋아요 한 레시피": "RECIPE-003-01",
+    "좋아요 - 좋아요 하지 않은 레시피": "RECIPE-003-02",
 
     // COMMENT
-
+    "인증절차 - 내가 작성한 코멘트에 대한 인증 실패": "COMMENT-001",
     // JWT
 
     "요청자의 JWT 토큰 만료 혹은 검증 실패": "REQUEST_JWT_FAIL",
@@ -35,6 +39,12 @@ const ERROR_CODE_LIST = {
     "데이터 베이스 연결 실패": "DATABASE_CONNECTION_FAIL",
     "부적절한 쿼리문의 실행": "DATABASE_UNKOWN_QUERY",
     "알 수 없는 에러": "UNKOWN",
+
+    // BCRYPT
+    "암호화 에러": "BCRYPT_HASH_COMPARE_FAIL",
+
+    // MULTER
+    "지원하지 않는 이미지 형식": "FILE EXTENSION ERROR",
 } as const;
 
 export type TERROR_CODE = typeof ERROR_CODE_LIST[keyof typeof ERROR_CODE_LIST];

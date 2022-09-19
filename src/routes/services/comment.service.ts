@@ -4,6 +4,7 @@ import {
     UpdateCommentDto,
     DeleteCommentDto,
     GetCommentDto,
+    BadRequestException,
 } from "../../models/_.loader";
 import { CommentRepository, RecipeRepository, AuthRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
@@ -32,10 +33,11 @@ export class CommentService {
             await conn.beginTransaction();
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, commentDto.recipeId);
-            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.");
+            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
             const isExists = await this.authRepository.isExistsById(conn, commentDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const createComment = await this.commentRepository.createComment(conn, commentDto);
             const commentId = createComment;
@@ -65,7 +67,7 @@ export class CommentService {
             await conn.beginTransaction();
 
             const findRecipeById: boolean = await this.recipeRepository.findRecipeById(conn, getCommentDto.recipeId);
-            if (!findRecipeById) throw new Error("존재하지 않는 레시피입니다.");
+            if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
             const getComments: ICommentPacket[] = await this.commentRepository.getComments(conn, getCommentDto);
 
@@ -88,10 +90,11 @@ export class CommentService {
             await conn.beginTransaction();
 
             const isExists = await this.authRepository.isExistsById(conn, updateCommentDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const isAuthenticated = await this.commentRepository.isAuthenticated(conn, updateCommentDto);
-            if (!isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
+            if (!isAuthenticated) throw new BadRequestException("내가 작성한 코멘트가 아닙니다.", "COMMENT-001");
 
             const findCommentById: ICommentPacket[] = await this.commentRepository.findCommentByCommentId(
                 conn,
@@ -126,10 +129,11 @@ export class CommentService {
             await conn.beginTransaction();
 
             const isExists = await this.authRepository.isExistsById(conn, deleteCommentDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
             const isAuthenticated = await this.commentRepository.isAuthenticated(conn, deleteCommentDto);
-            if (!isAuthenticated) throw new Error("내가 작성한 코멘트가 아닙니다.");
+            if (!isAuthenticated) throw new BadRequestException("내가 작성한 코멘트가 아닙니다.", "COMMENT-001");
 
             const findCommentById = await this.commentRepository.findCommentByCommentId(
                 conn,

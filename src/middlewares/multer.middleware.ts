@@ -7,13 +7,13 @@ export const multerMiddlewareForProfile: RequestHandler = async (req: Request, r
         if (!res.locals)
             return res.status(401).json({
                 isSuccess: false,
-                message: "존재하지 않는 유저입니다.",
+                message: "존재하지 않는 사용자입니다 AUTH-002",
             });
 
         if (err)
             return res.status(401).json({
                 isSuccess: false,
-                message: "지원하는 이미지 형식을 확인해 주세요.",
+                message: err,
             });
 
         return next();
@@ -25,13 +25,13 @@ export const multerMiddlewareForComment: RequestHandler = async (req: Request, r
         if (!res.locals)
             return res.status(401).json({
                 isSuccess: false,
-                message: "존재하지 않는 유저입니다.",
+                message: "존재하지 않는 사용자입니다 AUTH-002",
             });
 
         if (err)
             return res.status(401).json({
                 isSuccess: false,
-                message: "지원하는 이미지 형식을 확인해 주세요.",
+                message: err,
             });
 
         return next();

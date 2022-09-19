@@ -9,7 +9,6 @@ import {
     DeleteRecipeDto,
 } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
-import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeRepository {
     // IsExists
@@ -233,7 +232,7 @@ export class RecipeRepository {
         const resultSetHeader = result[0];
         const { affectedRows, insertId } = resultSetHeader;
 
-        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         return insertId;
     };
@@ -259,7 +258,7 @@ export class RecipeRepository {
             total += affectedRows;
             insertIdList.push(insertId);
 
-            if (total > 20) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+            if (total > 20) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
         }
 
         return insertIdList;
@@ -283,7 +282,7 @@ export class RecipeRepository {
         const [resultSetHeader, _] = createResult;
 
         if (resultSetHeader.affectedRows !== ingredientList.length)
-            throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+            throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         const insertedIdList = new Array(resultSetHeader.affectedRows)
             .fill(resultSetHeader.insertId)
@@ -305,7 +304,7 @@ export class RecipeRepository {
         const resultSetHeader = result[0];
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         return JSON.stringify(result[0].insertId);
     };
@@ -322,7 +321,7 @@ export class RecipeRepository {
         const resultSetHeader = result[0];
         const { affectedRows, insertId } = resultSetHeader;
 
-        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         return insertId;
     };
