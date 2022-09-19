@@ -193,7 +193,7 @@ export default class RecipeController {
         }
     };
 
-    public disRecipe: RequestHandler = async (req: Request, res: Response) => {
+    public dislikeRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
             const validator = await new JoiValidator().validateAsync<DeleteRecipeDto>(
                 new DeleteRecipeDto({
