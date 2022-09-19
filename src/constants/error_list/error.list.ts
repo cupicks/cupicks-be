@@ -27,9 +27,10 @@ const ERROR_CODE_LIST = {
     "좋아요 - 좋아요 하지 않은 레시피": "RECIPE-003-02",
 
     // COMMENT
-    "인증절차 - 내가 작성한 코멘트에 대한 인증 실패": "COMMENT-001",
-    // JWT
+    "존재하지 않는 코멘트": "COMMENT-001",
+    "인증절차 - 내가 작성한 코멘트에 대한 인증 실패": "COMMENT-002",
 
+    // JWT
     "요청자의 JWT 토큰 만료 혹은 검증 실패": "REQUEST_JWT_FAIL",
 
     // VALIDATION

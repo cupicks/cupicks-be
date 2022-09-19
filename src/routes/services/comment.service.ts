@@ -89,12 +89,18 @@ export class CommentService {
 
             await conn.beginTransaction();
 
-            const isExists = await this.authRepository.isExistsById(conn, updateCommentDto.userId);
-            if (isExists === false)
+            const isExistsByUserId = await this.authRepository.isExistsById(conn, updateCommentDto.userId);
+            if (isExistsByUserId === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
+            const isExistsByCommentId = await this.commentRepository.findCommentByCommentId(
+                conn,
+                updateCommentDto.commentId,
+            );
+            if (!isExistsByCommentId) throw new NotFoundException("존재하지 않는 코멘트입니다.", "COMMENT-001");
+
             const isAuthenticated = await this.commentRepository.isAuthenticated(conn, updateCommentDto);
-            if (!isAuthenticated) throw new BadRequestException("내가 작성한 코멘트가 아닙니다.", "COMMENT-001");
+            if (!isAuthenticated) throw new BadRequestException("내가 작성한 코멘트가 아닙니다.", "COMMENT-002");
 
             const findCommentById: ICommentPacket[] = await this.commentRepository.findCommentByCommentId(
                 conn,
@@ -132,8 +138,14 @@ export class CommentService {
             if (isExists === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
 
+            const isExistsByCommentId = await this.commentRepository.findCommentByCommentId(
+                conn,
+                deleteCommentDto.commentId,
+            );
+            if (!isExistsByCommentId) throw new NotFoundException("존재하지 않는 코멘트입니다.", "COMMENT-001");
+
             const isAuthenticated = await this.commentRepository.isAuthenticated(conn, deleteCommentDto);
-            if (!isAuthenticated) throw new BadRequestException("내가 작성한 코멘트가 아닙니다.", "COMMENT-001");
+            if (!isAuthenticated) throw new BadRequestException("내가 작성한 코멘트가 아닙니다.", "COMMENT-002");
 
             const findCommentById = await this.commentRepository.findCommentByCommentId(
                 conn,
