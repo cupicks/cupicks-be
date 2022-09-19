@@ -5,6 +5,8 @@ import {
     IRecipePacket,
     UnkownError,
     UpdateRecipeDto,
+    GetRecipeDto,
+    DeleteRecipeDto,
 } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
 import { IRecipeResponseCustom } from "../../constants/_.loader";
@@ -104,7 +106,7 @@ export class RecipeRepository {
         return result;
     };
 
-    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipeCombinedPacket[]> => {
+    public getRecipes = async (conn: PoolConnection, getRecipeDto: GetRecipeDto): Promise<IRecipeCombinedPacket[]> => {
         const selectQuery = `
         SELECT    
             recipe.recipe_id as recipeId,
@@ -123,7 +125,7 @@ export class RecipeRepository {
                 recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
             FROM recipe
             ORDER BY recipe_id desc
-            LIMIT ${count} OFFSET ${(page - 1) * count}
+            LIMIT ${getRecipeDto.count} OFFSET ${(getRecipeDto.page - 1) * getRecipeDto.count}
         ) recipe
         LEFT OUTER JOIN user_recipe
             ON recipe.recipe_id = user_recipe.recipe_id
@@ -327,11 +329,7 @@ export class RecipeRepository {
 
     // Update
 
-    public updateRecipeById = async (
-        conn: PoolConnection,
-        updateRecipeDto: UpdateRecipeDto,
-        recipeId: number,
-    ): Promise<object> => {
+    public updateRecipeById = async (conn: PoolConnection, updateRecipeDto: UpdateRecipeDto): Promise<object> => {
         const query = `
             UPDATE recipe
             SET
@@ -344,7 +342,7 @@ export class RecipeRepository {
             updateRecipeDto.content,
             updateRecipeDto.isIced,
             updateRecipeDto.isPublic,
-            recipeId,
+            updateRecipeDto.recipeId,
         ]);
 
         return result;
@@ -376,7 +374,7 @@ export class RecipeRepository {
 
     // Special
 
-    public likeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+    public likeRecipe = async (conn: PoolConnection, likeRecipeDto: DeleteRecipeDto): Promise<boolean> => {
         const query = `
             INSERT INTO user_like_recipe
                 (user_id, recipe_id)
@@ -384,18 +382,18 @@ export class RecipeRepository {
                 (?, ?);
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+        const [result] = await conn.query<ResultSetHeader>(query, [likeRecipeDto.userId, likeRecipeDto.recipeId]);
 
         return true;
     };
 
-    public disLikeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
+    public disLikeRecipe = async (conn: PoolConnection, dislikeRecipeDto: DeleteRecipeDto): Promise<boolean> => {
         const query = `
             DELETE FROM user_like_recipe
             WHERE user_id = ? AND recipe_id = ?
         `;
 
-        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+        const [result] = await conn.query<ResultSetHeader>(query, [dislikeRecipeDto.userId, dislikeRecipeDto.recipeId]);
 
         return true;
     };
