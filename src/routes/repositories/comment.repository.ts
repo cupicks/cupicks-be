@@ -99,7 +99,7 @@ export class CommentRepository {
         const [resultSetHeader, _] = insertResult;
         const { affectedRows, insertId } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         return insertId;
     };
@@ -124,7 +124,7 @@ export class CommentRepository {
         const [resultSetHeader, _] = insertResult;
         const { affectedRows, insertId } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         return insertId;
     };

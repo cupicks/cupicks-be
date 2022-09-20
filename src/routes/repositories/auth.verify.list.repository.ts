@@ -61,7 +61,7 @@ export class AuthVerifyListRepository {
 
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     // update
@@ -81,7 +81,7 @@ export class AuthVerifyListRepository {
 
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     public updateVerifyListByEmailAndEmailVerifyToken = async (
@@ -103,7 +103,7 @@ export class AuthVerifyListRepository {
 
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     public updateVerifyListByNickname = async (
@@ -125,7 +125,7 @@ export class AuthVerifyListRepository {
         const [resultSetHeader, _] = updateResult;
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     // reUpdate
@@ -153,7 +153,7 @@ export class AuthVerifyListRepository {
         const [resultSetHeader, _] = updateResult;
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     public reUpdateVerifyListByEmailAndEmailVerifyToken = async (
@@ -178,7 +178,7 @@ export class AuthVerifyListRepository {
         const [resultSetHeader, _] = updateResult;
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     // exipre
@@ -200,7 +200,7 @@ export class AuthVerifyListRepository {
         const [resultSetHeader] = exceedResult;
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     public disableExceedOfEmailSent = async (conn: PoolConnection, userVerifyListId: number): Promise<void> => {
@@ -215,6 +215,6 @@ export class AuthVerifyListRepository {
 
         const [resultSetHeader] = exceedResult;
         const { affectedRows } = resultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 }
