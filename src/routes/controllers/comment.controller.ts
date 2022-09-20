@@ -1,6 +1,6 @@
 import { RequestHandler, Request, Response } from "express";
 
-import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
+import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 import {
     CreateCommentDto,
     DeleteCommentDto,
@@ -23,13 +23,6 @@ export default class CommentController {
     public createComment: RequestHandler = async (req: Request, res: Response) => {
         try {
             const file = req.file as Express.MulterS3.File;
-
-            const imageLocation = file?.location.length > 0 ? file.location : null;
-            const resizedUrl =
-                imageLocation === null ? null : imageLocation.replace(/\/comment\//, `/comment-resized/`);
-
-            console.log(imageLocation);
-            console.log(resizedUrl);
 
             const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
                 new CreateCommentDto({
@@ -63,6 +56,7 @@ export default class CommentController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -91,6 +85,7 @@ export default class CommentController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -133,6 +128,7 @@ export default class CommentController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -160,13 +156,14 @@ export default class CommentController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
 
     public errorHandler = (err: unknown): CustomException => {
         if (err instanceof CustomException) return err;
-        else if (err instanceof Error) return new ValidationException(err.message);
+        else if (err instanceof Error) return new UnkownError(err.message);
         else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
     };
 }
