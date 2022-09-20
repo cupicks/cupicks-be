@@ -1,0 +1,43 @@
+{
+    // tsc 용 tsconfig.build.json
+    "compilerOptions": {
+        "strict": true,
+        "module": "commonjs",
+        "declaration": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "ES5",
+        "sourceMap": true,
+        "outDir": "./dist",
+        "baseUrl": "./src",
+        "incremental": true,
+        "moduleResolution": "node",
+        "downlevelIteration": true,
+  
+        // nest-cli 에서 카피
+        "skipLibCheck": true,
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "strictBindCallApply": false,
+        "forceConsistentCasingInFileNames": false,
+        "noFallthroughCasesInSwitch": false
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        ".github",
+        ".husky",
+        "coverage",
+        "dist",
+        "docs",
+        "key",
+        "node_modules",
+        "scripts",
+        "sql",
+        "test"
+    ]
+  }
+  
