@@ -5,6 +5,7 @@ import * as multer from "multer";
 import * as multerS3 from "multer-s3";
 
 import { IS3ConfigEnv } from "models/_.loader";
+import { UuidProvider } from "../_.loader";
 
 type ProfileImagePath = "profile" | "profile-resized";
 type CommentImagePath = "comment" | "comment-resized";
@@ -58,7 +59,7 @@ export class MulterProvider {
                 s3,
                 bucket: MulterProvider.BUCKET,
                 key(req, file, done) {
-                    done(null, `${path}/${Date.now()}${file.originalname}`);
+                    done(null, `${path}/${new UuidProvider().getUuid()}`);
                 },
             }),
             fileFilter(req, file, done) {
