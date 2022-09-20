@@ -1,12 +1,10 @@
 import { RequestHandler } from "express";
-import path from "path";
 
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import * as multer from "multer";
 import * as multerS3 from "multer-s3";
 
 import { IS3ConfigEnv } from "models/_.loader";
-import { ForBiddenException, CustomException, UnkownTypeError } from "../../models/_.loader";
 
 type ProfileImagePath = "profile" | "profile-resized";
 type CommentImagePath = "comment" | "comment-resized";

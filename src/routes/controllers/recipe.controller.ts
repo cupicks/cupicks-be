@@ -48,6 +48,7 @@ export default class RecipeController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -94,6 +95,7 @@ export default class RecipeController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -121,6 +123,7 @@ export default class RecipeController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -155,6 +158,7 @@ export default class RecipeController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -183,6 +187,7 @@ export default class RecipeController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -211,6 +216,7 @@ export default class RecipeController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -237,6 +243,7 @@ export default class RecipeController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };

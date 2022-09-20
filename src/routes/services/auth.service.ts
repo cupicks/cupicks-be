@@ -85,7 +85,7 @@ export class AuthService {
                 this.dayjsProvider.getDayjsInstance(),
                 this.dayjsProvider.getDayabaseFormat(),
             );
-            await this.authRepository.createUser(
+            const createdUserId = await this.authRepository.createUser(
                 conn,
                 { email, nickname, password, imageGroup: { imageUrl, resizedUrl } },
                 date,
@@ -95,7 +95,7 @@ export class AuthService {
             await conn.commit();
 
             return new UserDto({
-                userId: 1,
+                userId: createdUserId,
                 createdAt: date,
                 updatedAt: date,
                 email: email,
@@ -450,6 +450,7 @@ export class AuthService {
             if (isExistsOthersNickname === true)
                 throw new ConflictException(
                     `${confirmNicknameDto.nickname} 은 다른 사람이 중복 확인 중인 닉네임입니다.`,
+                    "AUTH-004-03",
                 );
 
             const findedVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
@@ -459,10 +460,12 @@ export class AuthService {
             if (findedVerifyList === null)
                 throw new NotFoundException(
                     `${emailVerifyTokenPayload.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`,
+                    "AUTH-004-01",
                 );
             if (findedVerifyList.isVerifiedEmail === 0)
                 throw new BadRequestException(
                     `${emailVerifyTokenPayload.email} 은 인증번호 확인 과정이 진행되지 않았습니다.`,
+                    "AUTH-004-04",
                 );
 
             const nowDayjsInstance = this.dayjsProvider.getDayjsInstance();

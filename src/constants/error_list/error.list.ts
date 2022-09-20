@@ -7,9 +7,13 @@ const ERROR_CODE_LIST = {
     "이미 사용 중인 닉네임": "AUTH-001-02",
     "존재하지 않는 이메일": "AUTH-002",
     "일치하지 않는 비밀번호": "AUTH-003",
+
     "인증절차를 진행하지 않은 사용자": "AUTH-004",
+
     "인증절차 - 인증번호 발송 을 진행하지 않은 사용자": "AUTH-004-01",
     "인증절차 - 잘못된 인증번호를 제출한 사용자": "AUTH-004-02",
+    "인증절차 - 이미 다른 사람이 인증 중인 닉네임": "AUTH-004-03",
+    "인증번호 - 인증번호 확인 을 진행하지 않은 사용자": "AUTH-004-04",
     "인증절차 - 이메일 인증번호 발급 사용제한": "AUTH-004-EXP-01",
     "인증절차 - 임시 비밀번호 발급 사용제한": "AUTH-004-EXP-02",
     "등록 되지 않은 EmailVerifyToken": "AUTH-005",
@@ -41,13 +45,13 @@ const ERROR_CODE_LIST = {
     // DATABASE
     "데이터 베이스 연결 실패": "DATABASE_CONNECTION_FAIL",
     "부적절한 쿼리문의 실행": "DATABASE_UNKOWN_QUERY",
-    "알 수 없는 에러": "UNKOWN",
 
     // BCRYPT
     "암호화 에러": "BCRYPT_HASH_COMPARE_FAIL",
 
     // MULTER
     "지원하지 않는 이미지 형식": "FILE EXTENSION ERROR",
+    "알 수 없는 에러": "UNKOWN",
 } as const;
 
 export type TERROR_CODE = typeof ERROR_CODE_LIST[keyof typeof ERROR_CODE_LIST];

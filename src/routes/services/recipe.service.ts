@@ -137,7 +137,7 @@ export class RecipeService {
                 return recipeDtoList;
             } else {
                 // 이번 주 구현 예정
-                throw new BadRequestException(`필터 기반 검색은 아직 지원하지 않는 도메인입니다.`);
+                throw new BadRequestException(`필터 기반 검색은 아직 지원하지 않는 도메인입니다.`, "UNKOWN");
             }
         } catch (err) {
             await conn.rollback();

@@ -57,6 +57,7 @@ export default class CommentController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -86,6 +87,7 @@ export default class CommentController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -129,6 +131,7 @@ export default class CommentController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -157,6 +160,7 @@ export default class CommentController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
