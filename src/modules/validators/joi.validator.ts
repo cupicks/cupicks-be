@@ -1,4 +1,4 @@
-import { CustomException, IBaseDto, UnkownTypeError, ValidationException } from "models/_.loader";
+import { CustomException, IBaseDto, UnkownTypeError, ValidationException } from "../../models/_.loader";
 
 export class JoiValidator {
     public async validateAsync<T extends IBaseDto>(anyDto: IBaseDto): Promise<T> {
