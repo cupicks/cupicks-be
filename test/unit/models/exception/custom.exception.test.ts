@@ -26,7 +26,8 @@ describe("ExceptionFile contains all CustomException", () => {
             expect(sutException.name).toBe("CustomException");
             expect(sutException.message).toBe(fixtureMessage);
             expect(sutException.statusCode).toBe(500);
-            expect(sutException.errorType).toBe("UNKOWN");
+            expect(sutException.errorCode).toBe("UNKOWN");
+            expect(sutException.errorResult).toEqual({});
         });
 
         describe("**Exception List", () => {
@@ -42,7 +43,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(400);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.ValidationException);
                 });
                 it("BadRequestException is using for '400' status code", () => {
@@ -56,7 +58,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(400);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.BadRequestException);
                 });
                 it("JwtAuthorizationException is using for '401' status code", () => {
@@ -70,7 +73,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(401);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.JwtAuthorizationException);
                 });
                 it("ForBiddenException is using for '403' status code", () => {
@@ -84,7 +88,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(403);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.ForBiddenException);
                 });
                 it("NotFoundException is using for '404' status code", () => {
@@ -98,7 +103,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(404);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.NotFoundException);
                 });
                 it("ConflictException is using for '409' status code", () => {
@@ -112,7 +118,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(409);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.ConflictException);
                 });
             });
@@ -129,7 +136,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(500);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.UnkownError);
                 });
                 it("UnkownTypeError is using for '500' status code", () => {
@@ -143,7 +151,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(500);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.UnkownTypeError);
                 });
                 it("UnOverrideDtoError is using for '500' status code", () => {
@@ -157,7 +166,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(500);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.UnOverrideDtoError);
                 });
                 it("DatabaseConnectionError is using for '500' status code", () => {
@@ -171,7 +181,8 @@ describe("ExceptionFile contains all CustomException", () => {
                     expect(sutException.message).toBe(fixtureMessage);
                     expect(sutException.statusCode).toBe(500);
 
-                    expect(sutException.errorType).toBe("UNKOWN");
+                    expect(sutException.errorCode).toBe("UNKOWN");
+                    expect(sutException.errorResult).toEqual({});
                     expect(sutException).toBeInstanceOf(ExceptionFile.DatabaseConnectionError);
                 });
             });
