@@ -5,13 +5,13 @@ export class CustomException implements TCustomException {
     name: string;
     message: string;
     statusCode: number;
-    errorType: TERROR_CODE;
+    errorCode: TERROR_CODE;
 
-    constructor(message: string, errorType?: TERROR_CODE) {
+    constructor(message: string, errorCode?: TERROR_CODE) {
         this.name = "CustomException";
         this.message = message;
         this.statusCode = 500;
-        this.errorType = errorType ?? "UNKOWN";
+        this.errorCode = errorCode ?? "UNKOWN";
     }
 }
 
@@ -19,8 +19,8 @@ export class ValidationException extends CustomException {
     name: string;
     statusCode: number;
 
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "ValidationException";
         this.statusCode = 400;
@@ -31,8 +31,8 @@ export class BadRequestException extends CustomException {
     name: string;
     statusCode: number;
 
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "BadRequestException";
         this.statusCode = 400;
@@ -42,8 +42,8 @@ export class BadRequestException extends CustomException {
 export class JwtAuthorizationException extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "JwtAuthorizationException";
         this.statusCode = 401;
@@ -53,8 +53,8 @@ export class JwtAuthorizationException extends CustomException {
 export class ForBiddenException extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "ForBiddenException";
         this.statusCode = 403;
@@ -64,8 +64,8 @@ export class ForBiddenException extends CustomException {
 export class NotFoundException extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "NotFoundException";
         this.statusCode = 404;
@@ -74,8 +74,8 @@ export class NotFoundException extends CustomException {
 export class ConflictException extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "ConflictException";
         this.statusCode = 409;
@@ -87,8 +87,8 @@ export class ConflictException extends CustomException {
 export class UnkownError extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "UnkownError";
         this.statusCode = 500;
@@ -98,8 +98,8 @@ export class UnkownError extends CustomException {
 export class UnkownTypeError extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "UnkownTypeError";
         this.statusCode = 500;
@@ -109,8 +109,8 @@ export class UnkownTypeError extends CustomException {
 export class UnOverrideDtoError extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "UnOverrideDtoError";
         this.statusCode = 500;
@@ -119,8 +119,8 @@ export class UnOverrideDtoError extends CustomException {
 export class DatabaseConnectionError extends CustomException {
     name: string;
     statusCode: number;
-    constructor(message: string, errorType?: TERROR_CODE) {
-        super(message, errorType);
+    constructor(message: string, errorCode?: TERROR_CODE) {
+        super(message, errorCode);
 
         this.name = "DatabaseConnectionError";
         this.statusCode = 500;
