@@ -64,6 +64,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -91,6 +92,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -116,6 +118,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -142,6 +145,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -178,6 +182,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -205,6 +210,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -232,6 +238,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -268,6 +275,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -291,6 +299,7 @@ export default class AuthController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };

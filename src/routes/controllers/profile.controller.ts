@@ -30,6 +30,7 @@ export default class ProfileController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -62,6 +63,7 @@ export default class ProfileController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -90,6 +92,7 @@ export default class ProfileController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
@@ -118,6 +121,7 @@ export default class ProfileController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
             });
         }
     };
