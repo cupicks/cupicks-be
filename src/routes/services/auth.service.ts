@@ -221,15 +221,14 @@ export class AuthService {
     public sendEmail = async (
         sendEmailDto: SendEmailDto,
     ): Promise<{
-        isExceeded: boolean;
+        email: string;
+        date: string;
         exceededDate:
             | {
                   lastSentDate: string;
                   accessibleDate: string;
               }
             | undefined;
-        email: string;
-        date: string;
     }> => {
         const conn = await this.mysqlProvider.getConnection();
 
@@ -258,11 +257,11 @@ export class AuthService {
             const isFirstVerifiedEMail = userVerifyList === null;
             if (isFirstVerifiedEMail) {
                 // 신규 인증 진입
-                console.log("1 depth 조건문 A : 신규 인증처리자 -> pass");
+                // console.log("1 depth 조건문 A : 신규 인증처리자 -> pass");
                 await this.authVerifyListRepository.createVerifyListByEmailAndCode(conn, email, emailVerifyCode);
             } else {
                 // 일일 이메일 발송 제한 초과의 경우
-                console.log("1 depth 조건문 B : 중복 인증처리자 -> pass");
+                // console.log("1 depth 조건문 B : 중복 인증처리자 -> pass");
                 const { userVerifyListId, isExeededOfEmailSent, currentEmailSentCount, emailSentExceedingDate } =
                     userVerifyList;
                 const lastSendDate = this.dayjsProvider.changeToProvidedFormat(
@@ -279,25 +278,24 @@ export class AuthService {
 
                 const isExeededLast = isExeededOfEmailSent === 1;
                 if (isExeededLast) {
-                    console.log("2 depth 조건문 B-a : 제한일까지 사용 금지");
+                    // console.log("2 depth 조건문 B-a : 제한일까지 사용 금지");
                     const banDate = this.dayjsProvider.getDiffMIlliSeconds(emailSentExceedingDate, nowDayjsInstance, {
                         limitCount: 1,
                         limitType: "day",
                     });
-                    console.log(banDate);
-
                     const isAlreadyBanned = banDate > 0;
-                    if (isAlreadyBanned) {
-                        return {
-                            isExceeded: true,
-                            exceededDate: {
-                                lastSentDate: lastSendDate,
-                                accessibleDate,
+                    if (isAlreadyBanned)
+                        throw new BadRequestException(
+                            `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
+                            "AUTH-004-EXP-01",
+                            {
+                                exceededDate: {
+                                    lastSentDate: lastSendDate,
+                                    accessibleDate,
+                                },
+                                date: nowClientDate,
                             },
-                            email,
-                            date: nowClientDate,
-                        };
-                    }
+                        );
 
                     await this.authVerifyListRepository.disableExceedOfEmailSent(conn, userVerifyListId);
                 }
@@ -305,41 +303,32 @@ export class AuthService {
                 // 일일 이메일 발송 제한 초과의 경우
                 const isExceededNow = currentEmailSentCount >= 5;
                 if (isExceededNow) {
-                    console.log("2 depth 조건문 B-b : 제한일까지 사용 금지");
+                    // console.log("2 depth 조건문 B-b : 제한일까지 사용 금지");
                     await this.authVerifyListRepository.exceedOfEmailSent(
                         conn,
                         userVerifyList.userVerifyListId,
                         nowDbDate,
                     );
-                    return {
-                        isExceeded: true,
-                        exceededDate: {
-                            lastSentDate: lastSendDate,
-                            accessibleDate,
+                    throw new BadRequestException(
+                        `사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!`,
+                        "AUTH-004-EXP-01",
+                        {
+                            exceededDate: {
+                                lastSentDate: lastSendDate,
+                                accessibleDate,
+                            },
+                            date: nowClientDate,
                         },
-                        email,
-                        date: nowClientDate,
-                    };
+                    );
                 }
 
-                // 일일 이메일 발송 제한 초과의 X 경우
-                // 회원가입 직전 까지 인증 절차를 따라간 사용자
-                // if (isVerifiedEmail === 1) {
-                //     console.log('2 depth 조건문-c');
-                //     await this.authVerifyListRepository.reUpdateVerifyListByIdAndCode(
-                //         conn,
-                //         userVerifyListId,
-                //         emailVerifyCode,
-                //     );
-                // } else {
-                console.log("2 depth 조건문 B-c");
                 // 최초 인증을 진행하는 사용자
+                // console.log("2 depth 조건문 B-c");
                 await this.authVerifyListRepository.updateVerifyListByIdAndCode(
                     conn,
                     userVerifyListId,
                     emailVerifyCode,
                 );
-                // }
             }
 
             const expiredDateString = this.dayjsProvider.changeToProvidedFormat(
@@ -357,10 +346,9 @@ export class AuthService {
 
             await conn.commit();
             return {
-                isExceeded: false,
-                exceededDate: undefined,
                 email,
                 date: nowClientDate,
+                exceededDate: undefined,
             };
         } catch (err) {
             await conn.rollback();
@@ -389,10 +377,10 @@ export class AuthService {
 
             const isPassedSendEmailProcess = userVerifyList === null;
             if (isPassedSendEmailProcess) {
-                console.log("1 depth 조건문 A : 이메일 미발송자 -> throw Error");
+                // console.log("1 depth 조건문 A : 이메일 미발송자 -> throw Error");
                 throw new BadRequestException(`${email} 은 인증번호 발송 과정이 진행되지 않았습니다.`, "AUTH-004-01");
             } else {
-                console.log("1 depth 조건문 B : 이메일 발송자 -> pass");
+                // console.log("1 depth 조건문 B : 이메일 발송자 -> pass");
                 const { emailVerifiedCode: dbEmailVerifiedCode, isVerifiedEmail } = userVerifyList;
 
                 if (dbEmailVerifiedCode !== emailVerifyCode)
@@ -403,7 +391,7 @@ export class AuthService {
                 const nowDayjsDbString = this.dayjsProvider.changeToProvidedFormat(nowDayjs, "YYYY-MM-DD hh:mm:ss");
 
                 if (isVerifiedEmail === 1) {
-                    console.log("2 depth 조건문 B-a : 닉네임 중복확인 진행자 -> 닉네임 중복확인 부분 초기화");
+                    // console.log("2 depth 조건문 B-a : 닉네임 중복확인 진행자 -> 닉네임 중복확인 부분 초기화");
                     await this.authVerifyListRepository.reUpdateVerifyListByEmailAndEmailVerifyToken(
                         conn,
                         email,
@@ -411,7 +399,7 @@ export class AuthService {
                         emailVerifyToken,
                     );
                 } else {
-                    console.log("2 depth 조건문 B-a : 닉네임 중복확인 미진행자 -> pass");
+                    // console.log("2 depth 조건문 B-a : 닉네임 중복확인 미진행자 -> pass");
                     await this.authVerifyListRepository.updateVerifyListByEmailAndEmailVerifyToken(
                         conn,
                         email,
@@ -507,15 +495,14 @@ export class AuthService {
     public sendPassword = async (
         sendPasswordDto: SendPasswordDto,
     ): Promise<{
-        isExceeded: boolean;
+        date: string;
+        email: string;
         exceededDate:
             | {
                   lastSentDate: string;
                   accessibleDate: string;
               }
             | undefined;
-        email: string;
-        date: string;
     }> => {
         const conn = await this.mysqlProvider.getConnection();
 
@@ -524,7 +511,7 @@ export class AuthService {
 
             const findedUser = await this.authRepository.findUserByEmail(conn, sendPasswordDto.email);
             if (findedUser === null)
-                throw new NotFoundException(`${sendPasswordDto.email} 은 존재하지 않는 이메일입니다.`);
+                throw new NotFoundException(`${sendPasswordDto.email} 은 존재하지 않는 이메일입니다.`, "AUTH-002");
 
             const randomPassword = this.randomGenerator.getRandomPassword();
             const hashedPassword = await this.bcryptProvider.hashPassword(randomPassword);
@@ -537,29 +524,33 @@ export class AuthService {
             const nowDaysInstance = this.dayjsProvider.getDayjsInstance();
             const nowDaysDbString = this.dayjsProvider.changeToProvidedFormat(nowDaysInstance, "YYYY-MM-DD hh:mm:ss");
 
-            console.log(findedUser);
             if (findedUser.isExeededOfPasswordSent === 1 || findedUser.currentPasswordSentCount >= 4) {
                 await this.authRepository.exceedOfResetPasswordSent(conn, findedUser.userId, nowDaysDbString);
 
                 await conn.commit();
-                return {
-                    isExceeded: true,
-                    date: this.dayjsProvider.changeToProvidedFormat(nowDaysInstance, "YYYY년 MM월 DD일 hh:mm"),
-                    email: sendPasswordDto.email,
-                    exceededDate: {
-                        lastSentDate: this.dayjsProvider.changeToProvidedFormat(
-                            findedUser.passwordSentExceedingDate ?? nowDaysDbString,
-                            "YYYY년 MM월 DD일 hh:mm",
-                        ),
-                        accessibleDate: this.dayjsProvider.changeToProvidedFormat(
-                            this.dayjsProvider.getAddTime(findedUser.passwordSentExceedingDate ?? nowDaysDbString, {
-                                limitCount: 2,
-                                limitType: "day",
-                            }),
-                            "YYYY년 MM월 DD일 hh:mm",
-                        ),
+                const lastSentDate = this.dayjsProvider.changeToProvidedFormat(
+                    findedUser.passwordSentExceedingDate ?? nowDaysDbString,
+                    "YYYY년 MM월 DD일 hh:mm",
+                );
+                const accessibleDate = this.dayjsProvider.changeToProvidedFormat(
+                    this.dayjsProvider.getAddTime(findedUser.passwordSentExceedingDate ?? nowDaysDbString, {
+                        limitCount: 2,
+                        limitType: "day",
+                    }),
+                    "YYYY년 MM월 DD일 hh:mm",
+                );
+                const date = this.dayjsProvider.changeToProvidedFormat(nowDaysInstance, "YYYY년 MM월 DD일 hh:mm");
+                throw new BadRequestException(
+                    "사용자 이메일로 일일 이메일 제한 횟수 5회를 초과했어요!\n24 시간 뒤에 다시 신청해주세요!",
+                    "AUTH-004-EXP-02",
+                    {
+                        date,
+                        exceededDate: {
+                            lastSentDate,
+                            accessibleDate,
+                        },
                     },
-                };
+                );
             } else {
                 await this.authRepository.updateUserResetPassword(
                     conn,
@@ -592,9 +583,8 @@ export class AuthService {
 
                 await conn.commit();
                 return {
-                    isExceeded: false,
-                    date: nowDaysClientString,
                     email: sendPasswordDto.email,
+                    date: nowDaysClientString,
                     exceededDate: undefined,
                 };
             }

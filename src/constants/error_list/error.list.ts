@@ -10,6 +10,8 @@ const ERROR_CODE_LIST = {
     "인증절차를 진행하지 않은 사용자": "AUTH-004",
     "인증절차 - 인증번호 발송 을 진행하지 않은 사용자": "AUTH-004-01",
     "인증절차 - 잘못된 인증번호를 제출한 사용자": "AUTH-004-02",
+    "인증절차 - 이메일 인증번호 발급 사용제한": "AUTH-004-EXP-01",
+    "인증절차 - 임시 비밀번호 발급 사용제한": "AUTH-004-EXP-02",
     "등록 되지 않은 EmailVerifyToken": "AUTH-005",
     "등록 되지 않은 NicnameVerifyToken": "AUTH-006",
     "이미 탈퇴한 사용자의 AccesshToken": "AUTH-007-01",

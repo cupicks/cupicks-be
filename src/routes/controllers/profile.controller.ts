@@ -31,6 +31,7 @@ export default class ProfileController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -64,6 +65,7 @@ export default class ProfileController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -93,6 +95,7 @@ export default class ProfileController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
@@ -122,6 +125,7 @@ export default class ProfileController {
                 isSuccess: false,
                 message: exception.message,
                 errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
