@@ -5,46 +5,40 @@ import {
     IRecipePacket,
     UnkownError,
     UpdateRecipeDto,
+    GetRecipeDto,
+    DeleteRecipeDto,
 } from "../../models/_.loader";
 import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
-import { IRecipeResponseCustom } from "../../constants/_.loader";
 
 export class RecipeRepository {
-    public isAuthenticated = async (conn: PoolConnection, recipeId: number, userId: number): Promise<boolean> => {
+    // IsExists
+
+    public isAuthenticatedByUserId = async (
+        conn: PoolConnection,
+        recipeId: number,
+        userId: number,
+    ): Promise<boolean> => {
         const query = `
             SELECT 
                 *
             FROM
                 (
-                SELECT R.recipe_id
-                FROM recipe R
-                ) R
+                SELECT recipe.recipe_id
+                FROM recipe
+                ) recipe
             LEFT JOIN 
                 (
-                SELECT U.recipe_id, U.user_id
-                FROM user_recipe U
-                ) U
-            ON R.recipe_id = U.recipe_id AND R.recipe_id = ?
-            WHERE U.user_id = ?
+                SELECT user_recipe.recipe_id, user_recipe.user_id
+                FROM user_recipe
+                ) user_recipe
+            ON recipe.recipe_id = user_recipe.recipe_id AND recipe.recipe_id = ?
+            WHERE user_recipe.user_id = ?
         `;
 
         const [selectResult] = await conn.query<RowDataPacket[]>(query, [recipeId, userId]);
         const [recipePackets, _] = selectResult;
 
         return recipePackets ? true : false;
-    };
-
-    public findRecipeById = async (conn: PoolConnection, recipeId: number): Promise<boolean> => {
-        const query = `
-            SELECT *
-            FROM recipe
-            WHERE recipe_id = ?
-        `;
-
-        const selectResult = await conn.query<RowDataPacket[]>(query, recipeId);
-        const [recipePackets, _] = selectResult;
-
-        return recipePackets.length !== 0 ? true : false;
     };
 
     public existLikeRecipeById = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
@@ -60,118 +54,29 @@ export class RecipeRepository {
         return recipePackets.length !== 0 ? true : false;
     };
 
-    public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
+    // Find
+
+    public findRecipeById = async (conn: PoolConnection, recipeId: number): Promise<boolean> => {
         const query = `
-            INSERT INTO recipe
-                (cup_size, title, content, is_iced, is_public)
-            VALUES
-                ("${recipeDto.cupSize}", "${recipeDto.title}", "${recipeDto.content}", ${recipeDto.isIced}, ${recipeDto.isPublic});
+            SELECT *
+            FROM recipe
+            WHERE recipe_id = ?
         `;
 
-        const result = await conn.query<ResultSetHeader>(query);
-        const resultSetHeader = result[0];
-        const { affectedRows, insertId } = resultSetHeader;
+        const selectResult = await conn.query<RowDataPacket[]>(query, recipeId);
+        const [recipePackets, _] = selectResult;
 
-        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
-
-        return insertId;
+        return recipePackets.length !== 0 ? true : false;
     };
 
-    /** @deprecated */
-    public createRecipeIngredientLegacy = async (
-        conn: PoolConnection,
-        ingredientList: Array<object>,
-    ): Promise<number[]> => {
-        const query = `
-            INSERT INTO recipe_ingredient SET ?
-        `;
-
-        let total = 0;
-        const insertIdList: number[] = [];
-
-        for (let i = 0; i < ingredientList.length; i++) {
-            const result = await conn.query<ResultSetHeader>(query, ingredientList[i]);
-
-            const resultSetHeader = result[0];
-            const { affectedRows, insertId } = resultSetHeader;
-
-            total += affectedRows;
-            insertIdList.push(insertId);
-
-            if (total > 20) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
-        }
-
-        return insertIdList;
-    };
-
-    public createRecipeIngredients = async (
-        conn: PoolConnection,
-        recipeId: number,
-        ingredientList: IngredientDto[],
-    ): Promise<number[]> => {
-        let tmpCreateQuery = `INSERT INTO recipe_ingredient (recipe_id, ingredient_name, ingredient_color, ingredient_amount) VALUES`;
-
-        for (const ingre of ingredientList) {
-            const ingreRowQuery = `(${recipeId}, "${ingre.ingredientName}", "${ingre.ingredientColor}", "${ingre.ingredientAmount}"), `;
-            tmpCreateQuery += ingreRowQuery;
-        }
-
-        const createQuery = tmpCreateQuery.substring(0, tmpCreateQuery.length - 2) + ";";
-
-        const createResult = await conn.query<ResultSetHeader>(createQuery);
-        const [resultSetHeader, _] = createResult;
-
-        if (resultSetHeader.affectedRows !== ingredientList.length)
-            throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
-
-        const insertedIdList = new Array(resultSetHeader.affectedRows)
-            .fill(resultSetHeader.insertId)
-            .map((insertedId, idx) => insertedId + idx);
-
-        return insertedIdList;
-    };
-
-    public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
-        const query = `
-            INSERT INTO user_recipe
-                (user_id, recipe_id)
-            VALUES
-                (?, ?);
-        `;
-
-        const result = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
-
-        const resultSetHeader = result[0];
-        const { affectedRows } = resultSetHeader;
-
-        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
-
-        return JSON.stringify(result[0].insertId);
-    };
-
-    public createRecipeIngredientList = async (conn: PoolConnection, recipeId: number, ingredientIdList: number[]) => {
-        const ingredientString = ingredientIdList.join(",").toString();
-
-        const query = `INSERT INTO recipe_ingredient_list
-                (recipe_id, recipe_ingredient_list)
-            VALUES (${recipeId}, "${ingredientString}");`;
-
-        const result = await conn.query<ResultSetHeader>(query);
-
-        const resultSetHeader = result[0];
-        const { affectedRows, insertId } = resultSetHeader;
-
-        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
-
-        return insertId;
-    };
+    // Get
 
     public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
         const query = `
         SELECT
-            R.recipe_id AS "recipeId", R.title, R.content, R.is_iced AS "isIced", R.cup_size AS "cupSize", R.created_at AS "createdAt", R.updated_at AS "updatedAt",
-            I.ingredient_name AS "ingredientName", I.ingredient_color AS "ingredientColor", I.ingredient_amount AS "ingredientAmount",
-            R.nickname, R.image_url as 'imageUrl', R.resized_url as 'resizedUrl'
+            recipe.recipe_id AS "recipeId", recipe.title, recipe.content, recipe.is_iced AS "isIced", recipe.cup_size AS "cupSize", recipe.created_at AS "createdAt", recipe.updated_at AS "updatedAt",
+            recipe_ingredient.ingredient_name AS "ingredientName", recipe_ingredient.ingredient_color AS "ingredientColor", recipe_ingredient.ingredient_amount AS "ingredientAmount",
+            recipe.nickname, recipe.image_url AS 'imageUrl', recipe.resized_url AS 'resizedUrl'
         FROM 
             (
                 SELECT 
@@ -186,13 +91,13 @@ export class RecipeRepository {
                 ON user_recipe.user_id = user.user_id
                 LEFT OUTER JOIN recipe
                 ON user_recipe.recipe_id = recipe.recipe_id
-            ) R
+            ) recipe
         LEFT OUTER JOIN
             (
                 SELECT *
-                FROM recipe_ingredient I
-            ) I
-        ON R.recipe_id = I.recipe_id
+                FROM recipe_ingredient recipe_ingredient
+            ) recipe_ingredient
+        ON recipe.recipe_id = recipe_ingredient.recipe_id
         `;
 
         const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
@@ -200,7 +105,7 @@ export class RecipeRepository {
         return result;
     };
 
-    public getRecipes = async (conn: PoolConnection, page: number, count: number): Promise<IRecipeCombinedPacket[]> => {
+    public getRecipes = async (conn: PoolConnection, getRecipeDto: GetRecipeDto): Promise<IRecipeCombinedPacket[]> => {
         const selectQuery = `
         SELECT    
             recipe.recipe_id as recipeId,
@@ -219,7 +124,7 @@ export class RecipeRepository {
                 recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
             FROM recipe
             ORDER BY recipe_id desc
-            LIMIT ${count} OFFSET ${(page - 1) * count}
+            LIMIT ${getRecipeDto.count} OFFSET ${(getRecipeDto.page - 1) * getRecipeDto.count}
         ) recipe
         LEFT OUTER JOIN user_recipe
             ON recipe.recipe_id = user_recipe.recipe_id
@@ -249,76 +154,7 @@ export class RecipeRepository {
         return result;
     };
 
-    public deleteRecipe = async (conn: PoolConnection, recipeId: number): Promise<object> => {
-        const query = `
-            DELETE FROM recipe
-            WHERE recipe_id = ?;
-        `;
-
-        const [result] = await conn.query(query, recipeId);
-
-        return result;
-    };
-
-    public deleteRecipeIngredient = async (conn: PoolConnection, recipeId: number) => {
-        const query = `
-            DELETE FROM recipe_ingredient
-            WHERE recipe_id = ?;
-        `;
-
-        const [result] = await conn.query(query, recipeId);
-
-        return result;
-    };
-
-    public updateRecipe = async (
-        conn: PoolConnection,
-        updateRecipeDto: UpdateRecipeDto,
-        recipeId: number,
-    ): Promise<object> => {
-        const query = `
-            UPDATE recipe
-            SET
-                title = ?, content = ?, is_iced = ?, is_public = ?
-            WHERE recipe_id = ?
-        `;
-
-        const [result] = await conn.query(query, [
-            updateRecipeDto.title,
-            updateRecipeDto.content,
-            updateRecipeDto.isIced,
-            updateRecipeDto.isPublic,
-            recipeId,
-        ]);
-
-        return result;
-    };
-
-    public likeRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
-        const query = `
-            INSERT INTO user_like_recipe
-                (user_id, recipe_id)
-            VALUES
-                (?, ?);
-        `;
-
-        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
-
-        return true;
-    };
-
-    public disRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<boolean> => {
-        const query = `
-            DELETE FROM user_like_recipe
-            WHERE user_id = ? AND recipe_id = ?
-        `;
-
-        const [result] = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
-
-        return true;
-    };
-
-    public getMyRecipeByUserid = async (
+    public getMyRecipeByUserId = async (
         conn: PoolConnection,
         userId: number,
         page: number,
@@ -380,5 +216,184 @@ export class RecipeRepository {
         const [iRecipePacket, _] = selectResult;
 
         return iRecipePacket;
+    };
+
+    // Create
+
+    public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
+        const query = `
+            INSERT INTO recipe
+                (cup_size, title, content, is_iced, is_public)
+            VALUES
+                ("${recipeDto.cupSize}", "${recipeDto.title}", "${recipeDto.content}", ${recipeDto.isIced}, ${recipeDto.isPublic});
+        `;
+
+        const result = await conn.query<ResultSetHeader>(query);
+        const resultSetHeader = result[0];
+        const { affectedRows, insertId } = resultSetHeader;
+
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+
+        return insertId;
+    };
+
+    /** @deprecated */
+    public createRecipeIngredientLegacy = async (
+        conn: PoolConnection,
+        ingredientList: Array<object>,
+    ): Promise<number[]> => {
+        const query = `
+            INSERT INTO recipe_ingredient SET ?
+        `;
+
+        let total = 0;
+        const insertIdList: number[] = [];
+
+        for (let i = 0; i < ingredientList.length; i++) {
+            const result = await conn.query<ResultSetHeader>(query, ingredientList[i]);
+
+            const resultSetHeader = result[0];
+            const { affectedRows, insertId } = resultSetHeader;
+
+            total += affectedRows;
+            insertIdList.push(insertId);
+
+            if (total > 20) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+        }
+
+        return insertIdList;
+    };
+
+    public createRecipeIngredients = async (
+        conn: PoolConnection,
+        recipeId: number,
+        ingredientList: IngredientDto[],
+    ): Promise<number[]> => {
+        let tmpCreateQuery = `INSERT INTO recipe_ingredient (recipe_id, ingredient_name, ingredient_color, ingredient_amount) VALUES`;
+
+        for (const ingre of ingredientList) {
+            const ingreRowQuery = `(${recipeId}, "${ingre.ingredientName}", "${ingre.ingredientColor}", "${ingre.ingredientAmount}"), `;
+            tmpCreateQuery += ingreRowQuery;
+        }
+
+        const createQuery = tmpCreateQuery.substring(0, tmpCreateQuery.length - 2) + ";";
+
+        const createResult = await conn.query<ResultSetHeader>(createQuery);
+        const [resultSetHeader, _] = createResult;
+
+        if (resultSetHeader.affectedRows !== ingredientList.length)
+            throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+
+        const insertedIdList = new Array(resultSetHeader.affectedRows)
+            .fill(resultSetHeader.insertId)
+            .map((insertedId, idx) => insertedId + idx);
+
+        return insertedIdList;
+    };
+
+    public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
+        const query = `
+            INSERT INTO user_recipe
+                (user_id, recipe_id)
+            VALUES
+                (?, ?);
+        `;
+
+        const result = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
+
+        const resultSetHeader = result[0];
+        const { affectedRows } = resultSetHeader;
+
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+
+        return JSON.stringify(result[0].insertId);
+    };
+
+    public createRecipeIngredientList = async (conn: PoolConnection, recipeId: number, ingredientIdList: number[]) => {
+        const ingredientString = ingredientIdList.join(",").toString();
+
+        const query = `INSERT INTO recipe_ingredient_list
+                (recipe_id, recipe_ingredient_list)
+            VALUES (${recipeId}, "${ingredientString}");`;
+
+        const result = await conn.query<ResultSetHeader>(query);
+
+        const resultSetHeader = result[0];
+        const { affectedRows, insertId } = resultSetHeader;
+
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+
+        return insertId;
+    };
+
+    // Update
+
+    public updateRecipeById = async (conn: PoolConnection, updateRecipeDto: UpdateRecipeDto): Promise<object> => {
+        const query = `
+            UPDATE recipe
+            SET
+                title = ?, content = ?, is_iced = ?, is_public = ?
+            WHERE recipe_id = ?
+        `;
+
+        const [result] = await conn.query(query, [
+            updateRecipeDto.title,
+            updateRecipeDto.content,
+            updateRecipeDto.isIced,
+            updateRecipeDto.isPublic,
+            updateRecipeDto.recipeId,
+        ]);
+
+        return result;
+    };
+
+    // Delete
+
+    public deleteRecipeById = async (conn: PoolConnection, recipeId: number): Promise<object> => {
+        const query = `
+            DELETE FROM recipe
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
+
+        return result;
+    };
+
+    public deleteRecipeIngredientById = async (conn: PoolConnection, recipeId: number) => {
+        const query = `
+            DELETE FROM recipe_ingredient
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query(query, recipeId);
+
+        return result;
+    };
+
+    // Special
+
+    public likeRecipe = async (conn: PoolConnection, likeRecipeDto: DeleteRecipeDto): Promise<boolean> => {
+        const query = `
+            INSERT INTO user_like_recipe
+                (user_id, recipe_id)
+            VALUES
+                (?, ?);
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [likeRecipeDto.userId, likeRecipeDto.recipeId]);
+
+        return true;
+    };
+
+    public disLikeRecipe = async (conn: PoolConnection, dislikeRecipeDto: DeleteRecipeDto): Promise<boolean> => {
+        const query = `
+            DELETE FROM user_like_recipe
+            WHERE user_id = ? AND recipe_id = ?
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(query, [dislikeRecipeDto.userId, dislikeRecipeDto.recipeId]);
+
+        return true;
     };
 }

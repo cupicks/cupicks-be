@@ -1,6 +1,6 @@
 import { RequestHandler, Request, Response } from "express";
 
-import { CustomException, UnkownTypeError, ValidationException } from "../../models/_.loader";
+import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 import {
     CreateCommentDto,
     DeleteCommentDto,
@@ -18,6 +18,7 @@ export default class CommentController {
     constructor() {
         this.commentService = new CommentService();
     }
+    // Create
 
     public createComment: RequestHandler = async (req: Request, res: Response) => {
         try {
@@ -45,7 +46,7 @@ export default class CommentController {
                     recipeId: validator.recipeId,
                     commentId: createComment.commentId,
                     imageUrl: validator.imageUrl ? validator.imageUrl : null,
-                    resizedUrl: validator.resizedUrl ? validator.recipeId : null,
+                    resizedUrl: validator.resizedUrl ? validator.resizedUrl : null,
                     createdAt: createComment.createdAt,
                     updatedAt: createComment.updatedAt,
                 },
@@ -55,34 +56,43 @@ export default class CommentController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
 
-    public deleteComment: RequestHandler = async (req: Request, res: Response) => {
+    // Get
+
+    public getComments: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const validator: DeleteCommentDto = await new JoiValidator().validateAsync<DeleteCommentDto>(
-                new DeleteCommentDto({
-                    userId: res.locals.userId,
-                    commentId: Number(req.params.commentId),
+            const validator = await new JoiValidator().validateAsync<GetCommentDto>(
+                new GetCommentDto({
+                    recipeId: Number(req.query.recipeId),
+                    page: Number(req.query.page),
+                    count: Number(req.query.count),
                 }),
             );
 
-            await this.commentService.deleteComment(validator);
+            const getComments: ICommentPacket[] = await this.commentService.getComments(validator);
 
             return res.status(200).json({
                 isSuccess: true,
-                message: "댓글 삭제에 성공하였습니다.",
+                message: "댓글 전체 조회에 성공했습니다.",
+                commentList: getComments,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
+
+    // Update
 
     public updateComment: RequestHandler = async (req: Request, res: Response) => {
         try {
@@ -120,39 +130,44 @@ export default class CommentController {
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
 
-    public getComments: RequestHandler = async (req: Request, res: Response) => {
+    // Delete
+
+    public deleteComment: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const validator = await new JoiValidator().validateAsync<GetCommentDto>(
-                new GetCommentDto({
-                    recipeId: Number(req.query.recipeId),
-                    page: Number(req.query.page),
-                    count: Number(req.query.count),
+            const validator: DeleteCommentDto = await new JoiValidator().validateAsync<DeleteCommentDto>(
+                new DeleteCommentDto({
+                    userId: res.locals.userId,
+                    commentId: Number(req.params.commentId),
                 }),
             );
 
-            const getComments: ICommentPacket[] = await this.commentService.getComments(validator);
+            await this.commentService.deleteComment(validator);
 
             return res.status(200).json({
                 isSuccess: true,
-                message: "댓글 전체 조회에 성공했습니다.",
-                commentList: getComments,
+                message: "댓글 삭제에 성공하였습니다.",
             });
         } catch (err) {
+            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
                 message: exception.message,
+                errorCode: exception.errorCode,
+                ...exception.errorResult,
             });
         }
     };
 
     public errorHandler = (err: unknown): CustomException => {
         if (err instanceof CustomException) return err;
-        else if (err instanceof Error) return new ValidationException(err.message);
+        else if (err instanceof Error) return new UnkownError(err.message);
         else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
     };
 }

@@ -43,7 +43,8 @@ export class ProfileService {
             if (editDto.password) editDto.password = this.bcryptProvider.hashPassword(editDto.password);
 
             const isExists = await this.authRepository.isExistsById(conn, editDto.userId);
-            if (isExists === false) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessTokne 입니다.`, "AUTH-007-01");
 
             if (editDto.imageUrl && editDto.resizedUrl) {
                 const imageKey = editDto.imageUrl.split("/")[4];
@@ -70,9 +71,9 @@ export class ProfileService {
             await conn.beginTransaction();
 
             const user = await this.authRepository.findUserById(conn, geMyRecipeDto.userId);
-            if (user === null) throw new NotFoundException("이미 탈퇴한 사용자의 토큰입니다.");
+            if (user === null) throw new NotFoundException("이미 탈퇴한 사용자의 AccessToken 입니다.", "AUTH-007-01");
 
-            const myRecipeList = await this.recipeRepository.getMyRecipeByUserid(
+            const myRecipeList = await this.recipeRepository.getLikeRecipeByUserid(
                 conn,
                 geMyRecipeDto.userId,
                 geMyRecipeDto.page,
@@ -130,7 +131,7 @@ export class ProfileService {
             await conn.beginTransaction();
 
             const user = await this.authRepository.findUserById(conn, getLikeRecipeDto.userId);
-            if (user === null) throw new NotFoundException(`이미 탈퇴한 사용자의 토큰입니다.`);
+            if (user === null) throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const myRecipeList = await this.recipeRepository.getLikeRecipeByUserid(
                 conn,

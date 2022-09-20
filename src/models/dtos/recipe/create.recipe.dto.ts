@@ -13,6 +13,7 @@ export interface ICreateRecipeDto {
     isPublic: boolean;
     ingredientList: IngredientDto[];
     userId: number;
+    recipeId?: number;
 }
 
 export class CreateRecipeDto extends RequestQueryExtractor<string> implements IBaseDto {
@@ -24,7 +25,7 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
     ingredientList: IngredientDto[];
     userId: number;
 
-    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [] }: ICreateRecipeDto, userId: number) {
+    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [], userId }: ICreateRecipeDto) {
         super();
         this.title = title;
         this.content = content;
@@ -33,7 +34,6 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
         this.userId = userId;
-        // 클래스가 아닙니다.
     }
 
     getJoiInstance(): ObjectSchema<CreateRecipeDto> {

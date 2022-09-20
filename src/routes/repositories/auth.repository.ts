@@ -188,7 +188,7 @@ export class AuthRepository {
         const [resultSetHeader] = insertReuslt;
         const { affectedRows, insertId } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
         return insertId;
     };
 
@@ -210,7 +210,7 @@ export class AuthRepository {
         const userResultSetHeader = createdUserResult[0];
 
         const { affectedRows, insertId } = userResultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         const userId = insertId;
 
@@ -224,7 +224,7 @@ export class AuthRepository {
         const resultSetHeader = createdResult[0];
 
         const { affectedRows } = resultSetHeader;
-        if (affectedRows !== 1) throw new Error("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     /** @deprecated */
@@ -234,15 +234,16 @@ export class AuthRepository {
 
         const userRefreshTokenResultSetHeader = createdUserRefreshTokenResutl[0];
         const { affectedRows } = userRefreshTokenResultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     // update
 
     private getUpdateUserQuery = (editDto: EditProfileDto): string => {
         const { userId, nickname, password, imageUrl, resizedUrl } = editDto;
+
         if (!nickname && !password && !imageUrl)
-            throw new BadRequestException(`회원 정보 수정을 위한 값이 하나도 들어있지 않습니다.`);
+            throw new BadRequestException(`회원 정보 수정을 위한 값이 하나도 들어있지 않습니다.`, "PROFILE-001");
 
         let queryString = `UPDATE user SET`;
         if (nickname) queryString += ` nickname =  "${nickname}",`;
@@ -262,7 +263,7 @@ export class AuthRepository {
 
         const [ResultSetHeader, _] = updateResult;
         const { affectedRows } = ResultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     public updateUserRefreshToken = async (
@@ -278,7 +279,7 @@ export class AuthRepository {
 
         const [ResultSetHeader, _] = updateResult;
         const { affectedRows } = ResultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     public updateUserPassword = async (conn: PoolConnection, email: string, hashedPassword: string): Promise<void> => {
@@ -287,7 +288,7 @@ export class AuthRepository {
 
         const [ResultSetHeader, _] = updateResult;
         const { affectedRows } = ResultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     public updateUserResetPassword = async (
@@ -310,7 +311,7 @@ export class AuthRepository {
 
         const [ResultSetHeader, _] = updateResult;
         const { affectedRows } = ResultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     // exipre
@@ -334,7 +335,7 @@ export class AuthRepository {
         const [resultSetHeader, _] = exceedResult;
         const { affectedRows } = resultSetHeader;
 
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 
     /** @deprecated */
@@ -345,6 +346,6 @@ export class AuthRepository {
 
         const [ResultSetHeader, _] = updateResult;
         const { affectedRows } = ResultSetHeader;
-        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행 된 것 같습니다.");
+        if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
 }

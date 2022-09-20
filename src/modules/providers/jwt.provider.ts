@@ -214,7 +214,7 @@ export class JwtProvider {
 
     private errorHandler = (err: unknown): CustomException => {
         if (err instanceof CustomException) return err;
-        else if (err instanceof Error) return new JwtAuthorizationException(err.message);
+        else if (err instanceof Error) return new JwtAuthorizationException(err.message, "REQUEST_JWT_FAIL");
         else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
     };
 }
