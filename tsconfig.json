@@ -1,29 +1,43 @@
 {
-    "compilerOptions": {
-      "strict": true,
-      "module": "commonjs",
-      "declaration": true,
-      "removeComments": true,
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "allowSyntheticDefaultImports": true,
-      "target": "ES5",
-      "sourceMap": true,
-      "outDir": "./dist",
-      "baseUrl": "./src",
-      "incremental": true,
-      "moduleResolution": "node",
-      "downlevelIteration": true
-    },
-    "include": ["src"],
-    "exclude": [
-      "**/node_module",
+  // tsc --watch 용 tsconfig.json
+  "compilerOptions": {
+    "allowJs": true,
+    
+    "strict": true,
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES5",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "incremental": true,
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+
+    // nest-cli 에서 카피
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  },
+  "include": [
+      "src"
+  ],
+  "exclude": [
       ".github",
       ".husky",
       "coverage",
       "dist",
+      "docs",
       "key",
-      "sql"
-    ]
-  }
-  
+      "node_modules",
+      "scripts",
+      "sql",
+      "test"
+  ]
+}

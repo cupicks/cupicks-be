@@ -8,13 +8,14 @@ USE cupick;
 
 DROP TABLE IF EXISTS user_recipe;
 DROP TABLE IF EXISTS user_like_recipe;
-DROP TABLE IF EXISTS user_favor_recipe;
-DROP TABLE IF EXISTS user_disfavor_recipe;
+DROP TABLE IF EXISTS user_favor_category_list;
+DROP TABLE IF EXISTS user_disfavor_category_list;
 
 
 -- 차상위 recipe 엔티티 제거
 DROP TABLE IF EXISTS recipe_ingredient_list;
 DROP TABLE IF EXISTS recipe_ingredient;
+DROP TABLE IF EXISTS recipe_category;
 
 
 -- 차상위 comment 엔티티 제거
@@ -30,7 +31,11 @@ DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS recipe;
 
 DROP TABLE IF EXISTS user_verify_list;
+DROP TABLE IF EXISTS category;
 
+CREATE TABLE IF NOT EXISTS category (
+    name            VARCHAR(20) PRIMARY KEY
+);
 
 CREATE TABLE IF NOT EXISTS user_verify_list (
     user_verify_list_id         INT              NOT NULL    PRIMARY KEY AUTO_INCREMENT,
@@ -76,12 +81,24 @@ CREATE TABLE IF NOT EXISTS recipe (
     content     VARCHAR(255)        NOT NULL,
     is_iced     BOOLEAN             NOT NULL,
     is_public   BOOLEAN             NOT NULL,
-    created_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP
+    created_at  DATETIME            NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME            NOT NULL    DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS recipe_category (
+    recipe_category_id      INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    recipe_id               INT             NOT NULL,
+    category_name           VARCHAR(20)     NOT NULL,
+    FOREIGN KEY (category_name) REFERENCES category (name)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS recipe_ingredient_list (
-    recipe_id               INT PRIMARY KEY,
+    recipe_id               INT             PRIMARY KEY,
     recipe_ingredient_list  VARCHAR(255),
     FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id)
         ON UPDATE CASCADE
@@ -89,11 +106,11 @@ CREATE TABLE IF NOT EXISTS recipe_ingredient_list (
 );
 
 CREATE TABLE IF NOT EXISTS recipe_ingredient (
-    recipe_ingredient_id    INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
-    recipe_id               INT         NOT NULL,
-    ingredient_name         VARCHAR(20) NOT NULL,
-    ingredient_color        VARCHAR(7)  NOT NULL,
-    ingredient_amount       VARCHAR(3)  NOT NULL,
+    recipe_ingredient_id    INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    recipe_id               INT             NOT NULL,
+    ingredient_name         VARCHAR(20)     NOT NULL,
+    ingredient_color        VARCHAR(7)      NOT NULL,
+    ingredient_amount       VARCHAR(3)      NOT NULL,
     FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -127,17 +144,17 @@ CREATE TABLE IF NOT EXISTS user_like_recipe (
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS user_favor_recipe (
+CREATE TABLE IF NOT EXISTS user_favor_category_list (
     user_id                 INT             NOT NULL    PRIMARY KEY,
-    recipe_ingredient_list  VARCHAR(255)    NOT NULL,
+    category_name           VARCHAR(255)    NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS user_disfavor_recipe (
+CREATE TABLE IF NOT EXISTS user_disfavor_category_list (
     user_id                 INT         NOT NULL    PRIMARY KEY,
-    recipe_ingredient_list  VARCHAR(255)    NOT NULL,
+    category_name           VARCHAR(255)    NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -156,10 +173,10 @@ CREATE TABLE IF NOT EXISTS comment (
 );
 
 CREATE TABLE IF NOT EXISTS recipe_comment (
-    recipe_comment_id      INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
-    user_id             INT         NOT NULL,
-    recipe_id            INT         NOT NULL,
-    comment_id          INT         NOT NULL,
+    recipe_comment_id       INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
+    user_id                 INT         NOT NULL,
+    recipe_id               INT         NOT NULL,
+    comment_id              INT         NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
