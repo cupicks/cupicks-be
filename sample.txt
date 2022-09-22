@@ -1,1 +1,0 @@
-Automated-Jest 의 cache 테스트를 위한 더미 파일
