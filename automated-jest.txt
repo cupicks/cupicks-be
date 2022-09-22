@@ -1,1 +1,0 @@
-Automated-Jest 테스트용 더미 파일 1회차
