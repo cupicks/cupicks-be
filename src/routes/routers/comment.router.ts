@@ -3,7 +3,7 @@ import { Router } from "express";
 import { CommentController } from "../controllers/_.exporter";
 import { formDataFilter, applicationJsonFilter } from "../../middlewares/filters/_.exporter";
 import { preventUnLoginUserGuard } from "../../middlewares/guards/_.exporter";
-import { multerMiddlewareForProfile, multerMiddlewareForComment } from "../../middlewares/multer.middleware";
+import { multerMiddlewareForProfile, multerMiddlewareForComment } from "../../middlewares/middlewares/_.exporter";
 
 const commentRouter: Router = Router();
 

@@ -7,7 +7,7 @@ import { preventLoginUserGuard, preventUnLoginUserGuard } from "../../middleware
 // } from "../../middlewares/filters/_.exporter";
 import { AuthController } from "../controllers/_.exporter";
 import { MulterProvider } from "../../modules/_.loader";
-import { multerMiddlewareForProfile } from "../../middlewares/multer.middleware";
+import { multerMiddlewareForProfile } from "../../middlewares/middlewares/_.exporter";
 
 const authRouter: Router = Router();
 authRouter.post(
