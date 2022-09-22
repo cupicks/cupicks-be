@@ -1,3 +1,4 @@
+import { tokenMiddleware } from "./token.middleware";
 import { multerMiddlewareForComment, multerMiddlewareForProfile } from "./multer.middleware";
 
-export { multerMiddlewareForComment, multerMiddlewareForProfile };
+export { tokenMiddleware, multerMiddlewareForComment, multerMiddlewareForProfile };
