@@ -61,6 +61,7 @@ import { IRecipePacket } from "./packets/i.recipe.packet";
 import { IRecipeCombinedPacket } from "./packets/i.recipe.combined.packet";
 import { IRecipeIngredientPacket } from "./packets/i.recipe.ingredient.packet";
 import { IRecipeIngredientListPacket } from "./packets/i.recipe.ingredient.list.packet";
+import { IRecipeLikePacket } from "./packets/i.recipe.like.packet";
 
 // PACKET - COMMENT
 import { ICommentPacket } from "./packets/i.comment.packet";
@@ -76,6 +77,7 @@ export {
     IUserRefresthTokenPacket,
     IUserVerifyListPacket,
     IRecipePacket,
+    IRecipeLikePacket,
     IRecipeCombinedPacket,
     IRecipeIngredientPacket,
     IRecipeIngredientListPacket,

@@ -12,16 +12,16 @@
     "build": "tsc -p tsconfig.build.json",
     "prestart": "npm run build",
     "start": "pm2 start ecosystem.config.js --env production",
-    "start:dev": "tsc -p tsconfig.json --watch | cross-env NODE_ENV=dev nodemon \"dist/server.js\"",
-    "test": "cross-env NODE_ENV=test jest",
-    "test:watch": "cross-env NODE_ENV=test jest --findRelatedTests test/unit/ --runInBand --silent --watch",
-    "test:unit": "cross-env NODE_ENV=test jest --findRelatedTests test/unit/ --runInBand --silent",
-    "test:unit:watch": "cross-env NODE_ENV=test jest --findRelatedTests test/unit/ --silent --watch",
-    "test:int": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --findRelatedTests test/integration/ --silent",
-    "test:int:watch": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --findRelatedTests test/integration/ --silent --watch",
-    "test:e2e": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --findRelatedTests test/e2e/ --silent",
-    "test:e2e:watch": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --findRelatedTests test/e2e/ --silent --watch",
-    "test:cov": "cross-env NODE_ENV=test jest --findRelatedTests test/ --runInBand --coverage --silent",
+    "start:dev": "cross-env NODE_ENV=dev tsc-watch --onSuccess \"node dist/server.js\"",
+    "test": "cross-env NODE_ENV=test jest --config ./jest.config.json",
+    "test:watch": "cross-env NODE_ENV=test jest --config ./jest.config.json --watch",
+    "test:unit": "cross-env NODE_ENV=test jest --config ./jest/jest.config.unit.json",
+    "test:int": "cross-env NODE_ENV=test jest --config ./jest/jest.config.int.json",
+    "test:e2e": "cross-env NODE_ENV=test jest --config ./jest/jest.config.e2e.json",
+    "test:unit:watch": "cross-env NODE_ENV=test jest --config ./jest/jest.config.unit.json --watch",
+    "test:int:watch": "cross-env NODE_ENV=test jest --config ./jest/jest.config.int.json --watch",
+    "test:e2e:watch": "cross-env NODE_ENV=test jest --config ./jest/jest.config.e2e.json  --watch",
+    "test:cov": "cross-env NODE_ENV=test jest --config ./jest.config.json --runInBand --coverage",
     "test:clear": "jest --clearCache",
     "prepare": "husky install"
   },
@@ -74,28 +74,5 @@
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
     "*.{ts}": "prettier --write"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": ".",
-    "testRegex": ".*\\.test\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "testEnvironment": "node",
-    "coverageDirectory": "./coverage",
-    "coveragePathIgnorePatterns": [
-      "dist/",
-      "backup/",
-      "backup_integration/",
-      "coverage/lcov-report"
-    ],
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ]
   }
 }

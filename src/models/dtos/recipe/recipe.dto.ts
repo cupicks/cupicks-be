@@ -14,6 +14,7 @@ export interface IRecipeDto {
     createdAt: string;
     updatedAt: string;
     ingredientList: IIngredientDto[];
+    isLiked?: boolean;
 }
 
 export class RecipeDto implements IRecipeDto {
@@ -28,6 +29,7 @@ export class RecipeDto implements IRecipeDto {
     createdAt: string;
     updatedAt: string;
     ingredientList: IIngredientDto[];
+    isLiked: boolean;
 
     constructor({
         recipeId,
@@ -41,6 +43,7 @@ export class RecipeDto implements IRecipeDto {
         createdAt,
         updatedAt,
         ingredientList,
+        isLiked,
     }: IRecipeDto) {
         this.recipeId = recipeId;
 
@@ -55,5 +58,6 @@ export class RecipeDto implements IRecipeDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.ingredientList = ingredientList;
+        this.isLiked = isLiked;
     }
 }
