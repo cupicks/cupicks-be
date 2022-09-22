@@ -102,10 +102,13 @@ export default class RecipeController {
 
     public getRecipes: RequestHandler = async (req: Request, res: Response) => {
         try {
+            res.locals.userId = null;
+
             const getRecipesValidator = await new JoiValidator().validateAsync<GetRecipeDto>(
                 new GetRecipeDto({
                     page: Number(req.query.page),
                     count: Number(req.query.count),
+                    userId: res.locals.userId,
                 }),
             );
 
@@ -206,7 +209,7 @@ export default class RecipeController {
             await this.recipeService.likeRecipe(likeRecipeValidator);
 
             return res.status(201).json({
-                isSuccess: false,
+                isSuccess: true,
                 message: "좋아요에 성공하셨습니다",
             });
         } catch (err) {
@@ -233,7 +236,7 @@ export default class RecipeController {
             await this.recipeService.disLikeRecipe(disLikeRecipeValidator);
 
             return res.status(201).json({
-                isSuccess: false,
+                isSuccess: true,
                 message: `좋아요 취소에 성공하셨습니다.`,
             });
         } catch (err) {

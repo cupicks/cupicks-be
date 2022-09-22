@@ -3,6 +3,7 @@ import {
     IngredientDto,
     IRecipeCombinedPacket,
     IRecipePacket,
+    IRecipeLikePacket,
     UnkownError,
     UpdateRecipeDto,
     GetRecipeDto,
@@ -133,8 +134,6 @@ export class RecipeRepository {
         const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
         const [recipePackets, _] = selectResult;
 
-        console.log(recipePackets);
-
         return recipePackets;
     };
 
@@ -216,6 +215,25 @@ export class RecipeRepository {
         const [iRecipePacket, _] = selectResult;
 
         return iRecipePacket;
+    };
+
+    public getMyLikeRecipeIds = async (conn: PoolConnection, userId: number | null): Promise<IRecipeLikePacket[]> => {
+        const selectQuery = `
+            SELECT user_like_recipe.recipe_id as recipeId
+            FROM (
+                SELECT user.user_id
+                FROM user
+            ) user
+            JOIN user_like_recipe
+            ON user.user_id = user_like_recipe.user_id
+            WHERE user.user_id = ?;
+        `;
+
+        const selectResult = await conn.query<IRecipeLikePacket[]>(selectQuery, [userId]);
+
+        const [recipePackets, _] = selectResult;
+
+        return recipePackets;
     };
 
     // Create

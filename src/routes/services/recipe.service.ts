@@ -3,6 +3,7 @@ import {
     CreateRecipeDto,
     IIngredientDto,
     IngredientDto,
+    IRecipeLikePacket,
     IRecipeIngredientPacket,
     IRecipeCombinedPacket,
     NotFoundException,
@@ -101,6 +102,16 @@ export class RecipeService {
                 //     recipeIdList,
                 // );
 
+                const myLikeRecipeIds: IRecipeLikePacket[] = await this.recipeRepository.getMyLikeRecipeIds(
+                    conn,
+                    getRecipeDto.userId,
+                );
+                const myLikeRecipeIdList = [];
+
+                for (const value of myLikeRecipeIds) {
+                    myLikeRecipeIdList.push(value.recipeId);
+                }
+
                 const recipeIngredientList: IRecipeIngredientPacket[][] = await Promise.all(
                     recipeIdList.map(
                         async (recipeId) =>
@@ -129,6 +140,7 @@ export class RecipeService {
                         nickname: recipeList[i].nickname,
                         imageUrl: recipeList[i].imageUrl,
                         resizedUrl: recipeList[i].resizedUrl,
+                        isLiked: myLikeRecipeIdList.includes(recipeList[i].recipeId) ? true : false,
                     });
                     recipeDtoList.push(recipeDto);
                 }
