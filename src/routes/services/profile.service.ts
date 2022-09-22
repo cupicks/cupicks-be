@@ -109,6 +109,7 @@ export class ProfileService {
                     nickname: user.nickname,
                     imageUrl: user.imageUrl,
                     resizedUrl: user.resizedUrl,
+                    isLiked: myRecipeList[i].isLiked === 1,
                 });
 
                 recipeDtoList.push(recipeDto);
@@ -169,6 +170,7 @@ export class ProfileService {
                     nickname: user.nickname,
                     imageUrl: user.imageUrl,
                     resizedUrl: user.resizedUrl,
+                    isLiked: myRecipeList[i].isLiked === 1,
                 });
 
                 recipeDtoList.push(recipeDto);
