@@ -14,6 +14,8 @@ export class DtoFactory {
         resizedUrl: string | undefined;
         nicknameVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
         emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }): Promise<SignupUserDto> {
         return await this.joiValidator.validateAsync<SignupUserDto>(new SignupUserDto(iDto));
     }
