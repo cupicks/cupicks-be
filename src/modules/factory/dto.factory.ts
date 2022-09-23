@@ -87,42 +87,89 @@ export class DtoFactory {
     }
 
     // RECIPE
-    public async getCreateRecipeDto() {
-        //
+    public async getCreateRecipeDto(iDto: {
+        title: string;
+        content: string;
+        isIced: boolean;
+        cupSize: number;
+        isPublic: boolean;
+        ingredientList: IIngredientDto[];
+        userId: number;
+    }): Promise<CreateRecipeDto> {
+        return await this.joiValidator.validateAsync<CreateRecipeDto>(new CreateRecipeDto(iDto));
     }
-    public async getUpdateRecipeDto() {
-        //
+    public async getUpdateRecipeDto(iDto: {
+        title: string;
+        content: string;
+        isIced: boolean;
+        isPublic: boolean;
+        ingredientList: IngredientDto[];
+        userId: number;
+        recipeId: number;
+    }): Promise<UpdateRecipeDto> {
+        return await this.joiValidator.validateAsync<UpdateRecipeDto>(new UpdateRecipeDto(iDto));
     }
-    public async getIngredientDto() {
-        //
+    public async getIngredientDto(iDto: {
+        ingredientName: string;
+        ingredientColor: string;
+        ingredientAmount: string;
+    }): Promise<IngredientDto> {
+        return await new IngredientDto(iDto);
     }
-    public async getCommonRecipeDto() {
-        //
+    public async getCommonRecipeDto(iDto: { recipeId: number }): Promise<CommonRecipeDto> {
+        return await this.joiValidator.validateAsync<CommonRecipeDto>(new CommonRecipeDto(iDto));
     }
-    public async getDeleteRecipeDto() {
-        //
+    public async getDeleteRecipeDto(iDto: { userId: number; recipeId: number }): Promise<DeleteRecipeDto> {
+        return await this.joiValidator.validateAsync<DeleteRecipeDto>(new DeleteRecipeDto(iDto));
     }
-    public async getGetRecipeDto() {
-        //
+    public async getGetRecipeDto(iDto: { page: number; count: number; userId: number | null }): Promise<GetRecipeDto> {
+        return await this.joiValidator.validateAsync<GetRecipeDto>(new GetRecipeDto(iDto));
     }
-    public async getRecipeDto() {
-        //
+    public async getRecipeDto(iDto: { page: number; count: number; userId: number | null }): Promise<GetRecipeDto> {
+        return await this.joiValidator.validateAsync<GetRecipeDto>(new GetRecipeDto(iDto));
     }
-    public async getIRecipeDto() {
-        //
+    public async getIRecipeDto(iDto: {
+        recipeId: number;
+        nickname: string;
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+        title: string;
+        content: string;
+        isIced: 0 | 1;
+        cupSize: string;
+        createdAt: string;
+        updatedAt: string;
+        ingredientList: IIngredientDto[];
+        isLiked: boolean;
+    }): Promise<RecipeDto> {
+        return new RecipeDto(iDto);
     }
     // COMMENT
-    public async getCreateCommentDto() {
-        //
+    public async getCreateCommentDto(iDto: {
+        userId: number;
+        nickname: string;
+        recipeId: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        comment: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+    }): Promise<CreateCommentDto> {
+        return await this.joiValidator.validateAsync<CreateCommentDto>(new CreateCommentDto(iDto));
     }
-    public async getDeleteCommentDto() {
-        //
+    public async getDeleteCommentDto(iDto: { userId: number; commentId: number }): Promise<DeleteCommentDto> {
+        return await this.joiValidator.validateAsync<DeleteCommentDto>(new DeleteCommentDto(iDto));
     }
-    public async getUpdateCommentDto() {
-        //
+    public async getUpdateCommentDto(iDto: {
+        userId: number;
+        nickname: string;
+        commentId: number;
+        comment: string;
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+    }): Promise<UpdateCommentDto> {
+        return await this.joiValidator.validateAsync<UpdateCommentDto>(new UpdateCommentDto(iDto));
     }
-    public async getGetCommentDto() {
-        //
+    public async getGetCommentDto(iDto: { recipeId: number; page: number; count: number }): Promise<GetCommentDto> {
+        return await this.joiValidator.validateAsync<GetCommentDto>(new GetCommentDto(iDto));
     }
 }
 
@@ -164,4 +211,5 @@ import {
     IEditProfileDto,
     IGetMyRecipeDto,
     GetLikeRecipeDto,
+    IIngredientDto,
 } from "../../models/_.loader";
