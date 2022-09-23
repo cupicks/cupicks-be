@@ -46,12 +46,14 @@ export class ProfileController {
 
             const editDto = await this.dtoFactory.getEditProfileDto({
                 userId: res.locals.userId,
-                nickname: req.query.nickname,
-                password: req.query.password,
-
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
+                nickname: req?.query["nickname"],
+                password: req?.query["password"],
+                favorCategory: req?.query["favorCategory"],
+                disfavorCategory: req?.query["disfavorCategory"],
             });
+
             await this.profileService.editProfile(editDto);
 
             return res.json({

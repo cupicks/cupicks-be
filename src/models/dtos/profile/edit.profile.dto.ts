@@ -4,7 +4,7 @@ import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
-
+import { ERecipeCategory } from "../../enums/_.exporter";
 export interface IEditProfileDto {
     userId: number;
     nickname: string | undefined;
@@ -12,10 +12,12 @@ export interface IEditProfileDto {
 
     imageUrl: string | undefined;
     resizedUrl: string | undefined;
+    favorCategory: ERecipeCategory[];
+    disfavorCategory: ERecipeCategory[];
 }
 
 export class EditProfileDto
-    extends RequestQueryExtractor<"nickname" | "password">
+    extends RequestQueryExtractor<"nickname" | "password" | "favorCategory" | "disfavorCategory">
     implements IBaseDto, IEditProfileDto
 {
     userId: number;
@@ -23,6 +25,8 @@ export class EditProfileDto
     password: string | undefined;
     imageUrl: string | undefined;
     resizedUrl: string | undefined;
+    favorCategory: ERecipeCategory[];
+    disfavorCategory: ERecipeCategory[];
 
     constructor({
         userId,
@@ -30,12 +34,16 @@ export class EditProfileDto
         password,
         imageUrl,
         resizedUrl,
+        favorCategory,
+        disfavorCategory,
     }: {
         userId: number;
         nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
         password: string | string[] | ParsedQs | ParsedQs[] | undefined;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
+        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
         super();
         this.userId = userId;
@@ -44,6 +52,16 @@ export class EditProfileDto
 
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
+
+        const tempFavor = this.getStringSetOrUndefinedFromQuery(favorCategory, "favorCategory")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.favorCategory = tempFavor ?? [];
+
+        const tempDisfavor = this.getStringSetOrUndefinedFromQuery(disfavorCategory, "disfavorCategory")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.disfavorCategory = tempDisfavor ?? [];
     }
 
     getJoiInstance(): ObjectSchema<EditProfileDto> {
@@ -70,6 +88,30 @@ export class EditProfileDto
                 ),
             imageUrl: joi.string().max(255).message("imageUrl 은 255 자 이하여야 합니다."),
             resizedUrl: joi.string().max(255).message("resizedUrl 은 255 자 이하여야 합니다."),
+            favorCategory: joi
+                .array()
+                .items(
+                    joi
+                        .string()
+                        .equal(
+                            ERecipeCategory.milk,
+                            ERecipeCategory.caffein,
+                            ERecipeCategory.lemon,
+                            ERecipeCategory.syrup,
+                        ),
+                ),
+            disfavorCategory: joi
+                .array()
+                .items(
+                    joi
+                        .string()
+                        .equal(
+                            ERecipeCategory.milk,
+                            ERecipeCategory.caffein,
+                            ERecipeCategory.lemon,
+                            ERecipeCategory.syrup,
+                        ),
+                ),
         });
     }
 }

@@ -31,6 +31,7 @@ export class UserCategoryRepository {
             affectedRows,
         };
     };
+
     public createDisfavorCategoryList = async (
         conn: PoolConnection,
         userId: number,
@@ -53,5 +54,16 @@ export class UserCategoryRepository {
             throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         return { insertId, affectedRows };
+    };
+
+    // Delete
+
+    public deleteAllFavorCateogryList = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_favor_category_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
+    };
+    public deleteAllDisfavorCateogryList = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_disfavor_category_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
     };
 }
