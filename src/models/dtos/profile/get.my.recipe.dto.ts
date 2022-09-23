@@ -5,13 +5,13 @@ import { ObjectSchema } from "joi";
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
 
-interface IMyGetRecipeDto {
+export interface IGetMyRecipeDto {
     userId: number;
     page: number;
     count: number;
 }
 
-export class GetMyRecipeDto extends RequestQueryExtractor<"page" | "count"> implements IBaseDto, IMyGetRecipeDto {
+export class GetMyRecipeDto extends RequestQueryExtractor<"page" | "count"> implements IBaseDto, IGetMyRecipeDto {
     userId: number;
     page: number;
     count: number;
