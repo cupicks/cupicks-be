@@ -6,6 +6,7 @@ import { MulterProvider } from "./providers/multer.provider";
 import { AwsSesProvider } from "./providers/aws.ses.provider";
 import { DateProvider } from "./providers/date.provider";
 import { UuidProvider } from "./providers/uuid.provider";
+import { DtoFactory } from "./factory/dto.factory";
 
 import { DayjsProvider } from "./providers/dayjs.provider";
 
@@ -25,4 +26,5 @@ export {
     JoiValidator,
     RandomGenerator,
     UuidProvider,
+    DtoFactory,
 };
