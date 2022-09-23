@@ -13,7 +13,7 @@ import {
     SendPasswordDto,
     ResetPasswordDto,
 } from "../../models/_.loader";
-import { JoiValidator } from "../../modules/_.loader";
+import { DtoFactory, JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
 
 export default class AuthController {
@@ -25,10 +25,12 @@ export default class AuthController {
 
     private authService: AuthService;
     private joiValidator: JoiValidator;
+    private dtoFactory: DtoFactory;
 
     constructor() {
         this.authService = new AuthService();
         this.joiValidator = new JoiValidator();
+        this.dtoFactory = new DtoFactory();
     }
 
     public signup: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,15 +42,13 @@ export default class AuthController {
              *
              * TypeScript 와 Dto 을 사용하고 있다면 class-validator 를 사용하고 미들웨어처럼 만드는 것은 어떨까요?
              */
-            const signupUserDto: SignupUserDto = await this.joiValidator.validateAsync<SignupUserDto>(
-                new SignupUserDto({
-                    imageUrl: file?.location,
-                    resizedUrl: file?.location,
-                    password: req?.query["password"],
-                    emailVerifyToken: req?.query["emailVerifyToken"],
-                    nicknameVerifyToken: req?.query["nicknameVerifyToken"],
-                }),
-            );
+            const signupUserDto: SignupUserDto = await this.dtoFactory.getSignupUserDto({
+                imageUrl: file?.location,
+                resizedUrl: file?.location,
+                password: req?.query["password"],
+                emailVerifyToken: req?.query["emailVerifyToken"],
+                nicknameVerifyToken: req?.query["nicknameVerifyToken"],
+            });
 
             const result = await this.authService.signup(signupUserDto);
 
@@ -72,11 +72,7 @@ export default class AuthController {
 
     public signin: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const singInUserDto: SigninUserDto = await this.joiValidator.validateAsync<SigninUserDto>(
-                new SigninUserDto({
-                    ...req.body,
-                }),
-            );
+            const singInUserDto: SigninUserDto = await this.dtoFactory.getSigninUserDto(req.body);
 
             const { accessToken, refreshToken } = await this.authService.signin(singInUserDto);
 
@@ -101,11 +97,7 @@ export default class AuthController {
 
     public logout: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const logoutUserDto = await this.joiValidator.validateAsync<LogoutUserDto>(
-                new LogoutUserDto({
-                    refreshToken: req?.query["refreshToken"],
-                }),
-            );
+            const logoutUserDto = await this.dtoFactory.getLogoutUserDto({ refreshToken: req?.query["refreshToken"] });
 
             await this.authService.logout(logoutUserDto);
 
@@ -128,12 +120,9 @@ export default class AuthController {
 
     public publishToken: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const publishTokenDto = await this.joiValidator.validateAsync<PublishTokenDto>(
-                new PublishTokenDto({
-                    refreshToken: req?.query["refreshToken"],
-                }),
-            );
-
+            const publishTokenDto = await this.dtoFactory.getPublishTokenDto({
+                refreshToken: req?.query["refreshToken"],
+            });
             const accessToken = await this.authService.publishToken(publishTokenDto);
 
             return res.json({
@@ -156,11 +145,7 @@ export default class AuthController {
 
     public sendEmail: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const sendEmailDto = await this.joiValidator.validateAsync<SendEmailDto>(
-                new SendEmailDto({
-                    email: req?.query["email"],
-                }),
-            );
+            const sendEmailDto = await this.dtoFactory.getSendEmailDto({ email: req?.query["email"] });
 
             const result = await this.authService.sendEmail(sendEmailDto);
 
@@ -185,12 +170,10 @@ export default class AuthController {
 
     public confirmEmailCode: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const confirmEailDto = await this.joiValidator.validateAsync<ConfirmEmailDto>(
-                new ConfirmEmailDto({
-                    email: req?.query["email"],
-                    emailVerifyCode: req?.query["email-verify-code"],
-                }),
-            );
+            const confirmEailDto = await this.dtoFactory.getConfirmEmailDto({
+                email: req?.query["email"],
+                emailVerifyCode: req?.query["email-verify-code"],
+            });
 
             const { emailVerifyToken } = await this.authService.confirmEmailCode(confirmEailDto);
 
@@ -214,12 +197,10 @@ export default class AuthController {
 
     public confirmNickname: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const confirmNicknameDto = await this.joiValidator.validateAsync<ConfirmNicknameDto>(
-                new ConfirmNicknameDto({
-                    emailVerifyToken: req?.query["emailVerifyToken"],
-                    nickname: req?.query["nickname"],
-                }),
-            );
+            const confirmNicknameDto = await this.dtoFactory.getConfirmNicknameDto({
+                emailVerifyToken: req?.query["emailVerifyToken"],
+                nickname: req?.query["nickname"],
+            });
 
             const { nicknameVerifyToken } = await this.authService.confirmNickname(confirmNicknameDto);
 
@@ -243,11 +224,7 @@ export default class AuthController {
 
     public sendPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const snedPasswordDto = await this.joiValidator.validateAsync<SendPasswordDto>(
-                new SendPasswordDto({
-                    email: req?.query["email"],
-                }),
-            );
+            const snedPasswordDto = await this.dtoFactory.getSendPasswordDto({ email: req?.query["email"] });
 
             const result = await this.authService.sendPassword(snedPasswordDto);
 
@@ -272,11 +249,9 @@ export default class AuthController {
 
     public resetPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const snedPasswordDto = await this.joiValidator.validateAsync<ResetPasswordDto>(
-                new ResetPasswordDto({
-                    resetPasswordToken: req?.query["resetPasswordToken"],
-                }),
-            );
+            const snedPasswordDto = await this.dtoFactory.getResetPasswordDto({
+                resetPasswordToken: req?.query["resetPasswordToken"],
+            });
 
             const email = await this.authService.resetPassword(snedPasswordDto);
 
