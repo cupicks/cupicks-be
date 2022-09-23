@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS recipe_category (
     name            VARCHAR(20) PRIMARY KEY
 );
 
+INSERT recipe_category (name) VALUES ('milk', 'caffein', 'lemon', 'syrup');
+
 CREATE TABLE IF NOT EXISTS user_verify_list (
     user_verify_list_id         INT              NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     email                       VARCHAR(100)     NOT NULL    UNIQUE,
