@@ -102,7 +102,7 @@ export default class RecipeController {
 
     public getRecipes: RequestHandler = async (req: Request, res: Response) => {
         try {
-            res.locals.userId = null;
+            // res.locals.userId = null;
 
             const getRecipesValidator = await new JoiValidator().validateAsync<GetRecipeDto>(
                 new GetRecipeDto({
