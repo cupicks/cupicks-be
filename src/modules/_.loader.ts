@@ -15,6 +15,13 @@ import { JoiValidator } from "./validators/joi.validator";
 import { RandomGenerator } from "./generator/random.generator";
 
 export {
+    // Factory
+    DtoFactory,
+
+    // Generator
+    RandomGenerator,
+
+    // Provider
     EnvProvider,
     BcryptProvider,
     MysqlProvider,
@@ -23,8 +30,8 @@ export {
     MulterProvider,
     DateProvider,
     DayjsProvider,
-    JoiValidator,
-    RandomGenerator,
     UuidProvider,
-    DtoFactory,
+
+    // Validator
+    JoiValidator,
 };
