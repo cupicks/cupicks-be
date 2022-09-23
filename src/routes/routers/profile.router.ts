@@ -4,12 +4,12 @@ import { MulterProvider } from "../../modules/_.loader";
 import { preventUnLoginUserGuard } from "../../middlewares/guards/_.exporter";
 import { multerMiddlewareForProfile } from "../../middlewares/middlewares/_.exporter";
 
-import ProfileController from "../controllers/profile.controller";
+import { ProfileController } from "../controllers/_.exporter";
 
-const profileRotuer: Router = Router();
+const profileRouter: Router = Router();
 
-profileRotuer.get("", /* applicationJsonFilter */ new ProfileController().getAllProfilesTemp);
-profileRotuer.patch(
+profileRouter.get("", /* applicationJsonFilter */ new ProfileController().getAllProfilesTemp);
+profileRouter.patch(
     "",
     /* formDataFilter */
     preventUnLoginUserGuard,
@@ -17,7 +17,7 @@ profileRotuer.patch(
     new ProfileController().editProfile,
 );
 
-profileRotuer.get("/my-recipe", preventUnLoginUserGuard, new ProfileController().getMyRecipe);
-profileRotuer.get("/like-recipe", preventUnLoginUserGuard, new ProfileController().getLikeRecipe);
+profileRouter.get("/my-recipe", preventUnLoginUserGuard, new ProfileController().getMyRecipe);
+profileRouter.get("/like-recipe", preventUnLoginUserGuard, new ProfileController().getLikeRecipe);
 
-export default profileRotuer;
+export { profileRouter };

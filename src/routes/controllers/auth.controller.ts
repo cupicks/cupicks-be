@@ -9,7 +9,7 @@ import { DtoFactory } from "../../modules/_.loader";
 
 import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 
-export default class AuthController {
+export class AuthController {
     static FRONT_URL: string;
 
     static init(FRONT_URL: string) {

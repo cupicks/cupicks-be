@@ -9,7 +9,7 @@ import { ProfileService } from "../services/profile.service";
 
 import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 
-export default class ProfileController {
+export class ProfileController {
     private profileService: ProfileService;
     private dtoFactory: DtoFactory;
 
