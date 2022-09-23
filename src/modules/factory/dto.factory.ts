@@ -69,6 +69,8 @@ export class DtoFactory {
         password: string | string[] | ParsedQs | ParsedQs[] | undefined;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
+        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }): Promise<EditProfileDto> {
         return await this.joiValidator.validateAsync<EditProfileDto>(new EditProfileDto(iDto));
     }
