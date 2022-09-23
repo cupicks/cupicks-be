@@ -1,20 +1,13 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
-import {
-    UnkownError,
-    UnkownTypeError,
-    CustomException,
-    SignupUserDto,
-    SigninUserDto,
-    LogoutUserDto,
-    PublishTokenDto,
-    SendEmailDto,
-    ConfirmEmailDto,
-    ConfirmNicknameDto,
-    SendPasswordDto,
-    ResetPasswordDto,
-} from "../../models/_.loader";
-import { DtoFactory, JoiValidator } from "../../modules/_.loader";
+import { RequestHandler, Request, Response } from "express";
+
+// Module Dependencies
+
 import { AuthService } from "../services/_.exporter";
+import { DtoFactory } from "../../modules/_.loader";
+
+// CustomExceptions
+
+import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 
 export default class AuthController {
     static FRONT_URL: string;
@@ -24,16 +17,14 @@ export default class AuthController {
     }
 
     private authService: AuthService;
-    private joiValidator: JoiValidator;
     private dtoFactory: DtoFactory;
 
     constructor() {
         this.authService = new AuthService();
-        this.joiValidator = new JoiValidator();
         this.dtoFactory = new DtoFactory();
     }
 
-    public signup: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    public signup: RequestHandler = async (req: Request, res: Response) => {
         try {
             const file = req.file as Express.MulterS3.File;
 
@@ -42,7 +33,7 @@ export default class AuthController {
              *
              * TypeScript 와 Dto 을 사용하고 있다면 class-validator 를 사용하고 미들웨어처럼 만드는 것은 어떨까요?
              */
-            const signupUserDto: SignupUserDto = await this.dtoFactory.getSignupUserDto({
+            const signupUserDto = await this.dtoFactory.getSignupUserDto({
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
                 password: req?.query["password"],
@@ -72,7 +63,7 @@ export default class AuthController {
 
     public signin: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const singInUserDto: SigninUserDto = await this.dtoFactory.getSigninUserDto(req.body);
+            const singInUserDto = await this.dtoFactory.getSigninUserDto(req.body);
 
             const { accessToken, refreshToken } = await this.authService.signin(singInUserDto);
 
