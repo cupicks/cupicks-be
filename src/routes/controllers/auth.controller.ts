@@ -39,6 +39,8 @@ export class AuthController {
                 password: req?.query["password"],
                 emailVerifyToken: req?.query["emailVerifyToken"],
                 nicknameVerifyToken: req?.query["nicknameVerifyToken"],
+                favorCategory: req?.query["favorCategory"],
+                disfavorCategory: req?.query["disfavorCategory"],
             });
 
             const result = await this.authService.signup(signupUserDto);

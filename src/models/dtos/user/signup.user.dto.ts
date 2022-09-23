@@ -4,6 +4,7 @@ import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
+import { ERecipeCategory } from "../../enums/_.exporter";
 
 export interface ISignupUserDto {
     password: string;
@@ -11,10 +12,14 @@ export interface ISignupUserDto {
     resizedUrl: string | undefined;
     nicknameVerifyToken: string;
     emailVerifyToken: string;
+    favorCategory: ERecipeCategory[];
+    disfavorCategory: ERecipeCategory[];
 }
 
 export class SignupUserDto
-    extends RequestQueryExtractor<"password" | "nicknameVerifyToken" | "emailVerifyToken">
+    extends RequestQueryExtractor<
+        "password" | "nicknameVerifyToken" | "emailVerifyToken" | "favorCategory" | "disfavorCategory"
+    >
     implements IBaseDto, ISignupUserDto
 {
     password: string;
@@ -22,6 +27,8 @@ export class SignupUserDto
     resizedUrl: string | undefined;
     nicknameVerifyToken: string;
     emailVerifyToken: string;
+    favorCategory: ERecipeCategory[];
+    disfavorCategory: ERecipeCategory[];
 
     constructor({
         password,
@@ -29,12 +36,16 @@ export class SignupUserDto
         resizedUrl,
         emailVerifyToken,
         nicknameVerifyToken,
+        favorCategory,
+        disfavorCategory,
     }: {
         password: string | string[] | ParsedQs | ParsedQs[] | undefined;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
         nicknameVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
         emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
     }) {
         super();
         this.password = this.validateType(password, "password");
@@ -43,6 +54,16 @@ export class SignupUserDto
 
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
+
+        const tempFavor = this.getStringSetOrUndefinedFromQuery(favorCategory, "favorCategory")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.favorCategory = tempFavor ?? [];
+
+        const tempDisfavor = this.getStringSetOrUndefinedFromQuery(disfavorCategory, "disfavorCategory")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.disfavorCategory = tempDisfavor ?? [];
     }
 
     getJoiInstance(): ObjectSchema<SignupUserDto> {
@@ -70,6 +91,30 @@ export class SignupUserDto
                 .required()
                 .max(1000)
                 .message("NicknameVerifyToken 은 반드시 포함하여야 합니다."),
+            favorCategory: joi
+                .array()
+                .items(
+                    joi
+                        .string()
+                        .equal(
+                            ERecipeCategory.milk,
+                            ERecipeCategory.caffein,
+                            ERecipeCategory.lemon,
+                            ERecipeCategory.syrup,
+                        ),
+                ),
+            disfavorCategory: joi
+                .array()
+                .items(
+                    joi
+                        .string()
+                        .equal(
+                            ERecipeCategory.milk,
+                            ERecipeCategory.caffein,
+                            ERecipeCategory.lemon,
+                            ERecipeCategory.syrup,
+                        ),
+                ),
         });
     }
 }

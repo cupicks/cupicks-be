@@ -154,8 +154,9 @@ CREATE TABLE IF NOT EXISTS user_like_recipe (
 );
 
 CREATE TABLE IF NOT EXISTS user_favor_category_list (
-    user_id                 INT             NOT NULL    PRIMARY KEY,
+    user_id                 INT            NOT NULL,
     category_name           VARCHAR(20)    NOT NULL,
+    PRIMARY KEY (user_id, category_name),
     FOREIGN KEY (user_id) REFERENCES user (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -165,8 +166,9 @@ CREATE TABLE IF NOT EXISTS user_favor_category_list (
 );
 
 CREATE TABLE IF NOT EXISTS user_disfavor_category_list (
-    user_id                 INT         NOT NULL    PRIMARY KEY,
+    user_id                 INT            NOT NULL,
     category_name           VARCHAR(20)    NOT NULL,
+    PRIMARY KEY (user_id, category_name),
     FOREIGN KEY (user_id) REFERENCES user (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
