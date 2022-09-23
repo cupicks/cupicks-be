@@ -170,16 +170,19 @@ export class RecipeRepository {
             IF (user_like_recipe.user_id IS NULL, 0, 1) as isLiked
         FROM (
             SELECT
-                recipe.recipe_id as recipe_id,
-                title,
-                content,
-                is_iced,
-                cup_size,
-                created_at,
-                updated_at,
+                recipe.title as title,
+                recipe.content as content,
+                recipe.is_iced as is_iced,
+                recipe.cup_size as cup_size,
+                recipe.created_at as created_at,
+                recipe.updated_at as updated_at,
+                user_recipe.recipe_id as recipe_id,
                 user_recipe.user_id as user_id
             FROM (
-                SELECT user_id, recipe_id FROM user_recipe
+                SELECT
+                    user_id,
+                    recipe_id
+                FROM user_recipe
                 WHERE user_id = ?
                 ORDER BY recipe_id desc
                 LIMIT ? OFFSET ?
