@@ -4,6 +4,11 @@ DROP DATABASE IF EXISTS cupick_test;
 CREATE DATABASE IF NOT EXISTS cupick_test;
 USE cupick_test;
 
+-- 차차차상위 비정휴과 ranking 페이지 제거
+
+DROP TABLE IF EXISTS best_recipe_ranking;
+DROP TABLE IF EXISTS ranking_category;
+
 -- 차차상위 user + recipe 엔티티 제거
 
 DROP TABLE IF EXISTS user_recipe;
@@ -15,7 +20,7 @@ DROP TABLE IF EXISTS user_disfavor_category_list;
 -- 차상위 recipe 엔티티 제거
 DROP TABLE IF EXISTS recipe_ingredient_list;
 DROP TABLE IF EXISTS recipe_ingredient;
-DROP TABLE IF EXISTS recipe_category;
+DROP TABLE IF EXISTS recipe_category_list;
 
 
 -- 차상위 comment 엔티티 제거
@@ -31,9 +36,9 @@ DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS recipe;
 
 DROP TABLE IF EXISTS user_verify_list;
-DROP TABLE IF EXISTS category;
+DROP TABLE IF EXISTS recipe_category;
 
-CREATE TABLE IF NOT EXISTS category (
+CREATE TABLE IF NOT EXISTS recipe_category (
     name            VARCHAR(20) PRIMARY KEY
 );
 
@@ -85,11 +90,11 @@ CREATE TABLE IF NOT EXISTS recipe (
     updated_at  DATETIME            NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS recipe_category (
+CREATE TABLE IF NOT EXISTS recipe_category_list (
     recipe_category_id      INT             NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     recipe_id               INT             NOT NULL,
     category_name           VARCHAR(20)     NOT NULL,
-    FOREIGN KEY (category_name) REFERENCES category (name)
+    FOREIGN KEY (category_name) REFERENCES recipe_category (name)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id)
@@ -135,7 +140,8 @@ CREATE TABLE IF NOT EXISTS user_recipe (
 CREATE TABLE IF NOT EXISTS user_like_recipe (
     user_like_recipe_id INT         NOT NULL    PRIMARY KEY AUTO_INCREMENT,
     user_id             INT         NOT NULL,
-    recipe_id            INT         NOT NULL,
+    recipe_id           INT         NOT NULL,
+    created_at          DATETIME    NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -146,16 +152,22 @@ CREATE TABLE IF NOT EXISTS user_like_recipe (
 
 CREATE TABLE IF NOT EXISTS user_favor_category_list (
     user_id                 INT             NOT NULL    PRIMARY KEY,
-    category_name           VARCHAR(255)    NOT NULL,
+    category_name           VARCHAR(20)    NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (category_name) REFERENCES recipe_category (name)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_disfavor_category_list (
     user_id                 INT         NOT NULL    PRIMARY KEY,
-    category_name           VARCHAR(255)    NOT NULL,
+    category_name           VARCHAR(20)    NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (user_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (category_name) REFERENCES recipe_category (name)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
@@ -186,4 +198,20 @@ CREATE TABLE IF NOT EXISTS recipe_comment (
     FOREIGN KEY (comment_id) REFERENCES comment (comment_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
+);
+-- best_recipe_ranking
+
+CREATE TABLE IF NOT EXISTS ranking_category (
+    name                VARCHAR(20)     NOT NULL PRIMARY KEY
+);
+INSERT INTO ranking_category (name) VALUES ('weekly'), ('monthly');
+
+CREATE TABLE IF NOT EXISTS best_recipe_ranking (
+    ranking             INT             NOT NULL    CHECK (ranking >=3 AND ranking > 1),
+    recipe_id           INT             NOT NULL,
+    start_date          DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    end_date            DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    category            VARCHAR(20)     NOT NULL,
+    PRIMARY KEY (ranking, start_date, end_date),
+    FOREIGN KEY (category) REFERENCES ranking_category (name)
 );
