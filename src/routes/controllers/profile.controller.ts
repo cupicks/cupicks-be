@@ -5,7 +5,7 @@ import { Request, RequestHandler, Response } from "express";
 import { ProfileService } from "../services/profile.service";
 import { GetLikeRecipeDto } from "models/dtos/profile/get.like.recipe.dto";
 
-export default class ProfileController {
+export class ProfileController {
     private joiValidator: JoiValidator;
     private profileService: ProfileService;
     private dtoFactory: DtoFactory;

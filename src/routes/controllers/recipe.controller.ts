@@ -12,7 +12,7 @@ import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
 import { IRecipeCombinedPacket } from "../../models/_.loader";
 
-export default class RecipeController {
+export class RecipeController {
     private recipeService: RecipeService;
 
     constructor() {

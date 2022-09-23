@@ -16,7 +16,7 @@ import {
 import { DtoFactory, JoiValidator } from "../../modules/_.loader";
 import { AuthService } from "../services/_.exporter";
 
-export default class AuthController {
+export class AuthController {
     static FRONT_URL: string;
 
     static init(FRONT_URL: string) {
