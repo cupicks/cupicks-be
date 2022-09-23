@@ -6,6 +6,7 @@ export interface IRecipePacket extends RowDataPacket {
     content: string;
 
     isIced: 0 | 1;
+    isLiked: 0 | 1;
     cupSize: string;
 
     createdAt: string;

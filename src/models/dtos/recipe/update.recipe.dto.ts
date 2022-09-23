@@ -12,17 +12,20 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
     title: string;
     content: string;
     isIced: boolean;
-    cupSize?: number;
     isPublic: boolean;
     ingredientList: IngredientDto[];
     userId: number;
     recipeId: number;
 
-    constructor(
-        { title, content, isIced, isPublic, ingredientList = [] }: Omit<ICreateRecipeDto, "cupSize">,
-        userId: number,
-        recipeId: number,
-    ) {
+    constructor({
+        title,
+        content,
+        isIced,
+        isPublic,
+        ingredientList = [],
+        userId,
+        recipeId,
+    }: Omit<ICreateRecipeDto, "cupSize">) {
         super();
         this.title = title;
         this.content = content;
@@ -30,7 +33,7 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
         this.userId = userId;
-        this.recipeId = recipeId;
+        this.recipeId = +recipeId!;
 
         // 클래스가 아닙니다.
     }

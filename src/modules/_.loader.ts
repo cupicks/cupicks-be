@@ -5,6 +5,7 @@ import { MysqlProvider } from "./providers/mysql.provider";
 import { MulterProvider } from "./providers/multer.provider";
 import { AwsSesProvider } from "./providers/aws.ses.provider";
 import { DateProvider } from "./providers/date.provider";
+import { UuidProvider } from "./providers/uuid.provider";
 
 import { DayjsProvider } from "./providers/dayjs.provider";
 
@@ -23,4 +24,5 @@ export {
     DayjsProvider,
     JoiValidator,
     RandomGenerator,
+    UuidProvider,
 };

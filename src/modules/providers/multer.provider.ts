@@ -1,12 +1,11 @@
-import { RequestHandler, NextFunction } from "express";
-import path from "path";
+import { RequestHandler } from "express";
 
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import * as multer from "multer";
 import * as multerS3 from "multer-s3";
 
 import { IS3ConfigEnv } from "models/_.loader";
-import { CustomException, UnkownTypeError } from "../../models/_.loader";
+import { UuidProvider } from "../_.loader";
 
 type ProfileImagePath = "profile" | "profile-resized";
 type CommentImagePath = "comment" | "comment-resized";
@@ -60,15 +59,17 @@ export class MulterProvider {
                 s3,
                 bucket: MulterProvider.BUCKET,
                 key(req, file, done) {
-                    done(null, `${path}/${Date.now()}${file.originalname}`);
+                    done(null, `${path}/${new UuidProvider().getUuid()}`);
                 },
             }),
             fileFilter(req, file, done) {
-                if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
-                    done(null, true);
-                } else {
-                    return done(new Error("Image type error"));
+                const ext = file.mimetype.split("/")[1];
+
+                if (!["jpg", "jpeg", "png"].includes(ext)) {
+                    return done(new Error("FILE EXTENSION ERROR"));
                 }
+
+                done(null, true);
             },
             limits: { fileSize: 5 * 1024 * 1024 },
         });
@@ -92,4 +93,10 @@ export class MulterProvider {
 
         return await s3.send(new DeleteObjectCommand(bucketParams));
     };
+
+    // public errorHandler = (err: unknown): CustomException => {
+    //     if (err instanceof CustomException) return err;
+    //     else if (err instanceof Error) return new ForBiddenException(err.message, "FILE EXTENSION ERROR")
+    //     else return new UnkownTypeError(`알 수 없는 에러가 발생하였습니다. 대상 : ${JSON.stringify(err)}`);
+    // };
 }
