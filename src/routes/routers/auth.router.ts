@@ -46,4 +46,4 @@ authRouter.get("/send-password", /* applicationXWwwFormUrlencodedFilter */ new A
 
 authRouter.get("/reset-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().resetPassword);
 
-export default authRouter;
+export { authRouter };

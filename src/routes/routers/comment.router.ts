@@ -32,4 +32,4 @@ commentRouter.put(
     new CommentController().updateComment,
 );
 
-export default commentRouter;
+export { commentRouter };
