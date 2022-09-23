@@ -39,4 +39,4 @@ recipeRouter.patch(
     new RecipeController().disLikeRecipe,
 );
 
-export default recipeRouter;
+export { recipeRouter };
