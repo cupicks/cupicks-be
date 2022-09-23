@@ -1,17 +1,19 @@
-import { DtoFactory, JoiValidator } from "../../modules/_.loader";
-import { CustomException, UnkownTypeError, UnkownError, EditProfileDto, GetMyRecipeDto } from "../../models/_.loader";
-
 import { Request, RequestHandler, Response } from "express";
+
+// Module Dependencies
+
+import { DtoFactory } from "../../modules/_.loader";
 import { ProfileService } from "../services/profile.service";
-import { GetLikeRecipeDto } from "models/dtos/profile/get.like.recipe.dto";
+
+// CustomExceptions
+
+import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 
 export class ProfileController {
-    private joiValidator: JoiValidator;
     private profileService: ProfileService;
     private dtoFactory: DtoFactory;
 
     constructor() {
-        this.joiValidator = new JoiValidator();
         this.profileService = new ProfileService();
         this.dtoFactory = new DtoFactory();
     }
