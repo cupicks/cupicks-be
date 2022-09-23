@@ -37,7 +37,7 @@ export class CommentService {
 
             const isExists = await this.authRepository.isExistsById(conn, commentDto.userId);
             if (isExists === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const createComment = await this.commentRepository.createComment(conn, commentDto);
             const commentId = createComment;
@@ -91,7 +91,7 @@ export class CommentService {
 
             const isExistsByUserId = await this.authRepository.isExistsById(conn, updateCommentDto.userId);
             if (isExistsByUserId === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const isExistsByCommentId = await this.commentRepository.findCommentByCommentId(
                 conn,
@@ -136,7 +136,7 @@ export class CommentService {
 
             const isExists = await this.authRepository.isExistsById(conn, deleteCommentDto.userId);
             if (isExists === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const isExistsByCommentId = await this.commentRepository.findCommentByCommentId(
                 conn,

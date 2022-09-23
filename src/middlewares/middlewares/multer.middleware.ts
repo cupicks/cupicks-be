@@ -1,7 +1,7 @@
-import { TERROR_CODE } from "../constants/_.loader";
+import { TERROR_CODE } from "../../constants/_.loader";
 import { RequestHandler, Request, Response, NextFunction } from "express";
 
-import { MulterProvider } from "../modules/_.loader";
+import { MulterProvider } from "../../modules/_.loader";
 
 export const multerMiddlewareForProfile: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     MulterProvider.uploadImageProfile(req, res, (err) => {

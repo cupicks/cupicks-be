@@ -18,7 +18,7 @@ const ERROR_CODE_LIST = {
     "인증절차 - 임시 비밀번호 발급 사용제한": "AUTH-004-EXP-02",
     "등록 되지 않은 EmailVerifyToken": "AUTH-005",
     "등록 되지 않은 NicnameVerifyToken": "AUTH-006",
-    "이미 탈퇴한 사용자의 AccesshToken": "AUTH-007-01",
+    "이미 탈퇴한 사용자의 AccessToken": "AUTH-007-01",
     "이미 탈퇴한 사용자의 RefreshToken": "AUTH-007-02",
     "등록되지 않은 RefreshToken": "AUTH-008", // 로그인 기록이 없는 사용자
 

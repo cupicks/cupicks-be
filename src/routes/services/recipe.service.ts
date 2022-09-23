@@ -3,6 +3,7 @@ import {
     CreateRecipeDto,
     IIngredientDto,
     IngredientDto,
+    IRecipeLikePacket,
     IRecipeIngredientPacket,
     IRecipeCombinedPacket,
     NotFoundException,
@@ -42,7 +43,7 @@ export class RecipeService {
 
             const isExists = await this.authRepository.isExistsById(conn, recipeDto.userId);
             if (isExists === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const recipeId: number = await this.recipeRepository.createRecipe(conn, recipeDto);
 
@@ -101,6 +102,16 @@ export class RecipeService {
                 //     recipeIdList,
                 // );
 
+                const myLikeRecipeIds: IRecipeLikePacket[] = await this.recipeRepository.getMyLikeRecipeIds(
+                    conn,
+                    getRecipeDto.userId,
+                );
+                const myLikeRecipeIdList = [];
+
+                for (const value of myLikeRecipeIds) {
+                    myLikeRecipeIdList.push(value.recipeId);
+                }
+
                 const recipeIngredientList: IRecipeIngredientPacket[][] = await Promise.all(
                     recipeIdList.map(
                         async (recipeId) =>
@@ -129,6 +140,7 @@ export class RecipeService {
                         nickname: recipeList[i].nickname,
                         imageUrl: recipeList[i].imageUrl,
                         resizedUrl: recipeList[i].resizedUrl,
+                        isLiked: myLikeRecipeIdList.includes(recipeList[i].recipeId) ? true : false,
                     });
                     recipeDtoList.push(recipeDto);
                 }
@@ -156,7 +168,7 @@ export class RecipeService {
 
             const isExists = await this.authRepository.isExistsById(conn, updateRecipeDto.userId);
             if (isExists === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, updateRecipeDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
@@ -207,7 +219,7 @@ export class RecipeService {
 
             const isExists = await this.authRepository.isExistsById(conn, deleteRecipeDto.userId);
             if (isExists === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, deleteRecipeDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
@@ -240,7 +252,7 @@ export class RecipeService {
 
             const isExists = await this.authRepository.isExistsById(conn, likeRecipeDto.userId);
             if (isExists === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, likeRecipeDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
@@ -270,7 +282,7 @@ export class RecipeService {
 
             const isExists = await this.authRepository.isExistsById(conn, dislikeRecipeDto.userId);
             if (isExists === false)
-                throw new NotFoundException(`이미 탈퇴한 사용자의 RefreshToken 입니다.`, "AUTH-007-02");
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, dislikeRecipeDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");

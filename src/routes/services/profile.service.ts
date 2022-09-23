@@ -73,7 +73,7 @@ export class ProfileService {
             const user = await this.authRepository.findUserById(conn, geMyRecipeDto.userId);
             if (user === null) throw new NotFoundException("이미 탈퇴한 사용자의 AccessToken 입니다.", "AUTH-007-01");
 
-            const myRecipeList = await this.recipeRepository.getLikeRecipeByUserid(
+            const myRecipeList = await this.recipeRepository.getMyRecipeByUserId(
                 conn,
                 geMyRecipeDto.userId,
                 geMyRecipeDto.page,
@@ -109,6 +109,7 @@ export class ProfileService {
                     nickname: user.nickname,
                     imageUrl: user.imageUrl,
                     resizedUrl: user.resizedUrl,
+                    isLiked: myRecipeList[i].isLiked === 1,
                 });
 
                 recipeDtoList.push(recipeDto);
@@ -169,6 +170,7 @@ export class ProfileService {
                     nickname: user.nickname,
                     imageUrl: user.imageUrl,
                     resizedUrl: user.resizedUrl,
+                    isLiked: myRecipeList[i].isLiked === 1,
                 });
 
                 recipeDtoList.push(recipeDto);
