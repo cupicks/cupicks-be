@@ -1,14 +1,7 @@
 name: Automated-Deploy
 
 on:
-  push:
-<<<<<<< HEAD
-    branches:
-      - 'main'
-      
   pull_request:
-=======
->>>>>>> 6f8bce7c31cc3d2ab8022828ba575e5a073da0ff
     branches:
       - 'main'
 
