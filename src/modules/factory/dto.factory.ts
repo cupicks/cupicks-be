@@ -99,6 +99,7 @@ export class DtoFactory {
         isPublic: boolean;
         ingredientList: IIngredientDto[];
         userId: number;
+        category: string[];
     }): Promise<CreateRecipeDto> {
         return await this.joiValidator.validateAsync<CreateRecipeDto>(new CreateRecipeDto(iDto));
     }
@@ -110,6 +111,7 @@ export class DtoFactory {
         ingredientList: IngredientDto[];
         userId: number;
         recipeId: number;
+        category: string[];
     }): Promise<UpdateRecipeDto> {
         return await this.joiValidator.validateAsync<UpdateRecipeDto>(new UpdateRecipeDto(iDto));
     }
