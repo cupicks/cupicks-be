@@ -85,6 +85,8 @@ export class RecipeService {
                 getRecipeDto.recipeId,
             );
 
+            console.log(userLikeRecipeExist);
+
             getRecipe[0].isLiked = userLikeRecipeExist === true ? true : false;
 
             await conn.commit();
