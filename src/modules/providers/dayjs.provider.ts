@@ -44,6 +44,10 @@ export class DayjsProvider {
         return dayjs(targetDayjs).add(addingOption.limitCount, addingOption.limitType);
     }
 
+    public getStartAndEndDate() {
+        //
+    }
+
     /**
      *
      * `targetDay` 에서 `currentDay` 의 차이를 milliseconds 로 계산해 반환합니다.

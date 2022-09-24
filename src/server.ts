@@ -10,6 +10,7 @@ import {
     MysqlProvider,
     MulterProvider,
     AwsSesProvider,
+    DayjsProvider,
 } from "./modules/_.loader";
 import { AuthController } from "./routes/controllers/_.exporter";
 
