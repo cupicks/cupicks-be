@@ -5,7 +5,7 @@ import { ObjectSchema } from "joi";
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
 
-interface IGetLikeRecipeDto {
+export interface IGetLikeRecipeDto {
     userId: number;
     page: number;
     count: number;

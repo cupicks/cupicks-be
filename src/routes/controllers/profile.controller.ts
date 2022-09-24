@@ -1,17 +1,21 @@
-import { JoiValidator } from "../../modules/_.loader";
-import { CustomException, UnkownTypeError, UnkownError, EditProfileDto, GetMyRecipeDto } from "../../models/_.loader";
-
 import { Request, RequestHandler, Response } from "express";
+
+// Module Dependencies
+
+import { DtoFactory } from "../../modules/_.loader";
 import { ProfileService } from "../services/profile.service";
-import { GetLikeRecipeDto } from "models/dtos/profile/get.like.recipe.dto";
+
+// CustomExceptions
+
+import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 
 export class ProfileController {
-    private joiValidator: JoiValidator;
     private profileService: ProfileService;
+    private dtoFactory: DtoFactory;
 
     constructor() {
-        this.joiValidator = new JoiValidator();
         this.profileService = new ProfileService();
+        this.dtoFactory = new DtoFactory();
     }
 
     /**
@@ -40,16 +44,16 @@ export class ProfileController {
         try {
             const file = req.file as Express.MulterS3.File;
 
-            const editDto = await this.joiValidator.validateAsync<EditProfileDto>(
-                new EditProfileDto({
-                    userId: res.locals.userId,
-                    nickname: req.query.nickname,
-                    password: req.query.password,
+            const editDto = await this.dtoFactory.getEditProfileDto({
+                userId: res.locals.userId,
+                imageUrl: file?.location,
+                resizedUrl: file?.location,
+                nickname: req?.query["nickname"],
+                password: req?.query["password"],
+                favorCategory: req?.query["favorCategory"],
+                disfavorCategory: req?.query["disfavorCategory"],
+            });
 
-                    imageUrl: file?.location,
-                    resizedUrl: file?.location,
-                }),
-            );
             await this.profileService.editProfile(editDto);
 
             return res.json({
@@ -72,13 +76,11 @@ export class ProfileController {
 
     public getMyRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const getMyRecipeDto = await this.joiValidator.validateAsync<GetMyRecipeDto>(
-                new GetMyRecipeDto({
-                    userId: res.locals.userId,
-                    count: req?.query["count"],
-                    page: req?.query["page"],
-                }),
-            );
+            const getMyRecipeDto = await this.dtoFactory.getGetMyRecipeDto({
+                userId: res.locals.userId,
+                count: req?.query["count"],
+                page: req?.query["page"],
+            });
 
             const recipeDtoList = await this.profileService.getMyRecipe(getMyRecipeDto);
 
@@ -102,13 +104,11 @@ export class ProfileController {
 
     public getLikeRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const getLikeRecipeDto = await this.joiValidator.validateAsync<GetLikeRecipeDto>(
-                new GetMyRecipeDto({
-                    userId: res.locals.userId,
-                    count: req?.query["count"],
-                    page: req?.query["page"],
-                }),
-            );
+            const getLikeRecipeDto = await this.dtoFactory.getGetLikeRecipeDto({
+                userId: res.locals.userId,
+                count: req?.query["count"],
+                page: req?.query["page"],
+            });
 
             const recipeDtoList = await this.profileService.getLikeRecipe(getLikeRecipeDto);
 

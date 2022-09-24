@@ -1,5 +1,5 @@
 import * as jwtLib from "jsonwebtoken";
-import { AuthRepository, AuthVerifyListRepository } from "../repositories/_.exporter";
+import { AuthRepository, AuthVerifyListRepository, UserCategoryRepository } from "../repositories/_.exporter";
 import {
     AwsSesProvider,
     BcryptProvider,
@@ -36,6 +36,7 @@ export class AuthService {
 
     private authRepository: AuthRepository;
     private authVerifyListRepository: AuthVerifyListRepository;
+    private userCategoryRepository: UserCategoryRepository;
 
     constructor() {
         this.jwtProvider = new JwtProvider();
@@ -44,16 +45,27 @@ export class AuthService {
         this.bcryptProvider = new BcryptProvider();
         this.dayjsProvider = new DayjsProvider();
 
+        this.randomGenerator = new RandomGenerator();
+
         this.authRepository = new AuthRepository();
         this.authVerifyListRepository = new AuthVerifyListRepository();
-        this.randomGenerator = new RandomGenerator();
+        this.userCategoryRepository = new UserCategoryRepository();
     }
 
     public signup = async (userDto: SignupUserDto): Promise<UserDto> => {
         const conn = await this.mysqlProvider.getConnection();
 
         userDto.password = this.bcryptProvider.hashPassword(userDto.password);
-        const { emailVerifyToken, nicknameVerifyToken, password, imageUrl, resizedUrl } = userDto;
+        const {
+            emailVerifyToken,
+            nicknameVerifyToken,
+            password,
+            imageUrl,
+            resizedUrl,
+            favorCategory,
+            disfavorCategory,
+        } = userDto;
+
         try {
             await conn.beginTransaction();
 
@@ -92,6 +104,9 @@ export class AuthService {
                 userVerifyList.userVerifyListId,
             );
 
+            await this.userCategoryRepository.createFavorCategoryList(conn, createdUserId, favorCategory);
+            await this.userCategoryRepository.createDisfavorCategoryList(conn, createdUserId, disfavorCategory);
+
             await conn.commit();
 
             return new UserDto({
@@ -102,6 +117,8 @@ export class AuthService {
                 nickname: nicknameVerifyTokenPayload.nickname,
                 imageUrl: userDto.imageUrl,
                 resizedUrl: userDto.resizedUrl,
+                favorCategory: favorCategory,
+                disfavorCategory: disfavorCategory,
             });
         } catch (err) {
             await conn.rollback();

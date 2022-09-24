@@ -9,7 +9,7 @@ import {
     NotFoundException,
     RecipeDto,
 } from "../../models/_.loader";
-import { RecipeRepository, RecipeIngredientRepository } from "../repositories/_.exporter";
+import { RecipeRepository, RecipeIngredientRepository, UserCategoryRepository } from "../repositories/_.exporter";
 import { GetLikeRecipeDto } from "models/dtos/profile/get.like.recipe.dto";
 
 export class ProfileService {
@@ -18,13 +18,16 @@ export class ProfileService {
     private authRepository: AuthRepository;
     private recipeRepository: RecipeRepository;
     private recipeIngredientRepository: RecipeIngredientRepository;
+    private userCategoryRepository: UserCategoryRepository;
 
     constructor() {
-        this.authRepository = new AuthRepository();
         this.bcryptProvider = new BcryptProvider();
         this.mysqlProvider = new MysqlProvider();
+
+        this.authRepository = new AuthRepository();
         this.recipeRepository = new RecipeRepository();
         this.recipeIngredientRepository = new RecipeIngredientRepository();
+        this.userCategoryRepository = new UserCategoryRepository();
     }
 
     public getAllProfile = async (): Promise<IUserPacket[]> => {
@@ -54,6 +57,24 @@ export class ProfileService {
             }
 
             await this.authRepository.updateUserProfile(conn, editDto);
+            await Promise.all([
+                (async () => {
+                    await this.userCategoryRepository.deleteAllFavorCateogryList(conn, editDto.userId);
+                    await this.userCategoryRepository.createFavorCategoryList(
+                        conn,
+                        editDto.userId,
+                        editDto.favorCategory,
+                    );
+                })(),
+                (async () => {
+                    await this.userCategoryRepository.deleteAllDisfavorCateogryList(conn, editDto.userId);
+                    await this.userCategoryRepository.createDisfavorCategoryList(
+                        conn,
+                        editDto.userId,
+                        editDto.disfavorCategory,
+                    );
+                })(),
+            ]);
 
             await conn.commit();
         } catch (err) {
