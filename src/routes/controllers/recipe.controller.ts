@@ -26,7 +26,7 @@ export class RecipeController {
 
     public createRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const CreateRecipeValidator = await this.dtoFactory.getCreateRecipeDto({
+            const createRecipeValidator: CreateRecipeDto = await this.dtoFactory.getCreateRecipeDto({
                 title: req.body.title,
                 content: req.body.content,
                 isIced: req.body.isIced,
@@ -34,9 +34,10 @@ export class RecipeController {
                 isPublic: req.body.isPublic,
                 ingredientList: req.body.ingredientList,
                 userId: res.locals.userId,
+                category: req.body.category,
             });
 
-            const createRecipe = await this.recipeService.createRecipe(CreateRecipeValidator);
+            const createRecipe = await this.recipeService.createRecipe(createRecipeValidator);
 
             return res.status(201).json({
                 isSuccess: true,
@@ -141,6 +142,7 @@ export class RecipeController {
                 ingredientList: req.body.ingredientList,
                 userId: res.locals.userId,
                 recipeId: Number(req.params.recipeId),
+                category: req.body.category,
             });
 
             await this.recipeService.updateRecipe(updateRecipeValidator);

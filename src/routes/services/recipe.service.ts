@@ -53,6 +53,20 @@ export class RecipeService {
 
             await this.recipeRepository.createRecipeIngredientList(conn, recipeId, insertedIdList);
 
+            const createRecipeCategoryAndList = await Promise.all(
+                recipeDto.category.map(async (category) => {
+                    const getRecipeCategory = await this.recipeRepository.getRecipeCategory(conn, category);
+
+                    if (getRecipeCategory.length <= 0) await this.recipeRepository.createRecipeCategory(conn, category);
+
+                    const createRecipeCategoryList = await this.recipeRepository.createRecipeCategoryList(
+                        conn,
+                        category,
+                        recipeId,
+                    );
+                }),
+            );
+
             await conn.commit();
             return recipeId;
         } catch (err) {
@@ -180,13 +194,29 @@ export class RecipeService {
             );
             if (!isAuthenticated) throw new NotFoundException("내가 작성한 레시피가 아닙니다.", "RECIPE-002");
 
-            const updateRecipe = this.recipeRepository.updateRecipeById(conn, updateRecipeDto);
             const deleteRecipeIngredient = this.recipeRepository.deleteRecipeIngredientById(
                 conn,
                 updateRecipeDto.recipeId,
             );
+            const deleteRecipeCategoryList = this.recipeRepository.deleteRecipeCategoryListById(
+                conn,
+                updateRecipeDto.recipeId,
+            );
 
-            await Promise.all([updateRecipe, deleteRecipeIngredient]);
+            const updateRecipe = this.recipeRepository.updateRecipeById(conn, updateRecipeDto);
+            const updateRecipeCategoryList = updateRecipeDto.category.map(async (category) => {
+                const getRecipeCategory = await this.recipeRepository.getRecipeCategory(conn, category);
+
+                if (getRecipeCategory.length <= 0) await this.recipeRepository.createRecipeCategory(conn, category);
+                this.recipeRepository.createRecipeCategoryList(conn, category, updateRecipeDto.recipeId);
+            });
+
+            await Promise.all([
+                updateRecipe,
+                deleteRecipeIngredient,
+                deleteRecipeCategoryList,
+                updateRecipeCategoryList,
+            ]);
 
             const result = updateRecipeDto.ingredientList.map((e) => {
                 return {

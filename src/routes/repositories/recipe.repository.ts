@@ -258,6 +258,20 @@ export class RecipeRepository {
         return recipePackets;
     };
 
+    public getRecipeCategory = async (conn: PoolConnection, category: string) => {
+        const selectQuery = `
+            SELECT * 
+            FROM recipe_category
+            WHERE name = ?
+        `;
+
+        const selectResult = await conn.query<RowDataPacket[]>(selectQuery, [category]);
+
+        const [categoryPacket, _] = selectResult;
+
+        return categoryPacket;
+    };
+
     // Create
 
     public createRecipe = async (conn: PoolConnection, recipeDto: CreateRecipeDto): Promise<number> => {
@@ -349,7 +363,11 @@ export class RecipeRepository {
         return JSON.stringify(result[0].insertId);
     };
 
-    public createRecipeIngredientList = async (conn: PoolConnection, recipeId: number, ingredientIdList: number[]) => {
+    public createRecipeIngredientList = async (
+        conn: PoolConnection,
+        recipeId: number,
+        ingredientIdList: number[],
+    ): Promise<number> => {
         const ingredientString = ingredientIdList.join(",").toString();
 
         const query = `INSERT INTO recipe_ingredient_list
@@ -360,6 +378,42 @@ export class RecipeRepository {
 
         const resultSetHeader = result[0];
         const { affectedRows, insertId } = resultSetHeader;
+
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+
+        return insertId;
+    };
+
+    public createRecipeCategory = async (conn: PoolConnection, category: string): Promise<number> => {
+        const query = `INSERT INTO recipe_category
+                (name)
+            VALUES (?);        
+        `;
+
+        const insertResult = await conn.query<ResultSetHeader>(query, [category]);
+
+        const insertRSetHeader = insertResult[0];
+        const { affectedRows, insertId } = insertRSetHeader;
+
+        if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+
+        return insertId;
+    };
+
+    public createRecipeCategoryList = async (
+        conn: PoolConnection,
+        category: string,
+        recipeId: number,
+    ): Promise<number> => {
+        const query = `INSERT INTO recipe_category_list
+                (recipe_id, category_name)
+            VALUES (?, ?);
+        `;
+
+        const insertResult = await conn.query<ResultSetHeader>(query, [recipeId, category]);
+
+        const insertSetHeader = insertResult[0];
+        const { affectedRows, insertId } = insertSetHeader;
 
         if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
@@ -387,26 +441,39 @@ export class RecipeRepository {
         return result;
     };
 
+    // public updateRecipeCategoryListById = async (conn: PoolConnection)
+
     // Delete
 
     public deleteRecipeById = async (conn: PoolConnection, recipeId: number): Promise<object> => {
-        const query = `
+        const deleteQuery = `
             DELETE FROM recipe
             WHERE recipe_id = ?;
         `;
 
-        const [result] = await conn.query(query, recipeId);
+        const [result] = await conn.query<ResultSetHeader>(deleteQuery, recipeId);
 
         return result;
     };
 
-    public deleteRecipeIngredientById = async (conn: PoolConnection, recipeId: number) => {
-        const query = `
+    public deleteRecipeIngredientById = async (conn: PoolConnection, recipeId: number): Promise<object> => {
+        const deleteQuery = `
             DELETE FROM recipe_ingredient
             WHERE recipe_id = ?;
         `;
 
-        const [result] = await conn.query(query, recipeId);
+        const [result] = await conn.query<ResultSetHeader>(deleteQuery, recipeId);
+
+        return result;
+    };
+
+    public deleteRecipeCategoryListById = async (conn: PoolConnection, recipeId: number): Promise<object> => {
+        const deleteQuery = `
+            DELETE FROM recipe_category_list
+            WHERE recipe_id = ?;
+        `;
+
+        const [result] = await conn.query<ResultSetHeader>(deleteQuery, recipeId);
 
         return result;
     };
