@@ -60,10 +60,11 @@ export default class RecipeController {
             const getRecipeValidator: CommonRecipeDto = await new JoiValidator().validateAsync<CommonRecipeDto>(
                 new CommonRecipeDto({
                     recipeId: Number(req.params.recipeId),
+                    userId: res.locals.userId,
                 }),
             );
 
-            const getRecipe: IRecipeCombinedPacket[] = await this.recipeService.getRecipe(getRecipeValidator.recipeId);
+            const getRecipe: IRecipeCombinedPacket[] = await this.recipeService.getRecipe(getRecipeValidator);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -86,6 +87,7 @@ export default class RecipeController {
                             ingredientAmount: e.ingredientAmount,
                         };
                     }),
+                    isLiked: getRecipe[0].isLiked,
                 },
             });
         } catch (err) {
@@ -102,8 +104,6 @@ export default class RecipeController {
 
     public getRecipes: RequestHandler = async (req: Request, res: Response) => {
         try {
-            // res.locals.userId = null;
-
             const getRecipesValidator = await new JoiValidator().validateAsync<GetRecipeDto>(
                 new GetRecipeDto({
                     page: Number(req.query.page),

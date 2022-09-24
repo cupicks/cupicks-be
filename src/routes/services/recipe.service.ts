@@ -11,6 +11,7 @@ import {
     UpdateRecipeDto,
     GetRecipeDto,
     DeleteRecipeDto,
+    CommonRecipeDto,
 } from "../../models/_.loader";
 import {
     AuthRepository,
@@ -65,15 +66,26 @@ export class RecipeService {
 
     // Get
 
-    getRecipe = async (recipeId: number): Promise<IRecipeCombinedPacket[]> => {
+    getRecipe = async (getRecipeDto: CommonRecipeDto): Promise<IRecipeCombinedPacket[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
 
-            const findRecipeById = await this.recipeRepository.findRecipeById(conn, recipeId);
+            const findRecipeById = await this.recipeRepository.findRecipeById(conn, getRecipeDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
-            const getRecipe = await this.recipeRepository.getRecipe(conn, recipeId);
+            const getRecipe: IRecipeCombinedPacket[] = await this.recipeRepository.getRecipe(
+                conn,
+                getRecipeDto.recipeId,
+            );
+
+            const userLikeRecipeExist = await this.recipeRepository.userLikeRecipeExist(
+                conn,
+                getRecipeDto.userId,
+                getRecipeDto.recipeId,
+            );
+
+            getRecipe[0].isLiked = userLikeRecipeExist === true ? true : false;
 
             await conn.commit();
 
