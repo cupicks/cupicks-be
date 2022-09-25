@@ -19,4 +19,6 @@ export interface IRecipeCombinedPacket extends RowDataPacket {
     nickname: string;
     imageUrl: string | undefined;
     resizedUrl: string | undefined;
+
+    isLiked: boolean;
 }

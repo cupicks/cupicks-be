@@ -9,7 +9,7 @@ const recipeRouter: Router = Router();
 
 recipeRouter.get("/", /* applicationJsonFilter */ tokenMiddleware, new RecipeController().getRecipes);
 
-recipeRouter.get("/:recipeId", /* applicationJsonFilter */ new RecipeController().getRecipe);
+recipeRouter.get("/:recipeId", /* applicationJsonFilter */ tokenMiddleware, new RecipeController().getRecipe);
 
 recipeRouter.post("/", /* applicationJsonFilter */ preventUnLoginUserGuard, new RecipeController().createRecipe);
 

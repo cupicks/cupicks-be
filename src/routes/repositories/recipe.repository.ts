@@ -55,6 +55,19 @@ export class RecipeRepository {
         return recipePackets.length !== 0 ? true : false;
     };
 
+    public userLikeRecipeExist = async (conn: PoolConnection, userId: number, recipeId: number) => {
+        const query = `
+            SELECT *
+            FROM user_like_recipe
+            WHERE user_id = ? AND recipe_id = ?
+        `;
+
+        const selectResult = await conn.query<RowDataPacket[]>(query, [userId, recipeId]);
+        const [recipePackets, _] = selectResult;
+
+        return recipePackets.length !== 0 ? true : false;
+    };
+
     // Find
 
     public findRecipeById = async (conn: PoolConnection, recipeId: number): Promise<boolean> => {
@@ -413,7 +426,7 @@ export class RecipeRepository {
 
     // Special
 
-    public likeRecipe = async (conn: PoolConnection, likeRecipeDto: DeleteRecipeDto): Promise<boolean> => {
+    public likeRecipe = async (conn: PoolConnection, likeRecipeDto?: DeleteRecipeDto): Promise<boolean> => {
         const query = `
             INSERT INTO user_like_recipe
                 (user_id, recipe_id)
