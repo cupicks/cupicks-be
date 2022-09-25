@@ -32,8 +32,11 @@ describe("Auth Controller Test", () => {
 
     it("Authontroller be defined", () => expect(AuthController).toBeDefined());
 
-    it('signup should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("signup should be call res.status(201).json()", async () => {
         await sutAuthController.signup(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -43,8 +46,11 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('signin should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("signin should be call res.status(201).json()", async () => {
         await sutAuthController.signin(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -55,8 +61,11 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('logout should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("logout should be call res.status(201).json()", async () => {
         await sutAuthController.logout(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -65,8 +74,11 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('publishToken should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("publishToken should be call res.status(201).json()", async () => {
         await sutAuthController.publishToken(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -76,8 +88,11 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('sendEmail should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("sendEmail should be call res.status(201).json()", async () => {
         await sutAuthController.sendEmail(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -88,8 +103,11 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('confirmEmailCode should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("confirmEmailCode should be call res.status(201).json()", async () => {
         await sutAuthController.confirmEmailCode(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -99,8 +117,11 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('confirmNickname should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("confirmNickname should be call res.status(201).json()", async () => {
         await sutAuthController.confirmNickname(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -110,8 +131,11 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('sendPassword should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("sendPassword should be call res.status(201).json()", async () => {
         await sutAuthController.sendPassword(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(201);
 
         expect(mockResponse.json).toBeCalled();
         expect(mockResponse.json).toBeCalledWith({
@@ -122,10 +146,15 @@ describe("Auth Controller Test", () => {
         });
     });
 
-    it('resetPassword should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+    it("resetPassword should be call res.status(302).redirect()", async () => {
         await sutAuthController.resetPassword(mockRequest, mockResponse, mockNextFunc);
 
+        expect(mockResponse.status).toBeCalled();
+        expect(mockResponse.status).toBeCalledWith(302);
+
         expect(mockResponse.json).not.toBeCalled();
+        expect(mockResponse.redirect).toBeCalled();
+        expect(mockResponse.redirect).toBeCalledWith(`${undefined}/signIn?email=${undefined}`);
     });
 
     afterAll(() => {
