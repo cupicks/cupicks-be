@@ -1,35 +1,134 @@
-import * as mockHttp from "node-mocks-http";
-import { Request, Response, NextFunction } from "express";
-
 // sut
 import { AuthController } from "../../../../src/routes/controllers/auth.controller";
 
-// fixture
-import { UserDtoFixtureProvider } from "../../../_.fake.datas/fixture/user.dto.fixture.provider";
+// type & mocking
+import { Request, Response, NextFunction } from "express";
+import { mockHttp, mockRoute, mockModule } from "../../../_.fake.datas/mocks/_.loader";
 
-// mocking
-import { AuthService } from "../../../../src/routes/services/auth.service";
-import { JoiValidator } from "../../../../src/modules/validators/joi.validator";
+jest.mock("../../../../src/routes/services/auth.service", () => {
+    return {
+        AuthService: jest.fn().mockImplementation(() => mockRoute.MockAuthService),
+    };
+});
+jest.mock("../../../../src/modules/factory/dto.factory", () => {
+    return {
+        DtoFactory: jest.fn().mockImplementation(() => mockModule.MockDtoFactory),
+    };
+});
 
 describe("Auth Controller Test", () => {
-    let authController: AuthController;
-    let userDtoFixtureProvider: UserDtoFixtureProvider;
+    let sutAuthController: AuthController;
+    // let userDtoFixtureProvider: UserDtoFixtureProvider;
     let mockRequest: Request, mockResponse: Response, mockNextFunc: NextFunction;
 
     beforeAll(() => {
-        authController = new AuthController();
-        userDtoFixtureProvider = new UserDtoFixtureProvider();
+        sutAuthController = new AuthController();
     });
+
     beforeEach(() => {
-        mockRequest = mockHttp.createRequest();
-        mockResponse = mockHttp.createResponse();
-        mockNextFunc = jest.fn();
+        mockRequest = mockHttp.getMockRequest();
+        mockResponse = mockHttp.getMockResponse();
     });
 
     it("Authontroller be defined", () => expect(AuthController).toBeDefined());
 
-    it("authContro", () => {
-        mockRequest.body = userDtoFixtureProvider.getSigninUserDto();
-        authController.signup(mockRequest, mockResponse, mockNextFunc);
+    it('signup should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.signup(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: "회원가입에 성공하셨습니다.",
+            user: undefined,
+        });
+    });
+
+    it('signin should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.signin(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: "로그인에 성공하셨습니다.",
+            accessToken: undefined,
+            refreshToken: undefined,
+        });
+    });
+
+    it('logout should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.logout(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: "로그아웃에 성공하셨습니다.",
+        });
+    });
+
+    it('publishToken should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.publishToken(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: "토큰 재발행에 성공하셨습니다.",
+            accessToken: undefined,
+        });
+    });
+
+    it('sendEmail should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.sendEmail(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: `사용자 이메일로 6자리 숫자가 발송되었어요!`,
+            date: undefined,
+            exceededDate: undefined,
+        });
+    });
+
+    it('confirmEmailCode should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.confirmEmailCode(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: "사용자 이메일 인증이 완료되었습니다.",
+            emailVerifyToken: undefined,
+        });
+    });
+
+    it('confirmNickname should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.confirmNickname(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: "사용자 닉네임 중복확인이 완료되었습니다.",
+            nicknameVerifyToken: undefined,
+        });
+    });
+
+    it('sendPassword should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.sendPassword(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).toBeCalled();
+        expect(mockResponse.json).toBeCalledWith({
+            isSuccess: true,
+            message: `임시 비밀번호를 이메일로 발송했어요!`,
+            date: undefined,
+            exceededDate: undefined,
+        });
+    });
+
+    it('resetPassword should be call res.json with { isSuccess:true, message:"회원가입에 성공하셨습니다.", user:undefined }', async () => {
+        await sutAuthController.resetPassword(mockRequest, mockResponse, mockNextFunc);
+
+        expect(mockResponse.json).not.toBeCalled();
+    });
+
+    afterAll(() => {
+        jest.clearAllMocks();
     });
 });
