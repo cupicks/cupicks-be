@@ -18,15 +18,18 @@ function getMockRequest(body?: object) {
  * 추가적으로 다음의 인자는 jest.fn() 으로 교체된 상태입니다.
  *
  * 1. response.json
- * 2. response.status
- * 3. response.redirect
+ * 2. response.redirect
+ *
+ * 추가적으로 다음의 인자는 jest.spyOn() 으로 감시되는 상태입니다.
+ *
+ * 1. jest.status
  */
 function getMockResponse() {
     const mockResponse = httpMock.createResponse({
         eventEmitter: EventEmitter,
     });
 
-    mockResponse.status = jest.fn();
+    jest.spyOn(mockResponse, "status");
     mockResponse.json = jest.fn();
     mockResponse.redirect = jest.fn();
 
