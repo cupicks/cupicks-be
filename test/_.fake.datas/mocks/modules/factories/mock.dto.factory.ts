@@ -1,3 +1,8 @@
+import { SigninUserDto, SignupUserDto } from "../../../../../src/models/_.loader";
+import { UserDtoFixtureProvider } from "../../../../_.fake.datas/fixture/user.dto.fixture.provider";
+
+const userDtoFixtureProvider = new UserDtoFixtureProvider();
+
 export const MockDtoFactory = {
     getSignupUserDto: jest.fn(),
     getSigninUserDto: jest.fn(),

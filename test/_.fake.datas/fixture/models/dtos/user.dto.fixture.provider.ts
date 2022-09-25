@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { ERecipeCategory } from "../../../src/models/enums/e.recipe.category";
+import { ERecipeCategory } from "../../../../../src/models/enums/e.recipe.category";
 
 import {
     SignupUserDto,
@@ -11,7 +11,7 @@ import {
     SendPasswordDto,
     ResetPasswordDto,
     SendEmailDto,
-} from "../../../src/models/_.loader";
+} from "../../../../../src/models/_.loader";
 
 export class UserDtoFixtureProvider {
     /**
@@ -24,8 +24,8 @@ export class UserDtoFixtureProvider {
         imageUrl?: string,
         resizedUrl?: string,
         password?: string,
-        favorCategory?: ERecipeCategory[],
-        disfavorCategory?: ERecipeCategory[],
+        favorCategory?: string,
+        disfavorCategory?: string,
     ): SignupUserDto {
         return new SignupUserDto({
             emailVerifyToken: emailVerifyToken ?? faker.word.noun(),
