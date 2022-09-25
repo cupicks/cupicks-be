@@ -177,6 +177,11 @@ export class DtoFactory {
     public async getGetCommentDto(iDto: { recipeId: number; page: number; count: number }): Promise<GetCommentDto> {
         return await this.joiValidator.validateAsync<GetCommentDto>(new GetCommentDto(iDto));
     }
+
+    // RANKING
+    public async getBestRecipeDto(iDto: { userId: number | null }): Promise<BestRecipeDto> {
+        return await this.joiValidator.validateAsync<BestRecipeDto>(new BestRecipeDto(iDto));
+    }
 }
 
 import {
@@ -218,4 +223,6 @@ import {
     IGetMyRecipeDto,
     GetLikeRecipeDto,
     IIngredientDto,
+    // RANKING
+    BestRecipeDto,
 } from "../../models/_.loader";

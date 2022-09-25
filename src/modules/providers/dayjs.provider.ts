@@ -5,6 +5,10 @@ export type TDatabaseFormat = "YYYY-MM-DD hh:mm:ss";
 export type TClientFormat = "YYYY년 MM월 DD일 hh:mm";
 
 export type TProvidedFormat = TDatabaseFormat | TClientFormat;
+export interface IGetWeeklyPeriodDate {
+    startDate: string;
+    endDate: string;
+}
 
 export class DayjsProvider {
     /**
@@ -44,8 +48,30 @@ export class DayjsProvider {
         return dayjs(targetDayjs).add(addingOption.limitCount, addingOption.limitType);
     }
 
-    public getStartAndEndDate() {
-        //
+    public getWeeklyPeriodDate(): IGetWeeklyPeriodDate {
+        const current = this.getDayjsInstance();
+
+        const day = current.get("day");
+        const diff = current.get("date") - day + (day === 0 ? -6 : 1);
+
+        const startDate = current
+            .set("date", diff)
+            .set("hour", 13) // 00: ㅡ> 01
+            .set("minute", 59) // 00:59
+            .set("second", 59) // :00:59:59
+            .format("YYYY-MM-DD hh:mm:ss");
+
+        const endDate = current
+            .set("date", diff + 6)
+            .set("hour", 23)
+            .set("minute", 59)
+            .set("second", 59)
+            .format(this.getDayabaseFormat());
+
+        return {
+            startDate,
+            endDate,
+        };
     }
 
     /**

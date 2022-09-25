@@ -134,6 +134,7 @@ export class RecipeService {
                 );
 
                 const recipeDtoList = new Array<RecipeDto>();
+
                 const loopLength = recipeList.length;
                 for (let i = 0; i < loopLength; i++) {
                     const recipeDto = new RecipeDto({

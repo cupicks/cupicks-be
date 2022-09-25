@@ -5,6 +5,6 @@ import { tokenMiddleware } from "../../middlewares/middlewares/_.exporter";
 
 const rankingRouter: Router = Router();
 
-rankingRouter.get("/weekly-recipe", tokenMiddleware, new RankingController().getWeeklyLikeRecipes);
+rankingRouter.get("/weekly-recipe", tokenMiddleware, new RankingController().getWeeklyBestRecipesByLike);
 
 export { rankingRouter };
