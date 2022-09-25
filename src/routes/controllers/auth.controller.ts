@@ -67,13 +67,13 @@ export class AuthController {
         try {
             const singInUserDto = await this.dtoFactory.getSigninUserDto(req.body);
 
-            const { accessToken, refreshToken } = await this.authService.signin(singInUserDto);
+            const result = await this.authService.signin(singInUserDto);
 
             return res.json({
                 isSuccess: true,
                 message: "로그인에 성공하셨습니다.",
-                accessToken,
-                refreshToken,
+                accessToken: result?.accessToken,
+                refreshToken: result?.refreshToken,
             });
         } catch (err) {
             console.log(err);
@@ -121,7 +121,7 @@ export class AuthController {
             return res.json({
                 isSuccess: true,
                 message: "토큰 재발행에 성공하셨습니다.",
-                accessToken,
+                accessToken: accessToken,
             });
         } catch (err) {
             console.log(err);
@@ -144,9 +144,9 @@ export class AuthController {
 
             return res.status(201).json({
                 isSuccess: true,
-                message: `사용자 이메일로 6자리 숫자가 발송되었어요!`,
-                date: result.date,
-                exceededDate: result.exceededDate,
+                message: "사용자 이메일로 6자리 숫자가 발송되었어요!",
+                date: result?.date,
+                exceededDate: result?.exceededDate,
             });
         } catch (err) {
             console.log(err);
@@ -168,12 +168,12 @@ export class AuthController {
                 emailVerifyCode: req?.query["email-verify-code"],
             });
 
-            const { emailVerifyToken } = await this.authService.confirmEmailCode(confirmEailDto);
+            const result = await this.authService.confirmEmailCode(confirmEailDto);
 
             return res.json({
                 isSuccess: true,
                 message: "사용자 이메일 인증이 완료되었습니다.",
-                emailVerifyToken: emailVerifyToken,
+                emailVerifyToken: result?.emailVerifyToken,
             });
         } catch (err) {
             console.log(err);
@@ -195,12 +195,12 @@ export class AuthController {
                 nickname: req?.query["nickname"],
             });
 
-            const { nicknameVerifyToken } = await this.authService.confirmNickname(confirmNicknameDto);
+            const result = await this.authService.confirmNickname(confirmNicknameDto);
 
             return res.json({
                 isSuccess: true,
                 message: "사용자 닉네임 중복확인이 완료되었습니다.",
-                nicknameVerifyToken: nicknameVerifyToken,
+                nicknameVerifyToken: result?.nicknameVerifyToken,
             });
         } catch (err) {
             console.log(err);
@@ -223,9 +223,9 @@ export class AuthController {
 
             return res.status(201).json({
                 isSuccess: true,
-                message: `임시 비밀번호를 이메일로 발송했어요!`,
-                date: result.date,
-                exceededDate: result.exceededDate,
+                message: "임시 비밀번호를 이메일로 발송했어요!",
+                date: result?.date,
+                exceededDate: result?.exceededDate,
             });
         } catch (err) {
             console.log(err);
