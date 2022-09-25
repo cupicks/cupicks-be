@@ -45,7 +45,7 @@ export class AuthController {
 
             const result = await this.authService.signup(signupUserDto);
 
-            return res.json({
+            return res.status(201).json({
                 isSuccess: true,
                 message: "회원가입에 성공하셨습니다.",
                 user: result,
@@ -69,7 +69,7 @@ export class AuthController {
 
             const result = await this.authService.signin(singInUserDto);
 
-            return res.json({
+            return res.status(201).json({
                 isSuccess: true,
                 message: "로그인에 성공하셨습니다.",
                 accessToken: result?.accessToken,
@@ -94,7 +94,7 @@ export class AuthController {
 
             await this.authService.logout(logoutUserDto);
 
-            return res.json({
+            return res.status(201).json({
                 isSuccess: true,
                 message: "로그아웃에 성공하셨습니다.",
             });
@@ -118,7 +118,7 @@ export class AuthController {
             });
             const accessToken = await this.authService.publishToken(publishTokenDto);
 
-            return res.json({
+            return res.status(201).json({
                 isSuccess: true,
                 message: "토큰 재발행에 성공하셨습니다.",
                 accessToken: accessToken,
@@ -170,7 +170,7 @@ export class AuthController {
 
             const result = await this.authService.confirmEmailCode(confirmEailDto);
 
-            return res.json({
+            return res.status(201).json({
                 isSuccess: true,
                 message: "사용자 이메일 인증이 완료되었습니다.",
                 emailVerifyToken: result?.emailVerifyToken,
@@ -197,7 +197,7 @@ export class AuthController {
 
             const result = await this.authService.confirmNickname(confirmNicknameDto);
 
-            return res.json({
+            return res.status(201).json({
                 isSuccess: true,
                 message: "사용자 닉네임 중복확인이 완료되었습니다.",
                 nicknameVerifyToken: result?.nicknameVerifyToken,
@@ -249,7 +249,7 @@ export class AuthController {
             const email = await this.authService.resetPassword(snedPasswordDto);
 
             // FE message : 'ㅇㅇㅇㅇ@naver.com 님 임시 비밀번호를 사용하실 수 있습니다.'
-            return res.redirect(AuthController.FRONT_URL + `/signIn?email=` + email);
+            return res.status(302).redirect(AuthController.FRONT_URL + `/signIn?email=` + email);
         } catch (err) {
             console.log(err);
             // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
