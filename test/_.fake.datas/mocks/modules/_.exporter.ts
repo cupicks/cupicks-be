@@ -1,3 +1,3 @@
-import { MockDtoFactory } from "./mock.dto.factory";
+import { MockDtoFactory } from "./factories/mock.dto.factory";
 
 export { MockDtoFactory };

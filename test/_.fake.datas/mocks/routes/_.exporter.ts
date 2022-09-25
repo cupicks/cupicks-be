@@ -1,3 +1,3 @@
-import { MockAuthService } from "./mock.auth.service";
+import { MockAuthService } from "./services/mock.auth.service";
 
 export { MockAuthService };
