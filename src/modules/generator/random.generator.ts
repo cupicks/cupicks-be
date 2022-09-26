@@ -14,7 +14,7 @@ export class RandomGenerator {
      * 특수문자 `!@#` 를 반환합니다.
      */
     private getRandSpecialString(idx: number): string {
-        const pattern = ["@", "!", "#", "@", "#", "@", "!"];
+        const pattern = ["@", "!", "@", "@", "!"];
         const specialStr = pattern[idx % pattern.length];
 
         return specialStr;
