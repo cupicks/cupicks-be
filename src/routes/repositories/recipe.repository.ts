@@ -100,17 +100,20 @@ export class RecipeRepository {
                     user.image_url,
                     user.resized_url
                 FROM (
-                    SELECT user_id, recipe_id FROM user_recipe WHERE recipe_id = ?
+                    SELECT user_id, recipe_id
+                    FROM user_recipe
+                    WHERE recipe_id = ?
                 ) user_recipe
                 LEFT OUTER JOIN user
                 ON user_recipe.user_id = user.user_id
+
                 LEFT OUTER JOIN recipe
                 ON user_recipe.recipe_id = recipe.recipe_id
             ) recipe
         LEFT OUTER JOIN
             (
                 SELECT *
-                FROM recipe_ingredient recipe_ingredient
+                FROM recipe_ingredient
                 WHERE recipe_id = ?
                 ORDER BY recipe_ingredient_id asc
             ) recipe_ingredient
