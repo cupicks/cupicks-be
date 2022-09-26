@@ -20,6 +20,7 @@ jobs:
       - name: Create Testing Environment File
         run:  |
           pwd
+            cd /home/runner/work/cupicks-be/cupicks-be
             touch .env.test
             echo PORT=${{secrets.TEST_PORT}} >> .env.test
             echo SALT=${{secrets.TEST_SALT}} >> .env.test
@@ -53,12 +54,14 @@ jobs:
       - name: Create Testing Jwt Private Key using local key
         run:  |
           pwd
+            cd /home/runner/work/cupicks-be/cupicks-be
             touch private.pem
             echo `${{secrets.TEST_JWT_PRIVATE_PEM}}` >> private.pem
       
       - name: Create Testing Jwt Public Key using local key
         run:  |
           pwd
+            cd /home/runner/work/cupicks-be/cupicks-be
             touch public.pem
             echo `${{secrets.TEST_JWT_PUBLIC_PEM}}` >> public.pem
 
