@@ -1,5 +1,7 @@
 import { RequestHandler, Request, Response } from "express";
 
+import { DtoFactory } from "../../modules/_.loader";
+
 import { CustomException, UnkownError, UnkownTypeError, ValidationException } from "../../models/_.loader";
 import {
     CreateRecipeDto,
@@ -12,27 +14,27 @@ import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
 import { IRecipeCombinedPacket } from "../../models/_.loader";
 
-export default class RecipeController {
+export class RecipeController {
     private recipeService: RecipeService;
+    private dtoFactory: DtoFactory;
 
     constructor() {
         this.recipeService = new RecipeService();
+        this.dtoFactory = new DtoFactory();
     }
     // Create
 
     public createRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const CreateRecipeValidator = await new JoiValidator().validateAsync<CreateRecipeDto>(
-                new CreateRecipeDto({
-                    title: req.body.title,
-                    content: req.body.content,
-                    isIced: req.body.isIced,
-                    cupSize: req.body.cupSize,
-                    isPublic: req.body.isPublic,
-                    ingredientList: req.body.ingredientList,
-                    userId: res.locals.userId,
-                }),
-            );
+            const CreateRecipeValidator = await this.dtoFactory.getCreateRecipeDto({
+                title: req.body.title,
+                content: req.body.content,
+                isIced: req.body.isIced,
+                cupSize: req.body.cupSize,
+                isPublic: req.body.isPublic,
+                ingredientList: req.body.ingredientList,
+                userId: res.locals.userId,
+            });
 
             const createRecipe = await this.recipeService.createRecipe(CreateRecipeValidator);
 
@@ -57,12 +59,9 @@ export default class RecipeController {
 
     public getRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const getRecipeValidator: CommonRecipeDto = await new JoiValidator().validateAsync<CommonRecipeDto>(
-                new CommonRecipeDto({
-                    recipeId: Number(req.params.recipeId),
-                    userId: res.locals.userId,
-                }),
-            );
+            const getRecipeValidator: CommonRecipeDto = await this.dtoFactory.getCommonRecipeDto({
+                recipeId: Number(req.params.recipeId),
+            });
 
             const getRecipe: IRecipeCombinedPacket[] = await this.recipeService.getRecipe(getRecipeValidator);
 
@@ -104,7 +103,7 @@ export default class RecipeController {
 
     public getRecipes: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const getRecipesValidator = await new JoiValidator().validateAsync<GetRecipeDto>(
+            const getRecipesValidator: GetRecipeDto = await this.dtoFactory.getRecipeDto(
                 new GetRecipeDto({
                     page: Number(req.query.page),
                     count: Number(req.query.count),
@@ -135,17 +134,15 @@ export default class RecipeController {
 
     public updatedRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const updateRecipeValidator: UpdateRecipeDto = await new JoiValidator().validateAsync<UpdateRecipeDto>(
-                new UpdateRecipeDto({
-                    title: req.body.title,
-                    content: req.body.content,
-                    isIced: req.body.isIced,
-                    isPublic: req.body.isPublic,
-                    ingredientList: req.body.ingredientList,
-                    userId: res.locals.userId,
-                    recipeId: Number(req.params.recipeId),
-                }),
-            );
+            const updateRecipeValidator: UpdateRecipeDto = await this.dtoFactory.getUpdateRecipeDto({
+                title: req.body.title,
+                content: req.body.content,
+                isIced: req.body.isIced,
+                isPublic: req.body.isPublic,
+                ingredientList: req.body.ingredientList,
+                userId: res.locals.userId,
+                recipeId: Number(req.params.recipeId),
+            });
 
             await this.recipeService.updateRecipe(updateRecipeValidator);
 
@@ -170,12 +167,10 @@ export default class RecipeController {
 
     public deleteRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const deleteRecipeValidator: DeleteRecipeDto = await new JoiValidator().validateAsync<DeleteRecipeDto>(
-                new DeleteRecipeDto({
-                    userId: res.locals.userId,
-                    recipeId: Number(req.params.recipeId),
-                }),
-            );
+            const deleteRecipeValidator: DeleteRecipeDto = await this.dtoFactory.getDeleteRecipeDto({
+                userId: res.locals.userId,
+                recipeId: Number(req.params.recipeId),
+            });
 
             await this.recipeService.deleteRecipe(deleteRecipeValidator);
 
@@ -199,12 +194,10 @@ export default class RecipeController {
 
     public likeRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const likeRecipeValidator = await new JoiValidator().validateAsync<DeleteRecipeDto>(
-                new DeleteRecipeDto({
-                    userId: res.locals.userId,
-                    recipeId: Number(req.params.recipeId),
-                }),
-            );
+            const likeRecipeValidator: DeleteRecipeDto = await this.dtoFactory.getDeleteRecipeDto({
+                userId: res.locals.userId,
+                recipeId: Number(req.params.recipeId),
+            });
 
             await this.recipeService.likeRecipe(likeRecipeValidator);
 
@@ -226,12 +219,10 @@ export default class RecipeController {
 
     public disLikeRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const disLikeRecipeValidator = await new JoiValidator().validateAsync<DeleteRecipeDto>(
-                new DeleteRecipeDto({
-                    userId: res.locals.userId,
-                    recipeId: Number(req.params.recipeId),
-                }),
-            );
+            const disLikeRecipeValidator: DeleteRecipeDto = await this.dtoFactory.getDeleteRecipeDto({
+                userId: res.locals.userId,
+                recipeId: Number(req.params.recipeId),
+            });
 
             await this.recipeService.disLikeRecipe(disLikeRecipeValidator);
 

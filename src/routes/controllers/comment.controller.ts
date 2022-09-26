@@ -1,5 +1,7 @@
 import { RequestHandler, Request, Response } from "express";
 
+import { DtoFactory } from "../../modules/_.loader";
+
 import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
 import {
     CreateCommentDto,
@@ -8,11 +10,12 @@ import {
     GetCommentDto,
     ICommentPacket,
 } from "../../models/_.loader";
+
 import { JoiValidator } from "../../modules/_.loader";
 import { CommentService } from "../services/_.exporter";
 import { ICommentResponse } from "../../constants/_.loader";
 
-export default class CommentController {
+export class CommentController {
     private commentService: CommentService;
 
     constructor() {

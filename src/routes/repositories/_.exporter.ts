@@ -7,11 +7,21 @@ import { RecipeIngredientListRepository } from "./recipe.ingredient.list.reposit
 
 import { CommentRepository } from "./comment.repository";
 
+import { UserCategoryRepository } from "./user.category.repository";
+
 export {
+    // Auth
     AuthRepository,
     AuthVerifyListRepository,
-    CommentRepository,
+
+    // Recipe
     RecipeRepository,
     RecipeIngredientRepository,
     RecipeIngredientListRepository,
+
+    // Comment
+    CommentRepository,
+
+    // UserCategory
+    UserCategoryRepository,
 };
