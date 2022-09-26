@@ -5,7 +5,7 @@ export class MysqlProvider {
     static isInit = false;
     static pool: mysql.Pool;
 
-    static init = ({ HOST, USER, DATABASE, PASSWORD, CONNECTION_LIMIT }: IMysqlEnv) => {
+    static init = async ({ HOST, USER, DATABASE, PASSWORD, CONNECTION_LIMIT }: IMysqlEnv) => {
         if (this.isInit === true) return;
 
         this.pool = mysql.createPool({
@@ -15,7 +15,7 @@ export class MysqlProvider {
             password: PASSWORD,
             connectionLimit: CONNECTION_LIMIT,
         });
-        this.validateConnetion(this.pool);
+        await this.validateConnetion(this.pool);
         this.isInit = true;
     };
 
