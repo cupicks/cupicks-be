@@ -56,7 +56,6 @@ jobs:
           pwd
             ssh-keygen -t rsa -P " " -b 4096 -m PEM -f private.pem -P ${{secrets.TEST_HASH_PASSPHRASE}}
             ssh-keygen -e -m PEM -f private.pem > public.pem
-            ls
 
       - name: Cachce node_modules
         uses: actions/cache@v2
