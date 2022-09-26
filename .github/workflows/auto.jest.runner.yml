@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Prepare Environment and Dependencies, and then Run Jest
+      - name: Create Testing Environment File
         run:  |
           pwd
             touch .env.test
@@ -49,10 +49,19 @@ jobs:
             echo SES_ACCESS_KEY=${{secrets.TEST_SES_ACCESS_KEY}} >> .env.test
             echo SES_SECRET_KEY=${{secrets.TEST_SES_SECRET_KEY}} >> .env.test
             echo SES_SENDER_EMAIL=${{secrets.TEST_SES_SENDER_EMAIL}} >> .env.test
-          
-          genrsa -des3 -out private.pem 2048
-          testpassword
       
+      - name: Create Testing Jwt Private Key using local key
+        run:  |
+          pwd
+            touch private.pem
+            echo ${{secrets.TEST_JWT_PRIVATE_PEM}} >> private.pem
+      
+      - name: Create Testing Jwt Public Key using local key
+        run:  |
+          pwd
+            touch public.pem
+            echo ${{secrets.TEST_JWT_PUBLIC_PEM}} >> public.pem
+
       - name: Cachce node_modules
         uses: actions/cache@v2
         id: node-cache
