@@ -53,6 +53,9 @@ import { DeleteCommentDto } from "./dtos/comment/delete.comment.dto";
 import { UpdateCommentDto } from "./dtos/comment/update.comment.dto";
 import { GetCommentDto } from "./dtos/comment/get.comment.dto";
 
+// RANKING
+import { BestRecipeDto } from "./dtos/ranking/best.recipe.dto";
+
 // PACKET - USER
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
 import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
@@ -66,6 +69,10 @@ import { IRecipeLikePacket } from "./packets/i.recipe.like.packet";
 
 // PACKET - COMMENT
 import { ICommentPacket } from "./packets/i.comment.packet";
+
+// PACKET - RANKING
+import { IWeeklyBestPacket } from "./packets/i.weekly.packet";
+import { IBestRecipePacket, IBestRecipeCategoryPacket } from "./packets/i.best.recipe.packet";
 
 export {
     Env,
@@ -83,6 +90,9 @@ export {
     IRecipeIngredientPacket,
     IRecipeIngredientListPacket,
     ICommentPacket,
+    IWeeklyBestPacket,
+    IBestRecipePacket,
+    IBestRecipeCategoryPacket,
 
     // BaseDtos
     IBaseDto,
@@ -129,6 +139,9 @@ export {
     DeleteCommentDto,
     UpdateCommentDto,
     GetCommentDto,
+
+    // RANKING
+    BestRecipeDto,
     // CustomExceptions
     CustomException, // 500
     BadRequestException, // 400
