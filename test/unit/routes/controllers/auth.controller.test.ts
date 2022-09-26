@@ -7,12 +7,12 @@ import { mockHttp, mockRoute, mockModule } from "../../../_.fake.datas/mocks/_.l
 
 jest.mock("../../../../src/routes/services/auth.service", () => {
     return {
-        AuthService: jest.fn().mockImplementation(() => mockRoute.MockAuthService),
+        AuthService: jest.fn().mockImplementation(() => mockRoute.Services.MockAuthService),
     };
 });
 jest.mock("../../../../src/modules/factory/dto.factory", () => {
     return {
-        DtoFactory: jest.fn().mockImplementation(() => mockModule.MockDtoFactory),
+        DtoFactory: jest.fn().mockImplementation(() => mockModule.Factories.MockDtoFactory),
     };
 });
 

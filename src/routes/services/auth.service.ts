@@ -124,7 +124,7 @@ export class AuthService {
             await conn.rollback();
             throw err;
         } finally {
-            conn.release();
+            conn?.release();
         }
     };
 
