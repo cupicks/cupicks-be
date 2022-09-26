@@ -17,26 +17,32 @@ import {
     EnvProvider,
     JwtProvider,
     MulterProvider,
-    MysqlProvider,
 } from "../../../../src/modules/_.loader";
 
 // arrange as mocking
-import { getMockConnection } from "../../../_.fake.datas/mocks/modules/providers/mock.mysql.provider";
+import { mockModule } from "../../../_.fake.datas/mocks/_.loader";
 import { UserDtoFixtureProvider } from "../../../_.fake.datas/fixture/_.exporter";
+
+jest.mock("../../../../src/modules/providers/mysql.provider", () => {
+    return {
+        MysqlProvider: jest.fn().mockImplementation(() => mockModule.Providers.MockMysqlProvider),
+    };
+});
 
 describe("Auth Service Test", () => {
     let sutAuthService: AuthService;
     let userDtoFixtureProvider: UserDtoFixtureProvider;
     let MODE: TNODE_ENV, ENV: Env;
 
-    beforeAll(() => {
+    beforeAll(async () => {
         MODE = "test";
         EnvProvider.init(MODE);
         ENV = new EnvProvider().getEnvInstance();
 
+        // await MysqlProvider.init(ENV.MYSQL);
+
         JwtProvider.init(ENV.JWT);
         BcryptProvider.init(ENV.SALT);
-        MysqlProvider.init(ENV.MYSQL);
         MulterProvider.init(ENV.S3);
         AwsSesProvider.init(ENV.SES, ENV.URL.SERVER_URL_WITH_PORT);
 
@@ -56,7 +62,7 @@ describe("Auth Service Test", () => {
             nickname = "sample_nickname";
 
             sutAuthService["bcryptProvider"].hashPassword = jest.fn((password: string): string => password);
-            sutAuthService["mysqlProvider"].getConnection = getMockConnection;
+            sutAuthService["mysqlProvider"].getConnection = mockModule.Providers.getMockConnection;
 
             emailVerifyToken = sutAuthService["jwtProvider"].signEmailVerifyToken({ type: "EmailVerifyToken", email });
             nicknameVerifyToken = sutAuthService["jwtProvider"].signNicknameVerifyToken({
