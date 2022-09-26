@@ -15,7 +15,7 @@ permissions:
 
 hooks:
   AfterInstall:
-    - location: scripts/after-deploy.sh
+    - location: /home/ubuntu/project/scripts/after-deploy.sh
       timeout: 300
       runas: ubuntu
       # runas는 사용자 이름
