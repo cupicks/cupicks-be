@@ -36,6 +36,8 @@ import { EditProfileDto, IEditProfileDto } from "./dtos/profile/edit.profile.dto
 import { GetMyRecipeDto, IGetMyRecipeDto } from "./dtos/profile/get.my.recipe.dto";
 import { GetLikeRecipeDto, IGetLikeRecipeDto } from "./dtos/profile/get.like.recipe.dto";
 
+import { GetMyProfileDto, IGetMyProfileDto } from "./dtos/profile/get.my.profile.dto";
+
 // RECIPE
 
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
@@ -119,6 +121,8 @@ export {
     ISendEmailDto,
     EditProfileDto,
     IEditProfileDto,
+    GetMyProfileDto,
+    IGetMyProfileDto,
     // RECIPE
     CreateRecipeDto,
     ICreateRecipeDto,

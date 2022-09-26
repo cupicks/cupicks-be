@@ -8,7 +8,6 @@ import { ProfileController } from "../controllers/_.exporter";
 
 const profileRouter: Router = Router();
 
-profileRouter.get("", /* applicationJsonFilter */ new ProfileController().getAllProfilesTemp);
 profileRouter.patch(
     "",
     /* formDataFilter */
@@ -17,6 +16,7 @@ profileRouter.patch(
     new ProfileController().editProfile,
 );
 
+profileRouter.get("/my-profile", preventUnLoginUserGuard, new ProfileController().getMyProfile);
 profileRouter.get("/my-recipe", preventUnLoginUserGuard, new ProfileController().getMyRecipe);
 profileRouter.get("/like-recipe", preventUnLoginUserGuard, new ProfileController().getLikeRecipe);
 
