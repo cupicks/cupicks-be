@@ -6,7 +6,7 @@ import { IngredientDto } from "./ingredient.dto";
 import { IBaseDto } from "../i.base.dto";
 
 import { RequestQueryExtractor } from "../request.query.extractor";
-import { ERecipeCategory } from "models/enums/e.recipe.category";
+import { ERecipeCategory } from "../../enums/e.recipe.category";
 
 export interface IUpdateRecipeDto {
     title: string;
