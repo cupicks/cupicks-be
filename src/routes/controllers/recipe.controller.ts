@@ -63,7 +63,8 @@ export class RecipeController {
                 recipeId: Number(req.params.recipeId),
             });
 
-            const getRecipe: IRecipeCombinedPacket[] = await this.recipeService.getRecipe(getRecipeValidator.recipeId);
+
+            const getRecipe: IRecipeCombinedPacket[] = await this.recipeService.getRecipe(getRecipeValidator);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -86,6 +87,7 @@ export class RecipeController {
                             ingredientAmount: e.ingredientAmount,
                         };
                     }),
+                    isLiked: getRecipe[0].isLiked,
                 },
             });
         } catch (err) {
@@ -103,6 +105,7 @@ export class RecipeController {
     public getRecipes: RequestHandler = async (req: Request, res: Response) => {
         try {
             const getRecipesValidator: GetRecipeDto = await this.dtoFactory.getRecipeDto(
+
                 new GetRecipeDto({
                     page: Number(req.query.page),
                     count: Number(req.query.count),
