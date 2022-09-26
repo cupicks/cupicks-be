@@ -8,7 +8,6 @@ import { ProfileController } from "../controllers/_.exporter";
 
 const profileRouter: Router = Router();
 
-profileRouter.get("", /* applicationJsonFilter */ new ProfileController().getAllProfilesTemp);
 profileRouter.patch(
     "",
     /* formDataFilter */

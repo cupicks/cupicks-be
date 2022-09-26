@@ -31,12 +31,6 @@ export class ProfileService {
         this.userCategoryRepository = new UserCategoryRepository();
     }
 
-    public getAllProfile = async (): Promise<IUserPacket[]> => {
-        const conn = await this.mysqlProvider.getConnection();
-
-        return await this.authRepository.findAllUser(conn);
-    };
-
     public editProfile = async (editDto: EditProfileDto): Promise<void> => {
         // 유저 있는 지 확인
         const conn = await this.mysqlProvider.getConnection();
