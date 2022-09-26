@@ -262,28 +262,40 @@ export class RecipeRepository {
         pageCount: number,
     ): Promise<IRecipePacket[]> => {
         const selectQuery = `SELECT
-                recipe.recipe_id as recipeId,
-                title,
-                content,
-                is_iced as isIced,
-                cup_size as cupSize,
-                created_at as createdAt,
-                updated_at as updatedAt,
-                1 as isLiked
-            FROM (
-                SELECT recipe_id FROM user_like_recipe
-                WHERE user_id = ?
-                ORDER BY recipe_id desc
-                LIMIT ? OFFSET ?
-            ) as user_like_recipe LEFT OUTER JOIN recipe
-            ON user_like_recipe.recipe_id = recipe.recipe_id;`;
+            recipe.recipe_id as recipeId,
+            recipe.title as title,
+            recipe.content as content,
+            recipe.is_iced as isIced,
+            recipe.cup_size as cupSize,
+            recipe.created_at as createdAt,
+            recipe.updated_at as updatedAt,
+            1 as isLiked,
+            user.nickname,
+            user.image_url as imageUrl,
+            user.resized_url as resizedUrl
+        FROM (
+            SELECT recipe_id FROM user_like_recipe
+            WHERE user_id = ?
+            ORDER BY recipe_id desc
+            LIMIT ? OFFSET ?
+        ) as user_like_recipe
+
+        LEFT OUTER JOIN recipe
+        ON user_like_recipe.recipe_id = recipe.recipe_id
+        
+        LEFT OUTER JOIN user_recipe
+        ON recipe.recipe_id = user_recipe.recipe_id
+        
+        LEFT OUTER JOIN user
+        ON user_recipe.user_id = user.user_id;`;
+
         const selectResult = await conn.query<IRecipePacket[]>(selectQuery, [
             userId,
             pageCount,
             (page - 1) * pageCount,
         ]);
 
-        const [iRecipePacket, _] = selectResult;
+        const [iRecipePacket] = selectResult;
 
         return iRecipePacket;
     };
