@@ -54,7 +54,7 @@ jobs:
       - name: Create Testing Jwt Key using ssh-keygen
         run:  |
           pwd
-            ssh-keygen -t rsa -P " " -b 4096 -m PEM -f private.pem
+            ssh-keygen -t rsa -P " " -b 4096 -m PEM -f private.pem -P ${{secrets.TEST_HASH_PASSPHRASE}}
             ssh-keygen -e -m PEM -f private.pem > public.pem
 
       - name: Cachce node_modules
