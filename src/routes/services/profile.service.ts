@@ -2,6 +2,7 @@ import { AuthRepository } from "../repositories/auth.repository";
 import { BcryptProvider, MulterProvider, MysqlProvider } from "../../modules/_.loader";
 import {
     EditProfileDto,
+    GetMyProfileDto,
     GetMyRecipeDto,
     IIngredientDto,
     IRecipeIngredientPacket,
@@ -77,6 +78,22 @@ export class ProfileService {
             ]);
 
             await conn.commit();
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public getMyProfile = async (getMyProfileDto: GetMyProfileDto) => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            const user = await this.authRepository.findUserById(conn, getMyProfileDto.userId);
+
+            await conn.commit();
+            return user;
         } catch (err) {
             await conn.rollback();
             throw err;

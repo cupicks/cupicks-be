@@ -17,6 +17,7 @@ profileRouter.patch(
     new ProfileController().editProfile,
 );
 
+profileRouter.get("/my-profile", preventUnLoginUserGuard, new ProfileController().getMyProfile);
 profileRouter.get("/my-recipe", preventUnLoginUserGuard, new ProfileController().getMyRecipe);
 profileRouter.get("/like-recipe", preventUnLoginUserGuard, new ProfileController().getLikeRecipe);
 
