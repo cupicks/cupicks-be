@@ -59,9 +59,7 @@ export class MulterProvider {
                 s3,
                 bucket: MulterProvider.BUCKET,
                 key(req, file, done) {
-                    const ext = file.mimetype.split("/")[1];
-
-                    done(null, `${path}/${new UuidProvider().getUuid()}.${ext}`);
+                    done(null, `${path}/${new UuidProvider().getUuid()}`);
                 },
             }),
             fileFilter(req, file, done) {

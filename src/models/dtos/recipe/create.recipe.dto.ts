@@ -14,7 +14,6 @@ export interface ICreateRecipeDto {
     ingredientList: IngredientDto[];
     userId: number;
     recipeId?: number;
-    category?: string[];
 }
 
 export class CreateRecipeDto extends RequestQueryExtractor<string> implements IBaseDto {
@@ -25,18 +24,8 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
     isPublic: boolean;
     ingredientList: IngredientDto[];
     userId: number;
-    category?: string[];
 
-    constructor({
-        title,
-        content,
-        isIced,
-        cupSize,
-        isPublic,
-        ingredientList = [],
-        userId,
-        category = [],
-    }: ICreateRecipeDto) {
+    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [], userId }: ICreateRecipeDto) {
         super();
         this.title = title;
         this.content = content;
@@ -45,7 +34,6 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
         this.userId = userId;
-        this.category = category.map((category) => category);
     }
 
     getJoiInstance(): ObjectSchema<CreateRecipeDto> {
@@ -73,9 +61,7 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
                     ingredientAmount: joi.number().max(1000).required(),
                 }),
             ),
-            // Joi.array().items(Joi.string())
             userId: joi.number().min(1).required(),
-            category: joi.array().items(joi.string().min(1).max(20).required()),
         });
     }
 }

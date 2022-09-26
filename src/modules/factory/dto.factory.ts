@@ -99,7 +99,6 @@ export class DtoFactory {
         isPublic: boolean;
         ingredientList: IIngredientDto[];
         userId: number;
-        category: string[];
     }): Promise<CreateRecipeDto> {
         return await this.joiValidator.validateAsync<CreateRecipeDto>(new CreateRecipeDto(iDto));
     }
@@ -111,7 +110,6 @@ export class DtoFactory {
         ingredientList: IngredientDto[];
         userId: number;
         recipeId: number;
-        category: string[];
     }): Promise<UpdateRecipeDto> {
         return await this.joiValidator.validateAsync<UpdateRecipeDto>(new UpdateRecipeDto(iDto));
     }
@@ -177,11 +175,6 @@ export class DtoFactory {
     public async getGetCommentDto(iDto: { recipeId: number; page: number; count: number }): Promise<GetCommentDto> {
         return await this.joiValidator.validateAsync<GetCommentDto>(new GetCommentDto(iDto));
     }
-
-    // RANKING
-    public async getBestRecipeDto(iDto: { userId: number | null }): Promise<BestRecipeDto> {
-        return await this.joiValidator.validateAsync<BestRecipeDto>(new BestRecipeDto(iDto));
-    }
 }
 
 import {
@@ -223,6 +216,4 @@ import {
     IGetMyRecipeDto,
     GetLikeRecipeDto,
     IIngredientDto,
-    // RANKING
-    BestRecipeDto,
 } from "../../models/_.loader";
