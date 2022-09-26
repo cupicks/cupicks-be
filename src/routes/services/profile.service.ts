@@ -199,9 +199,9 @@ export class ProfileService {
                             ingredientColor: ingredient.ingredientColor,
                         };
                     }),
-                    nickname: user.nickname,
-                    imageUrl: user.imageUrl,
-                    resizedUrl: user.resizedUrl,
+                    nickname: myRecipeList[i].nickname,
+                    imageUrl: myRecipeList[i].imageUrl,
+                    resizedUrl: myRecipeList[i].resizedUrl,
                     isLiked: myRecipeList[i].isLiked === 1,
                 });
 
