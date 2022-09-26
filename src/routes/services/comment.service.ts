@@ -39,6 +39,8 @@ export class CommentService {
             if (isExists === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
+            const findUser = await this.commentRepository.findUser(conn, commentDto.userId);
+
             const createComment = await this.commentRepository.createComment(conn, commentDto);
             const commentId = createComment;
 
@@ -48,6 +50,8 @@ export class CommentService {
 
             return {
                 commentId,
+                userImageUrl: findUser[0].imageUrl,
+                userResizedUrl: findUser[0].resizedUrl,
                 createdAt: date,
                 updatedAt: date,
             };

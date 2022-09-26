@@ -46,8 +46,11 @@ export class CommentController {
                 comment: {
                     userId: validator.userId,
                     nickname: validator.nickname,
+                    userImageUrl: createComment.userImageUrl,
+                    userResizedUrl: createComment.userResizedUrl,
                     recipeId: validator.recipeId,
                     commentId: createComment.commentId,
+                    comment: validator.comment,
                     imageUrl: validator.imageUrl ? validator.imageUrl : null,
                     resizedUrl: validator.resizedUrl ? validator.resizedUrl : null,
                     createdAt: createComment.createdAt,
