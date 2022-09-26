@@ -111,11 +111,13 @@ export class RecipeRepository {
             (
                 SELECT *
                 FROM recipe_ingredient recipe_ingredient
+                WHERE recipe_id = ?
+                ORDER BY recipe_ingredient_id asc
             ) recipe_ingredient
         ON recipe.recipe_id = recipe_ingredient.recipe_id
         `;
 
-        const [result] = await conn.query<IRecipeCombinedPacket[]>(query, recipeId);
+        const [result] = await conn.query<IRecipeCombinedPacket[]>(query, [recipeId, recipeId]);
 
         return result;
     };
