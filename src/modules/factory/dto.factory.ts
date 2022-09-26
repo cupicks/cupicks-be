@@ -74,7 +74,9 @@ export class DtoFactory {
     }): Promise<EditProfileDto> {
         return await this.joiValidator.validateAsync<EditProfileDto>(new EditProfileDto(iDto));
     }
-
+    public async getMyProfileDto(iDto: { userId: number }): Promise<GetMyProfileDto> {
+        return await this.joiValidator.validateAsync<GetMyProfileDto>(new GetMyProfileDto(iDto));
+    }
     public async getGetMyRecipeDto(iDto: {
         userId: number;
         page: string | string[] | ParsedQs | ParsedQs[] | undefined;
@@ -209,4 +211,5 @@ import {
     BestRecipeDto,
     IUpdateRecipeDto,
     ICreateRecipeDto,
+    GetMyProfileDto,
 } from "../../models/_.loader";
