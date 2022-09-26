@@ -29,7 +29,6 @@ export class RankingController {
                 message: "레시피 조회에성공하셨습니다.",
                 bestRecipeList: getWeeklyBestRecipes,
             });
-            return res.end();
         } catch (err) {
             console.log(err);
             const exception = this.errorHandler(err);
