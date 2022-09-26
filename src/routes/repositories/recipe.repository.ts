@@ -86,7 +86,37 @@ export class RecipeRepository {
 
     // Get
 
-    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
+    public getRecipe = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket> => {
+        const selectQuery = `
+        SELECT    
+            recipe.recipe_id as recipeId,
+            recipe.cup_size as cupSize,
+            recipe.title as title,
+            recipe.content as content,
+            recipe.is_iced as isIced,
+            recipe.is_public as isPublic,
+            recipe.created_at as createdAt,
+            recipe.updated_at as updatedAt,
+            user.nickname as nickname,
+            user.image_url as imageUrl,
+            user.resized_url as resizedUrl
+        FROM (
+            SELECT
+                recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
+            FROM recipe
+            WHERE recipe_id = ${recipeId}
+            LIMIT 1
+        ) recipe
+        LEFT OUTER JOIN user_recipe
+            ON recipe.recipe_id = user_recipe.recipe_id
+        LEFT OUTER JOIN user
+            ON user_recipe.user_id = user.user_id;`;
+        const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
+        const [recipePackets] = selectResult;
+
+        return recipePackets[0];
+    };
+    public getRecipeLegacy = async (conn: PoolConnection, recipeId: number): Promise<IRecipeCombinedPacket[]> => {
         const query = `
         SELECT
             recipe.recipe_id AS "recipeId", recipe.title, recipe.content, recipe.is_iced AS "isIced", recipe.cup_size AS "cupSize", recipe.created_at AS "createdAt", recipe.updated_at AS "updatedAt",

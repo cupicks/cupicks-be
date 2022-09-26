@@ -80,7 +80,7 @@ export class RecipeService {
 
     // Get
 
-    getRecipe = async (getRecipeDto: CommonRecipeDto): Promise<IRecipeCombinedPacket[]> => {
+    getRecipe = async (getRecipeDto: CommonRecipeDto): Promise<RecipeDto> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
@@ -88,7 +88,9 @@ export class RecipeService {
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, getRecipeDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
-            const getRecipe: IRecipeCombinedPacket[] = await this.recipeRepository.getRecipe(
+            const recipe: IRecipeCombinedPacket = await this.recipeRepository.getRecipe(conn, getRecipeDto.recipeId);
+
+            const ingredientList = await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(
                 conn,
                 getRecipeDto.recipeId,
             );
@@ -99,13 +101,31 @@ export class RecipeService {
                 getRecipeDto.recipeId,
             );
 
-            console.log(userLikeRecipeExist);
-
-            getRecipe[0].isLiked = userLikeRecipeExist === true ? true : false;
+            const recipeDto = new RecipeDto({
+                recipeId: recipe.recipeId,
+                title: recipe.title,
+                content: recipe.content,
+                isIced: recipe.isIced,
+                cupSize: recipe.cupSize,
+                createdAt: recipe.createdAt,
+                updatedAt: recipe.updatedAt,
+                ingredientList: ingredientList.map((ingredient): IIngredientDto => {
+                    return {
+                        ingredientName: ingredient.ingredientName,
+                        ingredientAmount: ingredient.ingredientAmount,
+                        ingredientColor: ingredient.ingredientColor,
+                    };
+                }),
+                nickname: recipe.nickname,
+                imageUrl: recipe.imageUrl,
+                resizedUrl: recipe.resizedUrl,
+                isLiked: userLikeRecipeExist === true ? true : false,
+                // isLiked: myLikeRecipeIdList.includes(recipe.recipeId) ? true : false,
+            });
 
             await conn.commit();
 
-            return getRecipe;
+            return recipeDto;
         } catch (err) {
             await conn.rollback();
             throw err;
