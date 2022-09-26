@@ -4,6 +4,8 @@ import { AuthController } from "../../../../src/routes/controllers/auth.controll
 // type & mocking
 import { Request, Response, NextFunction } from "express";
 import { mockHttp, mockRoute, mockModule } from "../../../_.fake.datas/mocks/_.loader";
+import { SignupUserDto, UserDto } from "../../../../src/models/_.loader";
+import { UserDtoFixtureProvider } from "../../../_.fake.datas/fixture/user.dto.fixture.provider";
 
 jest.mock("../../../../src/routes/services/auth.service", () => {
     return {
@@ -18,11 +20,18 @@ jest.mock("../../../../src/modules/factory/dto.factory", () => {
 
 describe("Auth Controller Test", () => {
     let sutAuthController: AuthController;
-    // let userDtoFixtureProvider: UserDtoFixtureProvider;
+    let userDtoFixtureProvider: UserDtoFixtureProvider;
     let mockRequest: Request, mockResponse: Response, mockNextFunc: NextFunction;
+
+    let mockErrorCode: string, mockErrorMessage: string, mockErrorInstance: Error;
 
     beforeAll(() => {
         sutAuthController = new AuthController();
+        userDtoFixtureProvider = new UserDtoFixtureProvider();
+
+        mockErrorCode = "UNKOWN";
+        mockErrorMessage = "Mock Error";
+        mockErrorInstance = new Error(mockErrorMessage);
     });
 
     beforeEach(() => {
@@ -30,20 +39,59 @@ describe("Auth Controller Test", () => {
         mockResponse = mockHttp.getMockResponse();
     });
 
-    it("Authontroller be defined", () => expect(AuthController).toBeDefined());
+    it("AuthController be defined", () => expect(AuthController).toBeDefined());
+    it("AuthController.prototpye contain ", () => expect(Object.keys(sutAuthController).length).toBe(10));
 
-    it("signup should be call res.status(201).json()", async () => {
-        await sutAuthController.signup(mockRequest, mockResponse, mockNextFunc);
+    describe("AuthService.prototype.signup", () => {
+        let signupUserDto: SignupUserDto;
+        let userDto: UserDto;
 
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
+        beforeEach(() => {
+            signupUserDto = userDtoFixtureProvider.getSignupUserDto();
+            userDto = userDtoFixtureProvider.getUserDto({});
 
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: "회원가입에 성공하셨습니다.",
-            user: undefined,
+            sutAuthController["dtoFactory"].getSignupUserDto = jest.fn(async (): Promise<SignupUserDto> => {
+                return signupUserDto;
+            });
+
+            sutAuthController["authService"].signup = jest.fn(async (): Promise<UserDto> => {
+                return userDto;
+            });
         });
+
+        it("should call res.status(201).json()", async () => {
+            await sutAuthController.signup(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(201);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "회원가입에 성공하셨습니다.",
+                user: userDto,
+            });
+        });
+
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].signup = jest.fn(async (): Promise<UserDto> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.signup(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
+        });
+
+        afterEach(() => jest.clearAllMocks());
     });
 
     it("signin should be call res.status(201).json()", async () => {
