@@ -9,6 +9,7 @@
     "transform": {
       "^.+\\.(t|j)s$": "esbuild-jest"
     },
+    "silent": true,
     "testEnvironment": "node",
     "coverageDirectory": "./coverage",
     "coveragePathIgnorePatterns": [
