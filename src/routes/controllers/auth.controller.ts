@@ -242,11 +242,11 @@ export class AuthController {
 
     public resetPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const snedPasswordDto = await this.dtoFactory.getResetPasswordDto({
+            const resetPasswordDto = await this.dtoFactory.getResetPasswordDto({
                 resetPasswordToken: req?.query["resetPasswordToken"],
             });
 
-            const email = await this.authService.resetPassword(snedPasswordDto);
+            const email = await this.authService.resetPassword(resetPasswordDto);
 
             // FE message : 'ㅇㅇㅇㅇ@naver.com 님 임시 비밀번호를 사용하실 수 있습니다.'
             return res.status(302).redirect(AuthController.FRONT_URL + `/signIn?email=` + email);

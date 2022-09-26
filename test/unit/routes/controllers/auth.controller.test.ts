@@ -4,8 +4,19 @@ import { AuthController } from "../../../../src/routes/controllers/auth.controll
 // type & mocking
 import { Request, Response, NextFunction } from "express";
 import { mockHttp, mockRoute, mockModule } from "../../../_.fake.datas/mocks/_.loader";
-import { SignupUserDto, UserDto } from "../../../../src/models/_.loader";
+import {
+    ConfirmEmailDto,
+    LogoutUserDto,
+    PublishTokenDto,
+    ResetPasswordDto,
+    SendEmailDto,
+    SendPasswordDto,
+    SigninUserDto,
+    SignupUserDto,
+    UserDto,
+} from "../../../../src/models/_.loader";
 import { UserDtoFixtureProvider } from "../../../_.fake.datas/fixture/user.dto.fixture.provider";
+import { string } from "joi";
 
 jest.mock("../../../../src/routes/services/auth.service", () => {
     return {
@@ -40,9 +51,11 @@ describe("Auth Controller Test", () => {
     });
 
     it("AuthController be defined", () => expect(AuthController).toBeDefined());
-    it("AuthController.prototpye contain ", () => expect(Object.keys(sutAuthController).length).toBe(10));
+    it("AuthController.prototpye contain 12 method", () => {
+        expect(Object.keys(sutAuthController).length).toBe(12);
+    });
 
-    describe("AuthService.prototype.signup", () => {
+    describe("AuthController.prototype.signup", () => {
         let signupUserDto: SignupUserDto;
         let userDto: UserDto;
 
@@ -94,118 +107,368 @@ describe("Auth Controller Test", () => {
         afterEach(() => jest.clearAllMocks());
     });
 
-    it("signin should be call res.status(201).json()", async () => {
-        await sutAuthController.signin(mockRequest, mockResponse, mockNextFunc);
+    describe("AuthController.prototype.signin", () => {
+        let signinUserDto: SigninUserDto;
+        let tokenDto: {
+            accessToken: string;
+            refreshToken: string;
+        };
 
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
+        beforeEach(() => {
+            signinUserDto = userDtoFixtureProvider.getSigninUserDto();
+            tokenDto = {
+                accessToken: "sample_token",
+                refreshToken: "sample_token",
+            };
 
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: "로그인에 성공하셨습니다.",
-            accessToken: undefined,
-            refreshToken: undefined,
+            sutAuthController["dtoFactory"].getSigninUserDto = jest.fn(async () => {
+                return signinUserDto;
+            });
+
+            sutAuthController["authService"].signin = jest.fn(async () => {
+                return tokenDto;
+            });
+        });
+
+        it("should call res.status(201).json", async () => {
+            await sutAuthController.signin(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(201);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "로그인에 성공하셨습니다.",
+                accessToken: tokenDto.accessToken,
+                refreshToken: tokenDto.refreshToken,
+            });
+        });
+
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].signin = jest.fn(async (): Promise<typeof tokenDto> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.signup(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
         });
     });
 
-    it("logout should be call res.status(201).json()", async () => {
-        await sutAuthController.logout(mockRequest, mockResponse, mockNextFunc);
+    describe("AuthController.prototype.logout", () => {
+        let logoutUserDto: LogoutUserDto;
 
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
+        beforeEach(() => {
+            logoutUserDto = userDtoFixtureProvider.getLogoutUserDto();
 
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: "로그아웃에 성공하셨습니다.",
+            sutAuthController["dtoFactory"].getLogoutUserDto = jest.fn(
+                async (): Promise<LogoutUserDto> => logoutUserDto,
+            );
+        });
+
+        it("should call res.status(201).json()", async () => {
+            await sutAuthController.logout(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(201);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "로그아웃에 성공하셨습니다.",
+            });
+        });
+
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].logout = jest.fn(async (): Promise<void> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.logout(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
         });
     });
 
-    it("publishToken should be call res.status(201).json()", async () => {
-        await sutAuthController.publishToken(mockRequest, mockResponse, mockNextFunc);
+    describe("AuthController.prototype.publishToken", () => {
+        let publishTokenDto: PublishTokenDto;
+        let accessToken: string;
 
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
+        beforeEach(() => {
+            publishTokenDto = userDtoFixtureProvider.getPublishTokenDto();
+            accessToken = "sample_token";
 
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: "토큰 재발행에 성공하셨습니다.",
-            accessToken: undefined,
+            sutAuthController["dtoFactory"].getPublishTokenDto = jest.fn(async () => publishTokenDto);
+            sutAuthController["authService"].publishToken = jest.fn(async () => accessToken);
+        });
+
+        it("should call res.status(201).json()", async () => {
+            await sutAuthController.publishToken(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(201);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "토큰 재발행에 성공하셨습니다.",
+                accessToken: accessToken,
+            });
+        });
+
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].publishToken = jest.fn(async (): Promise<string> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.logout(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
         });
     });
 
-    it("sendEmail should be call res.status(201).json()", async () => {
-        await sutAuthController.sendEmail(mockRequest, mockResponse, mockNextFunc);
+    describe("AuthController.prototype.sendEmail", () => {
+        let sendEmailDto: SendEmailDto;
+        let result: {
+            email: string;
+            date: string;
+            exceededDate:
+                | {
+                      lastSentDate: string;
+                      accessibleDate: string;
+                  }
+                | undefined;
+        };
 
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
+        beforeEach(() => {
+            sendEmailDto = userDtoFixtureProvider.getSendEmailDto();
+            result = {
+                email: "sample_email",
+                date: "sample_date",
+                exceededDate: {
+                    lastSentDate: "sample_last_sent_date",
+                    accessibleDate: "sample_accessible_date",
+                },
+            };
 
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: `사용자 이메일로 6자리 숫자가 발송되었어요!`,
-            date: undefined,
-            exceededDate: undefined,
+            sutAuthController["dtoFactory"].getSendEmailDto = jest.fn(async (): Promise<SendEmailDto> => sendEmailDto);
+            sutAuthController["authService"].sendEmail = jest.fn(async (): Promise<typeof result> => result);
+        });
+
+        it("should call res.status(201).json()", async () => {
+            await sutAuthController.sendEmail(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(201);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "사용자 이메일로 6자리 숫자가 발송되었어요!",
+                date: result?.date,
+                exceededDate: result?.exceededDate,
+            });
+        });
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].sendEmail = jest.fn(async (): Promise<typeof result> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.sendEmail(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
         });
     });
 
-    it("confirmEmailCode should be call res.status(201).json()", async () => {
-        await sutAuthController.confirmEmailCode(mockRequest, mockResponse, mockNextFunc);
+    describe("AuthController.prototype.confirmEmailCode", () => {
+        let confirmEmailDto: ConfirmEmailDto;
+        let result: {
+            emailVerifyToken: string;
+        };
 
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
+        beforeEach(() => {
+            confirmEmailDto = userDtoFixtureProvider.getConfirmEmailDto();
+            result = {
+                emailVerifyToken: "sample_token",
+            };
 
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: "사용자 이메일 인증이 완료되었습니다.",
-            emailVerifyToken: undefined,
+            sutAuthController["dtoFactory"].getConfirmEmailDto = jest.fn(
+                async (): Promise<ConfirmEmailDto> => confirmEmailDto,
+            );
+            sutAuthController["authService"].confirmEmailCode = jest.fn(async (): Promise<typeof result> => result);
+        });
+
+        it("should call res.status(201).json()", async () => {
+            await sutAuthController.confirmEmailCode(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(201);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "사용자 이메일 인증이 완료되었습니다.",
+                emailVerifyToken: result.emailVerifyToken,
+            });
+        });
+
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].confirmEmailCode = jest.fn(async (): Promise<typeof result> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.confirmEmailCode(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
+        });
+    });
+    describe("AuthController.prototype.sendPassword", () => {
+        let sendPasswordDto: SendPasswordDto;
+        let result: {
+            date: string;
+            email: string;
+            exceededDate:
+                | {
+                      lastSentDate: string;
+                      accessibleDate: string;
+                  }
+                | undefined;
+        };
+
+        beforeEach(() => {
+            sendPasswordDto = userDtoFixtureProvider.getSendPasswordDto();
+            result = {
+                date: "sample_date",
+                email: "sample_email",
+                exceededDate: {
+                    lastSentDate: "sample_last_sent_date",
+                    accessibleDate: "sample_accessible_date",
+                },
+            };
+
+            sutAuthController["dtoFactory"].getSendPasswordDto = jest.fn(
+                async (): Promise<SendPasswordDto> => sendPasswordDto,
+            );
+            sutAuthController["authService"].sendPassword = jest.fn(async (): Promise<typeof result> => result);
+        });
+
+        it("should call res.status(201).json()", async () => {
+            await sutAuthController.sendPassword(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(201);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "임시 비밀번호를 이메일로 발송했어요!",
+                date: result.date,
+                exceededDate: result.exceededDate,
+            });
+        });
+
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].sendPassword = jest.fn(async (): Promise<typeof result> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.sendPassword(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
         });
     });
 
-    it("confirmNickname should be call res.status(201).json()", async () => {
-        await sutAuthController.confirmNickname(mockRequest, mockResponse, mockNextFunc);
+    describe("AuthController.prototype.resetPassword", () => {
+        let resetPasswordDto: ResetPasswordDto;
+        let email: string;
 
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
+        beforeEach(() => {
+            resetPasswordDto = userDtoFixtureProvider.getResetPasswordDto();
+            email = "sample_email";
 
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: "사용자 닉네임 중복확인이 완료되었습니다.",
-            nicknameVerifyToken: undefined,
+            sutAuthController["dtoFactory"].getResetPasswordDto = jest.fn(
+                async (): Promise<ResetPasswordDto> => resetPasswordDto,
+            );
+            sutAuthController["authService"].resetPassword = jest.fn(async (): Promise<string> => email);
+        });
+
+        it("should call res.status(302).json()", async () => {
+            await sutAuthController.resetPassword(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(302);
+
+            expect(mockResponse.json).not.toBeCalled();
+            expect(mockResponse.redirect).toBeCalled();
+            expect(mockResponse.redirect).toBeCalledWith(`${undefined}/signIn?email=${email}`);
+        });
+        it("should call res.status(500).json()", async () => {
+            sutAuthController["authService"].resetPassword = jest.fn(async (): Promise<string> => {
+                throw mockErrorInstance;
+            });
+
+            await sutAuthController.sendPassword(mockRequest, mockResponse, mockNextFunc);
+
+            expect(mockResponse.status).toBeCalled();
+            expect(mockResponse.status).toBeCalledWith(500);
+
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: false,
+                message: mockErrorInstance.message,
+                errorCode: mockErrorCode,
+            });
         });
     });
 
-    it("sendPassword should be call res.status(201).json()", async () => {
-        await sutAuthController.sendPassword(mockRequest, mockResponse, mockNextFunc);
-
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(201);
-
-        expect(mockResponse.json).toBeCalled();
-        expect(mockResponse.json).toBeCalledWith({
-            isSuccess: true,
-            message: `임시 비밀번호를 이메일로 발송했어요!`,
-            date: undefined,
-            exceededDate: undefined,
-        });
-    });
-
-    it("resetPassword should be call res.status(302).redirect()", async () => {
-        await sutAuthController.resetPassword(mockRequest, mockResponse, mockNextFunc);
-
-        expect(mockResponse.status).toBeCalled();
-        expect(mockResponse.status).toBeCalledWith(302);
-
-        expect(mockResponse.json).not.toBeCalled();
-        expect(mockResponse.redirect).toBeCalled();
-        expect(mockResponse.redirect).toBeCalledWith(`${undefined}/signIn?email=${undefined}`);
-    });
-
-    afterAll(() => {
-        jest.clearAllMocks();
-    });
+    afterEach(() => jest.clearAllMocks());
 });
