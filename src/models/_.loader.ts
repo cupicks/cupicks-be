@@ -64,6 +64,7 @@ import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
 
 // PACKET - RECIPE
 import { IRecipePacket } from "./packets/i.recipe.packet";
+import { IRecipeOwnerPacket } from "./packets/i.recipe.owner.packet";
 import { IRecipeCombinedPacket } from "./packets/i.recipe.combined.packet";
 import { IRecipeIngredientPacket } from "./packets/i.recipe.ingredient.packet";
 import { IRecipeIngredientListPacket } from "./packets/i.recipe.ingredient.list.packet";
@@ -95,6 +96,7 @@ export {
     IWeeklyBestPacket,
     IBestRecipePacket,
     IBestRecipeCategoryPacket,
+    IRecipeOwnerPacket,
 
     // BaseDtos
     IBaseDto,
