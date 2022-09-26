@@ -1,9 +1,9 @@
 import { RequestHandler, Request, Response } from "express";
 
-import { DtoFactory } from "../../modules/_.loader";
-
-import { CustomException, UnkownError, UnkownTypeError, BestRecipeDto } from "../../models/_.loader";
 import { RankingService } from "../services/_.exporter";
+
+import { DtoFactory } from "../../modules/_.loader";
+import { CustomException, UnkownError, UnkownTypeError, BestRecipeDto } from "../../models/_.loader";
 
 export class RankingController {
     private dtoFactory: DtoFactory;

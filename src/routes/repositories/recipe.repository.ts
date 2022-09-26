@@ -1,3 +1,5 @@
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+
 import {
     CreateRecipeDto,
     IngredientDto,
@@ -9,7 +11,6 @@ import {
     GetRecipeDto,
     DeleteRecipeDto,
 } from "../../models/_.loader";
-import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
 
 export class RecipeRepository {
     // IsExists

@@ -1,18 +1,15 @@
-import { RankingRepository, RecipeIngredientRepository } from "../repositories/_.exporter";
-import { MysqlProvider, DayjsProvider } from "../../modules/_.loader";
+import { RankingRepository, RecipeRepository, RecipeIngredientRepository } from "../repositories/_.exporter";
 
+import { MysqlProvider, DayjsProvider } from "../../modules/_.loader";
 import {
     IWeeklyBestPacket,
     IBestRecipePacket,
     IBestRecipeCategoryPacket,
     IRecipeIngredientPacket,
-    IRecipeCombinedPacket,
     IRecipeLikePacket,
-    RecipeDto,
     IIngredientDto,
     BestRecipeDto,
 } from "../../models/_.loader";
-import { AuthRepository, RecipeRepository } from "../repositories/_.exporter";
 
 export class RankingService {
     private rankingRepository: RankingRepository;
@@ -101,7 +98,7 @@ export class RankingService {
                             ingredientAmount: ingredient.ingredientAmount,
                         };
                     }),
-                    categoryList: bestRecipeCategoryList[i].map((category) => category),
+                    categoryList: bestRecipeCategoryList[i].map((category) => category.categoryName),
                 };
                 bestRecipes.push(bestRecipe);
             }
@@ -111,16 +108,16 @@ export class RankingService {
             // const weeklyStartDate = period.startDate;
             // const weeklyEndDate = period.endDate;
 
-            // // const createBestRecipeRanking = await weeklyBestRankingList.map(async (recipeId, ranking) => {
-            // //     await this.rankingRepository.createBestRecipeRanking(
-            // //         conn,
-            // //         3,
-            // //         recipeId,
-            // //         `2022-09-19 10:10:${ranking}`,
-            // //         `2022-09-15 10:10:${ranking}`,
-            // //         "weekly",
-            // //     )
-            // // });
+            // const createBestRecipeRanking = await weeklyBestRankingList.map(async (recipeId, ranking) => {
+            //     await this.rankingRepository.createBestRecipeRanking(
+            //         conn,
+            //         3,
+            //         recipeId,
+            //         weeklyStartDate,
+            //         weeklyEndDate,
+            //         "weekly",
+            //     )
+            // });
 
             await conn.commit();
 

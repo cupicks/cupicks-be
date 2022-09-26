@@ -3,6 +3,7 @@ import * as dayjs from "dayjs";
 
 export type TDatabaseFormat = "YYYY-MM-DD hh:mm:ss";
 export type TClientFormat = "YYYY년 MM월 DD일 hh:mm";
+export type TWeeklyForamt = "YYYY-MM-DD";
 
 export type TProvidedFormat = TDatabaseFormat | TClientFormat;
 export interface IGetWeeklyPeriodDate {
@@ -25,6 +26,10 @@ export class DayjsProvider {
      */
     public getClientFormat(): TClientFormat {
         return "YYYY년 MM월 DD일 hh:mm";
+    }
+
+    public getWeeklyFormat(): TWeeklyForamt {
+        return "YYYY-MM-DD";
     }
 
     /**
@@ -56,17 +61,17 @@ export class DayjsProvider {
 
         const startDate = current
             .set("date", diff)
-            .set("hour", 13) // 00: ㅡ> 01
-            .set("minute", 59) // 00:59
-            .set("second", 59) // :00:59:59
-            .format("YYYY-MM-DD hh:mm:ss");
+            // .set("hour", 13) // 00: ㅡ> 01
+            // .set("minute", 0) // 00:00
+            // .set("second", 0) // :00:00:00
+            .format(this.getWeeklyFormat());
 
         const endDate = current
             .set("date", diff + 6)
-            .set("hour", 23)
-            .set("minute", 59)
-            .set("second", 59)
-            .format(this.getDayabaseFormat());
+            // .set("hour", 1)
+            // .set("minute", 59)
+            // .set("second", 59)
+            .format(this.getWeeklyFormat());
 
         return {
             startDate,

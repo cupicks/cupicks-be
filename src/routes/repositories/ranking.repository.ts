@@ -1,6 +1,6 @@
-import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
-import { UnkownError } from "../../models/_.loader";
+import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 
+import { UnkownError } from "../../models/_.loader";
 import { IWeeklyBestPacket, IBestRecipePacket, IBestRecipeCategoryPacket } from "../../models/_.loader";
 
 export class RankingRepository {
@@ -16,9 +16,11 @@ export class RankingRepository {
                 count(*) as totalLike, 
                 user_like_recipe.recipe_id as recipeId
             FROM user_like_recipe
-            WHERE created_at BETWEEN "2022-09-26 00:00:00" AND "2022-09-27 00:00:00"
+            WHERE created_at BETWEEN ? AND ?
             GROUP BY recipe_id ORDER BY count(*) DESC LIMIT 3;
         `;
+
+        console.log(startDate, endDate);
 
         const selectResult = await conn.query<IWeeklyBestPacket[]>(query, [startDate, endDate]);
         // const selectResult = await conn.query<IWeeklyBestPacket[]>(query);
