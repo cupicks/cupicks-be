@@ -51,8 +51,41 @@ describe("Auth Controller Test", () => {
     });
 
     it("AuthController be defined", () => expect(AuthController).toBeDefined());
-    it("AuthController.prototpye contain 12 method", () => {
+    it("AuthController.prototpye contain 2 dependencies and 10 methods", () => {
         expect(Object.keys(sutAuthController).length).toBe(12);
+
+        expect(sutAuthController["authService"]).toBeDefined();
+        expect(sutAuthController["dtoFactory"]).toBeDefined();
+
+        expect(sutAuthController.signup).toBeDefined();
+        expect(typeof sutAuthController.signup).toBe("function");
+
+        expect(sutAuthController.signin).toBeDefined();
+        expect(typeof sutAuthController.signin).toBe("function");
+
+        expect(sutAuthController.logout).toBeDefined();
+        expect(typeof sutAuthController.logout).toBe("function");
+
+        expect(sutAuthController.publishToken).toBeDefined();
+        expect(typeof sutAuthController.publishToken).toBe("function");
+
+        expect(sutAuthController.sendEmail).toBeDefined();
+        expect(typeof sutAuthController.sendEmail).toBe("function");
+
+        expect(sutAuthController.confirmEmailCode).toBeDefined();
+        expect(typeof sutAuthController.confirmEmailCode).toBe("function");
+
+        expect(sutAuthController.confirmNickname).toBeDefined();
+        expect(typeof sutAuthController.confirmNickname).toBe("function");
+
+        expect(sutAuthController.sendPassword).toBeDefined();
+        expect(typeof sutAuthController.sendPassword).toBe("function");
+
+        expect(sutAuthController.resetPassword).toBeDefined();
+        expect(typeof sutAuthController.resetPassword).toBe("function");
+
+        expect(sutAuthController["errorHandler"]).toBeDefined();
+        expect(typeof sutAuthController["errorHandler"]).toBe("function");
     });
 
     describe("AuthController.prototype.signup", () => {

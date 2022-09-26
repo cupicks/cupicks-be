@@ -14,14 +14,20 @@ import {
 import {
     AwsSesProvider,
     BcryptProvider,
+    DayjsProvider,
     EnvProvider,
     JwtProvider,
     MulterProvider,
+    MysqlProvider,
+    RandomGenerator,
 } from "../../../../src/modules/_.loader";
 
 // arrange as mocking
 import { mockModule } from "../../../_.fake.datas/mocks/_.loader";
 import { UserDtoFixtureProvider } from "../../../_.fake.datas/fixture/_.exporter";
+import { AuthRepository } from "../../../../src/routes/repositories/auth.repository";
+import { AuthVerifyListRepository } from "../../../../src/routes/repositories/auth.verify.list.repository";
+import { UserCategoryRepository } from "../../../../src/routes/repositories/user.category.repository";
 
 jest.mock("../../../../src/modules/providers/mysql.provider", () => {
     return {
@@ -51,6 +57,48 @@ describe("Auth Service Test", () => {
     });
 
     it("AuthService must be defined", () => expect(AuthService).toBeDefined());
+    it("AuthService.prototype contain 9 dependencies and 9 methods", () => {
+        expect(Object.keys(sutAuthService).length).toBe(18);
+
+        expect(sutAuthService["jwtProvider"]).toBeDefined();
+        expect(sutAuthService["mysqlProvider"]).toBeDefined();
+        expect(sutAuthService["sesProvider"]).toBeDefined();
+        expect(sutAuthService["bcryptProvider"]).toBeDefined();
+        expect(sutAuthService["dayjsProvider"]).toBeDefined();
+
+        expect(sutAuthService["randomGenerator"]).toBeDefined();
+
+        expect(sutAuthService["authRepository"]).toBeDefined();
+        expect(sutAuthService["authVerifyListRepository"]).toBeDefined();
+        expect(sutAuthService["userCategoryRepository"]).toBeDefined();
+
+        expect(sutAuthService.signup).toBeDefined();
+        expect(typeof sutAuthService.signup).toBe("function");
+
+        expect(sutAuthService.signin).toBeDefined();
+        expect(typeof sutAuthService.signin).toBe("function");
+
+        expect(sutAuthService.logout).toBeDefined();
+        expect(typeof sutAuthService.logout).toBe("function");
+
+        expect(sutAuthService.publishToken).toBeDefined();
+        expect(typeof sutAuthService.publishToken).toBe("function");
+
+        expect(sutAuthService.sendEmail).toBeDefined();
+        expect(typeof sutAuthService.sendEmail).toBe("function");
+
+        expect(sutAuthService.confirmEmailCode).toBeDefined();
+        expect(typeof sutAuthService.confirmEmailCode).toBe("function");
+
+        expect(sutAuthService.confirmNickname).toBeDefined();
+        expect(typeof sutAuthService.confirmNickname).toBe("function");
+
+        expect(sutAuthService.sendPassword).toBeDefined();
+        expect(typeof sutAuthService.sendPassword).toBe("function");
+
+        expect(sutAuthService.resetPassword).toBeDefined();
+        expect(typeof sutAuthService.resetPassword).toBe("function");
+    });
 
     describe("AuthService.prototype.signup", () => {
         let signupUserDto: SignupUserDto;
