@@ -28,7 +28,7 @@ export class MysqlProvider {
     };
 
     /** @throws { CustomException } */
-    public getConnection = async () => {
+    public getConnection = async (): Promise<mysql.PoolConnection> => {
         this.validateIsInit();
 
         try {
