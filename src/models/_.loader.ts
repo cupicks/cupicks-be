@@ -36,11 +36,13 @@ import { EditProfileDto, IEditProfileDto } from "./dtos/profile/edit.profile.dto
 import { GetMyRecipeDto, IGetMyRecipeDto } from "./dtos/profile/get.my.recipe.dto";
 import { GetLikeRecipeDto, IGetLikeRecipeDto } from "./dtos/profile/get.like.recipe.dto";
 
+import { GetMyProfileDto, IGetMyProfileDto } from "./dtos/profile/get.my.profile.dto";
+
 // RECIPE
 
 import { IngredientDto, IIngredientDto } from "./dtos/recipe/ingredient.dto";
 import { CreateRecipeDto, ICreateRecipeDto } from "./dtos/recipe/create.recipe.dto";
-import { UpdateRecipeDto } from "./dtos/recipe/update.recipe.dto";
+import { UpdateRecipeDto, IUpdateRecipeDto } from "./dtos/recipe/update.recipe.dto";
 import { CommonRecipeDto } from "./dtos/recipe/common.recipe.dts";
 import { DeleteRecipeDto } from "./dtos/recipe/delete.recipe.dto";
 import { GetRecipeDto } from "./dtos/recipe/get.recipe.dto";
@@ -53,12 +55,16 @@ import { DeleteCommentDto } from "./dtos/comment/delete.comment.dto";
 import { UpdateCommentDto } from "./dtos/comment/update.comment.dto";
 import { GetCommentDto } from "./dtos/comment/get.comment.dto";
 
+// RANKING
+import { BestRecipeDto } from "./dtos/ranking/best.recipe.dto";
+
 // PACKET - USER
 import { IUserPacket, IUserRefresthTokenPacket } from "./packets/i.user.packet";
 import { IUserVerifyListPacket } from "./packets/i.email.verify.packet";
 
 // PACKET - RECIPE
 import { IRecipePacket } from "./packets/i.recipe.packet";
+import { IRecipeOwnerPacket } from "./packets/i.recipe.owner.packet";
 import { IRecipeCombinedPacket } from "./packets/i.recipe.combined.packet";
 import { IRecipeIngredientPacket } from "./packets/i.recipe.ingredient.packet";
 import { IRecipeIngredientListPacket } from "./packets/i.recipe.ingredient.list.packet";
@@ -66,6 +72,10 @@ import { IRecipeLikePacket } from "./packets/i.recipe.like.packet";
 
 // PACKET - COMMENT
 import { ICommentPacket } from "./packets/i.comment.packet";
+
+// PACKET - RANKING
+import { IWeeklyBestPacket } from "./packets/i.weekly.packet";
+import { IBestRecipePacket, IBestRecipeCategoryPacket } from "./packets/i.best.recipe.packet";
 
 export {
     Env,
@@ -83,6 +93,10 @@ export {
     IRecipeIngredientPacket,
     IRecipeIngredientListPacket,
     ICommentPacket,
+    IWeeklyBestPacket,
+    IBestRecipePacket,
+    IBestRecipeCategoryPacket,
+    IRecipeOwnerPacket,
 
     // BaseDtos
     IBaseDto,
@@ -109,10 +123,13 @@ export {
     ISendEmailDto,
     EditProfileDto,
     IEditProfileDto,
+    GetMyProfileDto,
+    IGetMyProfileDto,
     // RECIPE
     CreateRecipeDto,
     ICreateRecipeDto,
     UpdateRecipeDto,
+    IUpdateRecipeDto,
     IngredientDto,
     IIngredientDto,
     CommonRecipeDto,
@@ -129,6 +146,9 @@ export {
     DeleteCommentDto,
     UpdateCommentDto,
     GetCommentDto,
+
+    // RANKING
+    BestRecipeDto,
     // CustomExceptions
     CustomException, // 500
     BadRequestException, // 400

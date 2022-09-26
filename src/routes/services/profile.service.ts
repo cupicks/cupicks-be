@@ -2,6 +2,7 @@ import { AuthRepository } from "../repositories/auth.repository";
 import { BcryptProvider, MulterProvider, MysqlProvider } from "../../modules/_.loader";
 import {
     EditProfileDto,
+    GetMyProfileDto,
     GetMyRecipeDto,
     IIngredientDto,
     IRecipeIngredientPacket,
@@ -29,12 +30,6 @@ export class ProfileService {
         this.recipeIngredientRepository = new RecipeIngredientRepository();
         this.userCategoryRepository = new UserCategoryRepository();
     }
-
-    public getAllProfile = async (): Promise<IUserPacket[]> => {
-        const conn = await this.mysqlProvider.getConnection();
-
-        return await this.authRepository.findAllUser(conn);
-    };
 
     public editProfile = async (editDto: EditProfileDto): Promise<void> => {
         // 유저 있는 지 확인
@@ -77,6 +72,22 @@ export class ProfileService {
             ]);
 
             await conn.commit();
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    };
+
+    public getMyProfile = async (getMyProfileDto: GetMyProfileDto) => {
+        const conn = await this.mysqlProvider.getConnection();
+
+        try {
+            const user = await this.authRepository.findUserById(conn, getMyProfileDto.userId);
+
+            await conn.commit();
+            return user;
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -188,9 +199,9 @@ export class ProfileService {
                             ingredientColor: ingredient.ingredientColor,
                         };
                     }),
-                    nickname: user.nickname,
-                    imageUrl: user.imageUrl,
-                    resizedUrl: user.resizedUrl,
+                    nickname: myRecipeList[i].nickname,
+                    imageUrl: myRecipeList[i].imageUrl,
+                    resizedUrl: myRecipeList[i].resizedUrl,
                     isLiked: myRecipeList[i].isLiked === 1,
                 });
 

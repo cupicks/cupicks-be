@@ -4,6 +4,7 @@ import { ObjectSchema } from "joi";
 import { IngredientDto } from "./ingredient.dto";
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
+import { ERecipeCategory } from "../../enums/e.recipe.category";
 
 export interface ICreateRecipeDto {
     title: string;
@@ -14,6 +15,7 @@ export interface ICreateRecipeDto {
     ingredientList: IngredientDto[];
     userId: number;
     recipeId?: number;
+    category?: ERecipeCategory[];
 }
 
 export class CreateRecipeDto extends RequestQueryExtractor<string> implements IBaseDto {
@@ -24,8 +26,27 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
     isPublic: boolean;
     ingredientList: IngredientDto[];
     userId: number;
+    category?: ERecipeCategory[];
 
-    constructor({ title, content, isIced, cupSize, isPublic, ingredientList = [], userId }: ICreateRecipeDto) {
+    constructor({
+        title,
+        content,
+        isIced,
+        cupSize,
+        isPublic,
+        ingredientList = [],
+        userId,
+        category = [],
+    }: {
+        title: string;
+        content: string;
+        isIced: boolean;
+        cupSize?: number;
+        isPublic: boolean;
+        ingredientList: IngredientDto[];
+        userId: number;
+        category?: string[];
+    }) {
         super();
         this.title = title;
         this.content = content;
@@ -34,6 +55,7 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
         this.userId = userId;
+        this.category = category.map((cate) => ERecipeCategory[cate]).filter((v) => v);
     }
 
     getJoiInstance(): ObjectSchema<CreateRecipeDto> {
@@ -61,7 +83,20 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
                     ingredientAmount: joi.number().max(1000).required(),
                 }),
             ),
+            // Joi.array().items(Joi.string())
             userId: joi.number().min(1).required(),
+            category: joi
+                .array()
+                .items(
+                    joi
+                        .string()
+                        .equal(
+                            ERecipeCategory.milk,
+                            ERecipeCategory.caffein,
+                            ERecipeCategory.lemon,
+                            ERecipeCategory.syrup,
+                        ),
+                ),
         });
     }
 }

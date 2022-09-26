@@ -54,6 +54,20 @@ export class RecipeService {
 
             await this.recipeRepository.createRecipeIngredientList(conn, recipeId, insertedIdList);
 
+            const createRecipeCategoryAndList = await Promise.all(
+                recipeDto.category.map(async (category) => {
+                    const getRecipeCategory = await this.recipeRepository.getRecipeCategory(conn, category);
+
+                    if (getRecipeCategory.length <= 0) await this.recipeRepository.createRecipeCategory(conn, category);
+
+                    const createRecipeCategoryList = await this.recipeRepository.createRecipeCategoryList(
+                        conn,
+                        category,
+                        recipeId,
+                    );
+                }),
+            );
+
             await conn.commit();
             return recipeId;
         } catch (err) {
@@ -66,7 +80,7 @@ export class RecipeService {
 
     // Get
 
-    getRecipe = async (getRecipeDto: CommonRecipeDto): Promise<IRecipeCombinedPacket[]> => {
+    getRecipe = async (getRecipeDto: CommonRecipeDto): Promise<RecipeDto> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
@@ -74,7 +88,9 @@ export class RecipeService {
             const findRecipeById = await this.recipeRepository.findRecipeById(conn, getRecipeDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
-            const getRecipe: IRecipeCombinedPacket[] = await this.recipeRepository.getRecipe(
+            const recipe: IRecipeCombinedPacket = await this.recipeRepository.getRecipe(conn, getRecipeDto.recipeId);
+
+            const ingredientList = await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(
                 conn,
                 getRecipeDto.recipeId,
             );
@@ -85,13 +101,31 @@ export class RecipeService {
                 getRecipeDto.recipeId,
             );
 
-            console.log(userLikeRecipeExist);
-
-            getRecipe[0].isLiked = userLikeRecipeExist === true ? true : false;
+            const recipeDto = new RecipeDto({
+                recipeId: recipe.recipeId,
+                title: recipe.title,
+                content: recipe.content,
+                isIced: recipe.isIced,
+                cupSize: recipe.cupSize,
+                createdAt: recipe.createdAt,
+                updatedAt: recipe.updatedAt,
+                ingredientList: ingredientList.map((ingredient): IIngredientDto => {
+                    return {
+                        ingredientName: ingredient.ingredientName,
+                        ingredientAmount: ingredient.ingredientAmount,
+                        ingredientColor: ingredient.ingredientColor,
+                    };
+                }),
+                nickname: recipe.nickname,
+                imageUrl: recipe.imageUrl,
+                resizedUrl: recipe.resizedUrl,
+                isLiked: userLikeRecipeExist === true ? true : false,
+                // isLiked: myLikeRecipeIdList.includes(recipe.recipeId) ? true : false,
+            });
 
             await conn.commit();
 
-            return getRecipe;
+            return recipeDto;
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -134,6 +168,7 @@ export class RecipeService {
                 );
 
                 const recipeDtoList = new Array<RecipeDto>();
+
                 const loopLength = recipeList.length;
                 for (let i = 0; i < loopLength; i++) {
                     const recipeDto = new RecipeDto({
@@ -194,13 +229,29 @@ export class RecipeService {
             );
             if (!isAuthenticated) throw new NotFoundException("내가 작성한 레시피가 아닙니다.", "RECIPE-002");
 
-            const updateRecipe = this.recipeRepository.updateRecipeById(conn, updateRecipeDto);
             const deleteRecipeIngredient = this.recipeRepository.deleteRecipeIngredientById(
                 conn,
                 updateRecipeDto.recipeId,
             );
+            const deleteRecipeCategoryList = this.recipeRepository.deleteRecipeCategoryListById(
+                conn,
+                updateRecipeDto.recipeId,
+            );
 
-            await Promise.all([updateRecipe, deleteRecipeIngredient]);
+            const updateRecipe = this.recipeRepository.updateRecipeById(conn, updateRecipeDto);
+            const updateRecipeCategoryList = updateRecipeDto.category.map(async (category) => {
+                const getRecipeCategory = await this.recipeRepository.getRecipeCategory(conn, category);
+
+                if (getRecipeCategory.length <= 0) await this.recipeRepository.createRecipeCategory(conn, category);
+                this.recipeRepository.createRecipeCategoryList(conn, category, updateRecipeDto.recipeId);
+            });
+
+            await Promise.all([
+                updateRecipe,
+                deleteRecipeIngredient,
+                deleteRecipeCategoryList,
+                updateRecipeCategoryList,
+            ]);
 
             const result = updateRecipeDto.ingredientList.map((e) => {
                 return {

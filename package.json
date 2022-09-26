@@ -8,7 +8,7 @@
   "description": "",
   "scripts": {
     "rimraf": "./node_modules/rimraf/bin.js",
-    "prebuild": "rimraf ./dist",
+    "prebuild": "",
     "build": "tsc -p tsconfig.build.json",
     "prestart": "npm run build",
     "start": "pm2 start ecosystem.config.js --env production",

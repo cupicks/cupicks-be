@@ -2,11 +2,22 @@ import * as joi from "joi";
 import { ObjectSchema } from "joi";
 
 import { IngredientDto } from "./ingredient.dto";
-import { ICreateRecipeDto } from "./create.recipe.dto";
 
 import { IBaseDto } from "../i.base.dto";
 
 import { RequestQueryExtractor } from "../request.query.extractor";
+import { ERecipeCategory } from "../../enums/e.recipe.category";
+
+export interface IUpdateRecipeDto {
+    title: string;
+    content: string;
+    isIced: boolean;
+    isPublic: boolean;
+    ingredientList: IngredientDto[];
+    userId: number;
+    recipeId: number;
+    category: ERecipeCategory[];
+}
 
 export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IBaseDto {
     title: string;
@@ -16,6 +27,7 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
     ingredientList: IngredientDto[];
     userId: number;
     recipeId: number;
+    category: ERecipeCategory[];
 
     constructor({
         title,
@@ -25,7 +37,8 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
         ingredientList = [],
         userId,
         recipeId,
-    }: Omit<ICreateRecipeDto, "cupSize">) {
+        category = [],
+    }: IUpdateRecipeDto) {
         super();
         this.title = title;
         this.content = content;
@@ -33,9 +46,8 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
         this.isPublic = isPublic;
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
         this.userId = userId;
-        this.recipeId = +recipeId!;
-
-        // 클래스가 아닙니다.
+        this.recipeId = +recipeId;
+        this.category = category.map((cate) => ERecipeCategory[cate]).filter((v) => v);
     }
 
     getJoiInstance(): ObjectSchema<UpdateRecipeDto> {
@@ -64,6 +76,18 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
             ),
             userId: joi.number().min(1).required(),
             recipeId: joi.number().min(1).required(),
+            category: joi
+                .array()
+                .items(
+                    joi
+                        .string()
+                        .equal(
+                            ERecipeCategory.milk,
+                            ERecipeCategory.caffein,
+                            ERecipeCategory.lemon,
+                            ERecipeCategory.syrup,
+                        ),
+                ),
         });
     }
 }

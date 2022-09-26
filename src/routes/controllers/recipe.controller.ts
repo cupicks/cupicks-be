@@ -2,7 +2,7 @@ import { RequestHandler, Request, Response } from "express";
 
 import { DtoFactory } from "../../modules/_.loader";
 
-import { CustomException, UnkownError, UnkownTypeError, ValidationException } from "../../models/_.loader";
+import { CustomException, RecipeDto, UnkownError, UnkownTypeError, ValidationException } from "../../models/_.loader";
 import {
     CreateRecipeDto,
     UpdateRecipeDto,
@@ -26,7 +26,7 @@ export class RecipeController {
 
     public createRecipe: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const CreateRecipeValidator = await this.dtoFactory.getCreateRecipeDto({
+            const createRecipeValidator: CreateRecipeDto = await this.dtoFactory.getCreateRecipeDto({
                 title: req.body.title,
                 content: req.body.content,
                 isIced: req.body.isIced,
@@ -34,9 +34,10 @@ export class RecipeController {
                 isPublic: req.body.isPublic,
                 ingredientList: req.body.ingredientList,
                 userId: res.locals.userId,
+                category: req.body.category,
             });
 
-            const createRecipe = await this.recipeService.createRecipe(CreateRecipeValidator);
+            const createRecipe = await this.recipeService.createRecipe(createRecipeValidator);
 
             return res.status(201).json({
                 isSuccess: true,
@@ -63,30 +64,24 @@ export class RecipeController {
                 recipeId: Number(req.params.recipeId),
             });
 
-            const getRecipe: IRecipeCombinedPacket[] = await this.recipeService.getRecipe(getRecipeValidator);
+            const recipe: RecipeDto = await this.recipeService.getRecipe(getRecipeValidator);
 
             return res.status(200).json({
                 isSuccess: true,
                 message: "레시피 조회에성공하셨습니다.",
                 recipe: {
-                    recipeId: getRecipe[0].recipeId,
-                    nickname: getRecipe[0].nickname,
-                    imageUrl: getRecipe[0].imageUrl,
-                    resizedUrl: getRecipe[0].resizedUrl,
-                    title: getRecipe[0].title,
-                    content: getRecipe[0].content,
-                    isIced: getRecipe[0].isIced,
-                    cupSize: getRecipe[0].cupSize,
-                    createdAt: getRecipe[0].createdAt,
-                    updatedAt: getRecipe[0].updatedAt,
-                    ingredientList: getRecipe.map((e) => {
-                        return {
-                            ingredientName: e.ingredientName,
-                            ingredientColor: e.ingredientColor,
-                            ingredientAmount: e.ingredientAmount,
-                        };
-                    }),
-                    isLiked: getRecipe[0].isLiked,
+                    recipeId: recipe.recipeId,
+                    nickname: recipe.nickname,
+                    imageUrl: recipe.imageUrl,
+                    resizedUrl: recipe.resizedUrl,
+                    title: recipe.title,
+                    content: recipe.content,
+                    isIced: recipe.isIced,
+                    cupSize: recipe.cupSize,
+                    createdAt: recipe.createdAt,
+                    updatedAt: recipe.updatedAt,
+                    ingredientList: recipe.ingredientList,
+                    isLiked: recipe.isLiked,
                 },
             });
         } catch (err) {
@@ -142,6 +137,7 @@ export class RecipeController {
                 ingredientList: req.body.ingredientList,
                 userId: res.locals.userId,
                 recipeId: Number(req.params.recipeId),
+                category: req.body.category,
             });
 
             await this.recipeService.updateRecipe(updateRecipeValidator);

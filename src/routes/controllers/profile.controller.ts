@@ -18,28 +18,6 @@ export class ProfileController {
         this.dtoFactory = new DtoFactory();
     }
 
-    /**
-     * @deprecated
-     */
-    public getAllProfilesTemp: RequestHandler = async (req: Request, res: Response) => {
-        try {
-            const result = await this.profileService.getAllProfile();
-            return res.status(200).json({
-                result,
-            });
-        } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
-            const exception = this.errorHandler(err);
-            return res.status(exception.statusCode).json({
-                isSuccess: false,
-                message: exception.message,
-                errorCode: exception.errorCode,
-                ...exception.errorResult,
-            });
-        }
-    };
-
     public editProfile: RequestHandler = async (req: Request, res: Response) => {
         try {
             const file = req.file as Express.MulterS3.File;
@@ -60,6 +38,38 @@ export class ProfileController {
                 isSuccess: true,
                 message: "프로필 수정에 성공하셨습니다.",
                 userId: editDto.userId,
+            });
+        } catch (err) {
+            console.log(err);
+            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
+            const exception = this.errorHandler(err);
+            return res.status(exception.statusCode).json({
+                isSuccess: false,
+                message: exception.message,
+                errorCode: exception.errorCode,
+                ...exception.errorResult,
+            });
+        }
+    };
+
+    public getMyProfile: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const getMyProfileDto = await this.dtoFactory.getMyProfileDto({
+                userId: res.locals.userId,
+            });
+
+            const userDto = await this.profileService.getMyProfile(getMyProfileDto);
+
+            return res.json({
+                isSuccess: true,
+                message: "프로필 조회에 성공하셨습니다.",
+                user: {
+                    userId: userDto.userId,
+                    email: userDto.email,
+                    nickname: userDto.nickname,
+                    imageUrl: userDto.imageUrl,
+                    resizedUrl: userDto.resizedUrl,
+                },
             });
         } catch (err) {
             console.log(err);

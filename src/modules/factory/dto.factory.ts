@@ -74,7 +74,9 @@ export class DtoFactory {
     }): Promise<EditProfileDto> {
         return await this.joiValidator.validateAsync<EditProfileDto>(new EditProfileDto(iDto));
     }
-
+    public async getMyProfileDto(iDto: { userId: number }): Promise<GetMyProfileDto> {
+        return await this.joiValidator.validateAsync<GetMyProfileDto>(new GetMyProfileDto(iDto));
+    }
     public async getGetMyRecipeDto(iDto: {
         userId: number;
         page: string | string[] | ParsedQs | ParsedQs[] | undefined;
@@ -91,26 +93,10 @@ export class DtoFactory {
     }
 
     // RECIPE
-    public async getCreateRecipeDto(iDto: {
-        title: string;
-        content: string;
-        isIced: boolean;
-        cupSize: number;
-        isPublic: boolean;
-        ingredientList: IIngredientDto[];
-        userId: number;
-    }): Promise<CreateRecipeDto> {
+    public async getCreateRecipeDto(iDto: ICreateRecipeDto): Promise<CreateRecipeDto> {
         return await this.joiValidator.validateAsync<CreateRecipeDto>(new CreateRecipeDto(iDto));
     }
-    public async getUpdateRecipeDto(iDto: {
-        title: string;
-        content: string;
-        isIced: boolean;
-        isPublic: boolean;
-        ingredientList: IngredientDto[];
-        userId: number;
-        recipeId: number;
-    }): Promise<UpdateRecipeDto> {
+    public async getUpdateRecipeDto(iDto: IUpdateRecipeDto): Promise<UpdateRecipeDto> {
         return await this.joiValidator.validateAsync<UpdateRecipeDto>(new UpdateRecipeDto(iDto));
     }
     public async getIngredientDto(iDto: {
@@ -175,6 +161,11 @@ export class DtoFactory {
     public async getGetCommentDto(iDto: { recipeId: number; page: number; count: number }): Promise<GetCommentDto> {
         return await this.joiValidator.validateAsync<GetCommentDto>(new GetCommentDto(iDto));
     }
+
+    // RANKING
+    public async getBestRecipeDto(iDto: { userId: number | null }): Promise<BestRecipeDto> {
+        return await this.joiValidator.validateAsync<BestRecipeDto>(new BestRecipeDto(iDto));
+    }
 }
 
 import {
@@ -216,4 +207,9 @@ import {
     IGetMyRecipeDto,
     GetLikeRecipeDto,
     IIngredientDto,
+    // RANKING
+    BestRecipeDto,
+    IUpdateRecipeDto,
+    ICreateRecipeDto,
+    GetMyProfileDto,
 } from "../../models/_.loader";
