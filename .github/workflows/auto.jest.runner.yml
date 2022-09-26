@@ -49,7 +49,9 @@ jobs:
             echo SES_ACCESS_KEY=${{secrets.TEST_SES_ACCESS_KEY}} >> .env.test
             echo SES_SECRET_KEY=${{secrets.TEST_SES_SECRET_KEY}} >> .env.test
             echo SES_SENDER_EMAIL=${{secrets.TEST_SES_SENDER_EMAIL}} >> .env.test
-
+          
+          genrsa -des3 -out private.pem 2048
+          testpassword
       
       - name: Cachce node_modules
         uses: actions/cache@v2
