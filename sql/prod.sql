@@ -1,8 +1,8 @@
 
 USE sys;
-DROP DATABASE IF EXISTS cupick_dev;
-CREATE DATABASE IF NOT EXISTS cupick_dev;
-USE cupick_dev;
+DROP DATABASE IF EXISTS cupick_prod;
+CREATE DATABASE IF NOT EXISTS cupick_prod;
+USE cupick_prod;
 
 -- 차차차상위 비정휴과 ranking 페이지 제거
 
