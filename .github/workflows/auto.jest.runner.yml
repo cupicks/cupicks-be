@@ -54,13 +54,13 @@ jobs:
         run:  |
           pwd
             touch private.pem
-            echo ${{secrets.TEST_JWT_PRIVATE_PEM}} >> private.pem
+            echo `${{secrets.TEST_JWT_PRIVATE_PEM}}` >> private.pem
       
       - name: Create Testing Jwt Public Key using local key
         run:  |
           pwd
             touch public.pem
-            echo ${{secrets.TEST_JWT_PUBLIC_PEM}} >> public.pem
+            echo `${{secrets.TEST_JWT_PUBLIC_PEM}}` >> public.pem
 
       - name: Cachce node_modules
         uses: actions/cache@v2
