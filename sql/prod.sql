@@ -1,8 +1,8 @@
 
 USE sys;
-DROP DATABASE IF EXISTS cupick_prod;
-CREATE DATABASE IF NOT EXISTS cupick_prod;
-USE cupick_prod;
+DROP DATABASE IF EXISTS cupick_dev;
+CREATE DATABASE IF NOT EXISTS cupick_dev;
+USE cupick_dev;
 
 -- 차차차상위 비정휴과 ranking 페이지 제거
 
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS ranking_category (
 INSERT INTO ranking_category (name) VALUES ('weekly'), ('monthly');
 
 CREATE TABLE IF NOT EXISTS best_recipe_ranking (
-    ranking             INT             NOT NULL    CHECK (ranking >=3 AND ranking > 1),
+    ranking             INT             NOT NULL    CHECK (ranking <=3 AND ranking >= 1),
     recipe_id           INT             NOT NULL,
     start_date          DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     end_date            DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP,

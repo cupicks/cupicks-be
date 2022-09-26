@@ -16,6 +16,7 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
     ingredientList: IngredientDto[];
     userId: number;
     recipeId: number;
+    category: string[];
 
     constructor({
         title,
@@ -25,6 +26,7 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
         ingredientList = [],
         userId,
         recipeId,
+        category = [],
     }: Omit<ICreateRecipeDto, "cupSize">) {
         super();
         this.title = title;
@@ -34,6 +36,7 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
         this.ingredientList = ingredientList.map((ingredient) => new IngredientDto(ingredient));
         this.userId = userId;
         this.recipeId = +recipeId!;
+        this.category = category.map((category) => category);
 
         // 클래스가 아닙니다.
     }
@@ -64,6 +67,7 @@ export class UpdateRecipeDto extends RequestQueryExtractor<string> implements IB
             ),
             userId: joi.number().min(1).required(),
             recipeId: joi.number().min(1).required(),
+            category: joi.array().items(joi.string().min(1).max(20).required()),
         });
     }
 }
