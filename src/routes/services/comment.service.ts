@@ -97,13 +97,13 @@ export class CommentService {
     public updateComment = async (updateCommentDto: UpdateCommentDto): Promise<object> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
-            const updatedAt = this.dayjsProvider.getDayjsInstance().format(this.dayjsProvider.getClientFormat());
-
             await conn.beginTransaction();
 
             const isExistsByUserId: boolean = await this.authRepository.isExistsById(conn, updateCommentDto.userId);
             if (isExistsByUserId === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
+
+            const findUserById = await this.authRepository.findUserById(conn, updateCommentDto.userId);
 
             const isExistsByCommentId: ICommentPacket[] = await this.commentRepository.findCommentByCommentId(
                 conn,
@@ -133,10 +133,12 @@ export class CommentService {
             return {
                 userId: updateCommentDto.userId,
                 nickname: updateCommentDto.nickname,
+                userImageUrl: findUserById.imageUrl,
+                userResizedUrl: findUserById.resizedUrl,
                 commentId: updateCommentDto.commentId,
                 comment: updateCommentDto.comment,
-                imageUrl: updateCommentDto.imageUrl,
-                resizedUrl: updateCommentDto.resizedUrl,
+                imageUrl: updateCommentDto.imageUrl ?? null,
+                resizedUrl: updateCommentDto.resizedUrl ?? null,
                 createdAt: findCommentById[0].createdAt,
                 updatedAt: findCommentById[0].updatedAt,
             };
