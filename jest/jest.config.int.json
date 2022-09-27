@@ -4,6 +4,7 @@
     "json",
     "ts"
   ],
+  "silent": true,
   "rootDir": "../test/integration",
   "testRegex": ".*\\.test\\.ts$",
   "transform": {
