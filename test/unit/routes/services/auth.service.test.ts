@@ -10,6 +10,7 @@ import {
     ForBiddenException,
     IUserPacket,
     IUserVerifyListPacket,
+    LogoutUserDto,
     NotFoundException,
     SigninUserDto,
     SignupUserDto,
@@ -32,6 +33,7 @@ import { UserDtoFixtureProvider, PacketFixtureProvider } from "../../../_.fake.d
 import { AuthRepository } from "../../../../src/routes/repositories/auth.repository";
 import { AuthVerifyListRepository } from "../../../../src/routes/repositories/auth.verify.list.repository";
 import { UserCategoryRepository } from "../../../../src/routes/repositories/user.category.repository";
+import * as jwtLib from "jsonwebtoken";
 
 jest.mock("../../../../src/modules/providers/mysql.provider", () => {
     return {
@@ -39,7 +41,18 @@ jest.mock("../../../../src/modules/providers/mysql.provider", () => {
     };
 });
 
-describe("Auth Service Test", () => {
+describe("Auth Service Test", /**
+ * AuthService 에 대한 단위 테스트의 주요 목적은 다음과 같습니다.
+ *
+ * 1. AuthService 가 선언되었는 지 여부
+ * 2. AuthService 의 `의존성의 수` 와 `메서드의 수` 확인
+ * 3. AuthService.prototype.method 의 내부 분기점 확인
+ *      1. 실패할 경우, 재정의 되어 있는 CustomException 이 제대로 throw 되는 지 확인
+ *      2. 성공할 경우, 올바른 반환값이 return 되는 지 확인
+ *
+ * @since 2022-09-27
+ */
+() => {
     let sutAuthService: AuthService;
     let userDtoFixtureProvider: UserDtoFixtureProvider;
     let packetFixtureProvider: PacketFixtureProvider;
