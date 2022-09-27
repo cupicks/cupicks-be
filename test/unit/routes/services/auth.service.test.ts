@@ -7,7 +7,11 @@ import {
     BadRequestException,
     ConflictException,
     Env,
+    ForBiddenException,
+    IUserPacket,
     IUserVerifyListPacket,
+    NotFoundException,
+    SigninUserDto,
     SignupUserDto,
     UserDto,
 } from "../../../../src/models/_.loader";
@@ -24,7 +28,7 @@ import {
 
 // arrange as mocking
 import { mockModule } from "../../../_.fake.datas/mocks/_.loader";
-import { UserDtoFixtureProvider } from "../../../_.fake.datas/fixture/_.exporter";
+import { UserDtoFixtureProvider, PacketFixtureProvider } from "../../../_.fake.datas/fixture/_.exporter";
 import { AuthRepository } from "../../../../src/routes/repositories/auth.repository";
 import { AuthVerifyListRepository } from "../../../../src/routes/repositories/auth.verify.list.repository";
 import { UserCategoryRepository } from "../../../../src/routes/repositories/user.category.repository";
@@ -38,22 +42,28 @@ jest.mock("../../../../src/modules/providers/mysql.provider", () => {
 describe("Auth Service Test", () => {
     let sutAuthService: AuthService;
     let userDtoFixtureProvider: UserDtoFixtureProvider;
+    let packetFixtureProvider: PacketFixtureProvider;
     let MODE: TNODE_ENV, ENV: Env;
 
     beforeAll(async () => {
+        userDtoFixtureProvider = new UserDtoFixtureProvider();
+        packetFixtureProvider = new PacketFixtureProvider();
+
         MODE = "test";
         EnvProvider.init(MODE);
         ENV = new EnvProvider().getEnvInstance();
 
         // await MysqlProvider.init(ENV.MYSQL);
-
         JwtProvider.init(ENV.JWT);
         BcryptProvider.init(ENV.SALT);
         MulterProvider.init(ENV.S3);
         AwsSesProvider.init(ENV.SES, ENV.URL.SERVER_URL_WITH_PORT);
 
         sutAuthService = new AuthService();
-        userDtoFixtureProvider = new UserDtoFixtureProvider();
+    });
+
+    beforeEach(() => {
+        sutAuthService["mysqlProvider"].getConnection = mockModule.Providers.getMockConnection;
     });
 
     it("AuthService must be defined", () => expect(AuthService).toBeDefined());
@@ -110,7 +120,6 @@ describe("Auth Service Test", () => {
             nickname = "sample_nickname";
 
             sutAuthService["bcryptProvider"].hashPassword = jest.fn((password: string): string => password);
-            sutAuthService["mysqlProvider"].getConnection = mockModule.Providers.getMockConnection;
 
             emailVerifyToken = sutAuthService["jwtProvider"].signEmailVerifyToken({ type: "EmailVerifyToken", email });
             nicknameVerifyToken = sutAuthService["jwtProvider"].signNicknameVerifyToken({
@@ -311,9 +320,104 @@ describe("Auth Service Test", () => {
 
             expect(sutAuthService["authRepository"].createUser).toBeCalled();
         });
-
-        beforeEach(() => jest.clearAllMocks());
     });
 
-    afterAll(() => jest.clearAllMocks());
+    describe("AuthService.prototype.signin", () => {
+        let signinUserDto: SigninUserDto;
+        let accessToken: string, refreshToken: string;
+        let findedUser: IUserPacket;
+
+        beforeEach(() => {
+            signinUserDto = userDtoFixtureProvider.getSigninUserDto();
+            accessToken = "sample_access_token";
+            refreshToken = "sample_refresh_token";
+
+            findedUser = packetFixtureProvider.getIUserPacket({});
+        });
+
+        it("should throw AUTH-002, ${email} 은 존재하지 않는 이메일입니다.", async () => {
+            sutAuthService["authRepository"].findUserByEmail = jest.fn(async (): Promise<IUserPacket | null> => null);
+
+            try {
+                await sutAuthService.signin(signinUserDto);
+            } catch (err) {
+                expect(err).toBeDefined();
+                expect(err).toBeInstanceOf(NotFoundException);
+
+                expect(err instanceof NotFoundException && err.statusCode).toBe(404);
+                expect(err instanceof NotFoundException && err.message).toBe(
+                    `${signinUserDto.email} 은 존재하지 않는 이메일입니다.`,
+                );
+                expect(err instanceof NotFoundException && err.errorCode).toBe("AUTH-002");
+            }
+        });
+
+        it("should throw AUTH-003, ${email} 와 일치하지 않는 비밀번호 입니다.", async () => {
+            sutAuthService["authRepository"].findUserByEmail = jest.fn(
+                async (): Promise<IUserPacket | null> => findedUser,
+            );
+            sutAuthService["bcryptProvider"].comparedPassword = jest.fn(async (): Promise<boolean> => false);
+
+            try {
+                await sutAuthService.signin(signinUserDto);
+            } catch (err) {
+                expect(err).toBeDefined();
+                expect(err).toBeInstanceOf(ForBiddenException);
+
+                expect(err instanceof ForBiddenException && err.statusCode).toBe(403);
+                expect(err instanceof ForBiddenException && err.message).toBe(
+                    `${signinUserDto.email} 와 일치하지 않는 비밀번호 입니다.`,
+                );
+                expect(err instanceof ForBiddenException && err.errorCode).toBe("AUTH-003");
+            }
+        });
+
+        it("should return { accessToken: string, refreshToken: string }", async () => {
+            sutAuthService["authRepository"].findUserByEmail = jest.fn(
+                async (): Promise<IUserPacket | null> => findedUser,
+            );
+            sutAuthService["bcryptProvider"].comparedPassword = jest.fn(async (): Promise<boolean> => true);
+
+            sutAuthService["jwtProvider"].signAccessToken = jest.fn((): string => accessToken);
+            sutAuthService["jwtProvider"].signRefreshToken = jest.fn((): string => refreshToken);
+            sutAuthService["authRepository"].updateUserRefreshToken = jest.fn();
+
+            const response = await sutAuthService.signin(signinUserDto);
+
+            expect(response).toBeDefined();
+
+            expect(response.accessToken).toBeDefined();
+            expect(response.accessToken).toBe(accessToken);
+            expect(response.refreshToken).toBeDefined();
+            expect(response.refreshToken).toBe(refreshToken);
+
+            // calling
+
+            expect(sutAuthService["authRepository"].findUserByEmail).toBeCalled();
+
+            expect(sutAuthService["bcryptProvider"].comparedPassword).toBeCalled();
+
+            expect(sutAuthService["jwtProvider"].signAccessToken).toBeCalled();
+            expect(sutAuthService["jwtProvider"].signAccessToken).toBeCalledTimes(1);
+            expect(sutAuthService["jwtProvider"].signAccessToken).toBeCalledWith({
+                type: "AccessToken",
+                userId: findedUser.userId,
+                nickname: findedUser.nickname,
+            });
+
+            expect(sutAuthService["jwtProvider"].signRefreshToken).toBeCalled();
+            expect(sutAuthService["jwtProvider"].signRefreshToken).toBeCalledTimes(1);
+            expect(sutAuthService["jwtProvider"].signRefreshToken).toBeCalledWith({
+                type: "RefreshToken",
+                userId: findedUser.userId,
+                nickname: findedUser.nickname,
+                email: findedUser.email,
+                imageUrl: findedUser.imageUrl,
+            });
+
+            expect(sutAuthService["authRepository"].updateUserRefreshToken).toBeCalled();
+        });
+    });
+
+    afterEach(() => jest.clearAllMocks());
 });

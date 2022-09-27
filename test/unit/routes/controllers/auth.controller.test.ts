@@ -16,7 +16,6 @@ import {
     UserDto,
 } from "../../../../src/models/_.loader";
 import { UserDtoFixtureProvider } from "../../../_.fake.datas/fixture/user.dto.fixture.provider";
-import { string } from "joi";
 
 jest.mock("../../../../src/routes/services/auth.service", () => {
     return {
