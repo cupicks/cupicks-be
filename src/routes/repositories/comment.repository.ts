@@ -45,15 +45,20 @@ export class CommentRepository {
 
     public findCommentByCommentId = async (conn: PoolConnection, commentId: number): Promise<ICommentPacket[]> => {
         const query = `
-            SELECT *
+            SELECT 
+                comment_id as commentId,
+                image_url as imageUrl,
+                resized_url as resizedUrl,
+                created_at as createdAt,
+            updated_at as updatedAt
             FROM comment
             WHERE comment_id = ?
         `;
 
         const selectResult = await conn.query<ICommentPacket[]>(query, commentId);
-        const [commentPackets, _] = selectResult;
+        const comment = selectResult[0];
 
-        return commentPackets;
+        return comment;
     };
 
     // Get
