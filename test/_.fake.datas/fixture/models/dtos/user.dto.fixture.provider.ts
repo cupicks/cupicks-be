@@ -11,6 +11,7 @@ import {
     SendPasswordDto,
     ResetPasswordDto,
     SendEmailDto,
+    UserDto,
 } from "../../../../../src/models/_.loader";
 
 export class UserDtoFixtureProvider {
@@ -122,6 +123,40 @@ export class UserDtoFixtureProvider {
     public getSendEmailDto(email?: string): SendEmailDto {
         return new SendEmailDto({
             email: email ?? faker.internet.email(),
+        });
+    }
+
+    public getUserDto({
+        userId,
+        createdAt,
+        disfavorCategory,
+        favorCategory,
+        email,
+        imageUrl,
+        nickname,
+        resizedUrl,
+        updatedAt,
+    }: {
+        userId?: number;
+        email?: string;
+        nickname?: string;
+        imageUrl?: string;
+        resizedUrl?: string;
+        createdAt?: string;
+        updatedAt?: string;
+        favorCategory?: ERecipeCategory[];
+        disfavorCategory?: ERecipeCategory[];
+    }): UserDto {
+        return new UserDto({
+            userId: userId ?? 1,
+            email: email ?? faker.internet.email(),
+            nickname: nickname ?? faker.internet.userName().substring(0, 10),
+            imageUrl: imageUrl ?? faker.internet.url(),
+            resizedUrl: resizedUrl ?? faker.internet.url(),
+            updatedAt: updatedAt ?? faker.date.recent().toString(),
+            createdAt: createdAt ?? faker.date.recent().toString(),
+            disfavorCategory: disfavorCategory ?? [ERecipeCategory.caffein, ERecipeCategory.lemon],
+            favorCategory: favorCategory ?? [ERecipeCategory.milk, ERecipeCategory.syrup],
         });
     }
 }
