@@ -20,10 +20,7 @@ export class RankingRepository {
             GROUP BY recipe_id ORDER BY count(*) DESC LIMIT 3;
         `;
 
-        console.log(startDate, endDate);
-
         const selectResult = await conn.query<IWeeklyBestPacket[]>(query, [startDate, endDate]);
-        // const selectResult = await conn.query<IWeeklyBestPacket[]>(query);
         const [Packets, _] = selectResult;
 
         return Packets;

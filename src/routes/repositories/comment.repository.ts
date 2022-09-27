@@ -10,22 +10,6 @@ import { ICommentPacket } from "../../models/_.loader";
 import { count } from "console";
 
 export class CommentRepository {
-    // HotFix
-    public findUser = async (conn: PoolConnection, userId: number): Promise<RowDataPacket[]> => {
-        const query = `
-            SELECT 
-                image_url as imageUrl,
-                resized_url as resizedUrl
-            FROM user
-            WHERE user_id = ?
-        `;
-
-        const selectResult = await conn.query<RowDataPacket[]>(query, [userId]);
-        const [selectPackets, _] = selectResult;
-
-        return selectPackets;
-    };
-
     // IsExists
     public isAuthenticated = async (
         conn: PoolConnection,

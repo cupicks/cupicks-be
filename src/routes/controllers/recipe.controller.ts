@@ -2,7 +2,7 @@ import { RequestHandler, Request, Response } from "express";
 
 import { DtoFactory } from "../../modules/_.loader";
 
-import { CustomException, RecipeDto, UnkownError, UnkownTypeError, ValidationException } from "../../models/_.loader";
+import { CustomException, RecipeDto, UnkownError, UnkownTypeError } from "../../models/_.loader";
 import {
     CreateRecipeDto,
     UpdateRecipeDto,
@@ -10,9 +10,7 @@ import {
     CommonRecipeDto,
     GetRecipeDto,
 } from "../../models/_.loader";
-import { JoiValidator } from "../../modules/_.loader";
 import { RecipeService } from "../services/_.exporter";
-import { IRecipeCombinedPacket } from "../../models/_.loader";
 
 export class RecipeController {
     private recipeService: RecipeService;
@@ -64,25 +62,12 @@ export class RecipeController {
                 recipeId: Number(req.params.recipeId),
             });
 
-            const recipe: RecipeDto = await this.recipeService.getRecipe(getRecipeValidator);
+            const getRecipe = await this.recipeService.getRecipe(getRecipeValidator);
 
             return res.status(200).json({
                 isSuccess: true,
                 message: "레시피 조회에성공하셨습니다.",
-                recipe: {
-                    recipeId: recipe.recipeId,
-                    nickname: recipe.nickname,
-                    imageUrl: recipe.imageUrl,
-                    resizedUrl: recipe.resizedUrl,
-                    title: recipe.title,
-                    content: recipe.content,
-                    isIced: recipe.isIced,
-                    cupSize: recipe.cupSize,
-                    createdAt: recipe.createdAt,
-                    updatedAt: recipe.updatedAt,
-                    ingredientList: recipe.ingredientList,
-                    isLiked: recipe.isLiked,
-                },
+                recipe: getRecipe,
             });
         } catch (err) {
             console.log(err);
@@ -106,12 +91,12 @@ export class RecipeController {
                 }),
             );
 
-            const recipeDtoList = await this.recipeService.getRecipes(getRecipesValidator);
+            const getRecipes = await this.recipeService.getRecipes(getRecipesValidator);
 
             return res.json({
                 isSuccess: true,
                 message: "레시피 조회에성공하셨습니다.",
-                recipeList: recipeDtoList,
+                recipeList: getRecipes,
             });
         } catch (err) {
             console.log(err);
@@ -140,7 +125,7 @@ export class RecipeController {
                 category: req.body.category,
             });
 
-            await this.recipeService.updateRecipe(updateRecipeValidator);
+            const updateRecipe = await this.recipeService.updateRecipe(updateRecipeValidator);
 
             return res.status(200).json({
                 isSuccess: true,
