@@ -19,21 +19,14 @@ import {
 import {
     AwsSesProvider,
     BcryptProvider,
-    DayjsProvider,
     EnvProvider,
     JwtProvider,
     MulterProvider,
-    MysqlProvider,
-    RandomGenerator,
 } from "../../../../src/modules/_.loader";
 
 // arrange as mocking
 import { mockModule } from "../../../_.fake.datas/mocks/_.loader";
 import { UserDtoFixtureProvider, PacketFixtureProvider } from "../../../_.fake.datas/fixture/_.exporter";
-import { AuthRepository } from "../../../../src/routes/repositories/auth.repository";
-import { AuthVerifyListRepository } from "../../../../src/routes/repositories/auth.verify.list.repository";
-import { UserCategoryRepository } from "../../../../src/routes/repositories/user.category.repository";
-import * as jwtLib from "jsonwebtoken";
 
 jest.mock("../../../../src/modules/providers/mysql.provider", () => {
     return {
@@ -41,7 +34,8 @@ jest.mock("../../../../src/modules/providers/mysql.provider", () => {
     };
 });
 
-describe("Auth Service Test", /**
+describe("Auth Service Test"
+/**
  * AuthService 에 대한 단위 테스트의 주요 목적은 다음과 같습니다.
  *
  * 1. AuthService 가 선언되었는 지 여부
@@ -51,8 +45,7 @@ describe("Auth Service Test", /**
  *      2. 성공할 경우, 올바른 반환값이 return 되는 지 확인
  *
  * @since 2022-09-27
- */
-() => {
+ */, () => {
     let sutAuthService: AuthService;
     let userDtoFixtureProvider: UserDtoFixtureProvider;
     let packetFixtureProvider: PacketFixtureProvider;
@@ -431,6 +424,51 @@ describe("Auth Service Test", /**
             expect(sutAuthService["authRepository"].updateUserRefreshToken).toBeCalled();
         });
     });
+
+    // describe("AuthService.prototype.logout", () => {
+
+    //     let logoutUserDto: LogoutUserDto;
+    //     let refreshTokenPayload: {
+    //         type: 'RefreshToken',
+    //         email: string,
+    //         nickname: string,
+    //         userId: number,
+    //         imageUrl: string,
+    //     }
+
+    //     beforeEach(() => {
+    //         logoutUserDto = userDtoFixtureProvider.getLogoutUserDto();
+    //         refreshTokenPayload = {
+    //             type: "RefreshToken",
+    //             email: "sample_email",
+    //             nickname: "sample_nickname",
+    //             userId: 123456,
+    //             imageUrl: "sample_image"
+    //         }
+
+    //         const jestFn = jest.fn();
+    //         jestFn.mockRejectedValue(refreshTokenPayload)
+    //         sutAuthService["jwtProvider"].decodeToken = jestFn;
+    //     });
+
+    //     it("should throw AUTH-007-02, 이미 탈퇴한 사용자의 RefreshToken 입니다.", async () => {
+
+    //         sutAuthService["authRepository"].findUserById = jest.fn(async (): Promise<IUserPacket | null> => null);
+    //         try {
+    //             await sutAuthService.logout(logoutUserDto);
+    //         } catch (err) {
+    //             expect(err).toBeDefined();
+    //             expect(err).toBeInstanceOf(NotFoundException);
+
+    //             expect(err instanceof NotFoundException && err.statusCode).toBe(404);
+    //             expect(err instanceof NotFoundException && err.message).toBe(
+    //                 `이미 탈퇴한 사용자의 RefreshToken 입니다.`,
+    //             );
+    //             expect(err instanceof NotFoundException && err.errorCode).toBe("AUTH-007-02");
+    //         }
+
+    //     });
+    // });
 
     afterEach(() => jest.clearAllMocks());
 });
