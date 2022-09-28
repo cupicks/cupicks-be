@@ -106,7 +106,7 @@ export class DtoFactory {
     }): Promise<IngredientDto> {
         return await new IngredientDto(iDto);
     }
-    public async getCommonRecipeDto(iDto: { recipeId: number }): Promise<CommonRecipeDto> {
+    public async getCommonRecipeDto(iDto: { recipeId: number; userId: number | null }): Promise<CommonRecipeDto> {
         return await this.joiValidator.validateAsync<CommonRecipeDto>(new CommonRecipeDto(iDto));
     }
     public async getDeleteRecipeDto(iDto: { userId: number; recipeId: number }): Promise<DeleteRecipeDto> {
@@ -117,22 +117,6 @@ export class DtoFactory {
     }
     public async getRecipeDto(iDto: { page: number; count: number; userId: number | null }): Promise<GetRecipeDto> {
         return await this.joiValidator.validateAsync<GetRecipeDto>(new GetRecipeDto(iDto));
-    }
-    public async getIRecipeDto(iDto: {
-        recipeId: number;
-        nickname: string;
-        imageUrl: string | undefined;
-        resizedUrl: string | undefined;
-        title: string;
-        content: string;
-        isIced: 0 | 1;
-        cupSize: string;
-        createdAt: string;
-        updatedAt: string;
-        ingredientList: IIngredientDto[];
-        isLiked: boolean;
-    }): Promise<RecipeDto> {
-        return new RecipeDto(iDto);
     }
     // COMMENT
     public async getCreateCommentDto(iDto: {

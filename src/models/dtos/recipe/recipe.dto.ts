@@ -53,7 +53,7 @@ export class RecipeDto implements IRecipeDto {
 
         this.title = title;
         this.content = content;
-        this.isIced = isIced;
+        this.isIced = isIced === 1 ? 1 : 0;
         this.cupSize = cupSize;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

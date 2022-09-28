@@ -10,7 +10,7 @@ export interface ICreateRecipeDto {
     title: string;
     content: string;
     isIced: boolean;
-    cupSize?: number;
+    cupSize: string;
     isPublic: boolean;
     ingredientList: IngredientDto[];
     userId: number;
@@ -22,7 +22,7 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
     title: string;
     content: string;
     isIced: boolean;
-    cupSize?: number;
+    cupSize: string;
     isPublic: boolean;
     ingredientList: IngredientDto[];
     userId: number;
@@ -41,7 +41,7 @@ export class CreateRecipeDto extends RequestQueryExtractor<string> implements IB
         title: string;
         content: string;
         isIced: boolean;
-        cupSize?: number;
+        cupSize: string;
         isPublic: boolean;
         ingredientList: IngredientDto[];
         userId: number;

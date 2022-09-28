@@ -2,8 +2,9 @@ import { RequestHandler, Request, Response } from "express";
 
 import { DtoFactory } from "../../modules/_.loader";
 
-import { CustomException, RecipeDto, UnkownError, UnkownTypeError } from "../../models/_.loader";
+import { CustomException, UnkownError, UnkownTypeError } from "../../models/_.loader";
 import {
+    RecipeDto,
     CreateRecipeDto,
     UpdateRecipeDto,
     DeleteRecipeDto,
@@ -60,6 +61,7 @@ export class RecipeController {
         try {
             const getRecipeValidator: CommonRecipeDto = await this.dtoFactory.getCommonRecipeDto({
                 recipeId: Number(req.params.recipeId),
+                userId: Number(res.locals.userId),
             });
 
             const getRecipe = await this.recipeService.getRecipe(getRecipeValidator);
@@ -93,7 +95,7 @@ export class RecipeController {
 
             const getRecipes = await this.recipeService.getRecipes(getRecipesValidator);
 
-            return res.json({
+            return res.status(200).json({
                 isSuccess: true,
                 message: "레시피 조회에성공하셨습니다.",
                 recipeList: getRecipes,

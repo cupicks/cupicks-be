@@ -101,6 +101,8 @@ export class RecipeService {
                 getRecipeDto.recipeId,
             );
 
+            recipe.isIced;
+
             const recipeDto = new RecipeDto({
                 recipeId: recipe.recipeId,
                 title: recipe.title,
@@ -210,7 +212,7 @@ export class RecipeService {
 
     // Update
 
-    updateRecipe = async (updateRecipeDto: UpdateRecipeDto): Promise<void> => {
+    updateRecipe = async (updateRecipeDto: UpdateRecipeDto): Promise<number> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
             await conn.beginTransaction();
@@ -267,6 +269,8 @@ export class RecipeService {
             const updateRecipeIngredient = await this.recipeRepository.createRecipeIngredientLegacy(conn, result);
 
             await conn.commit();
+
+            return updateRecipeDto.recipeId;
         } catch (err) {
             await conn.rollback();
             throw err;
