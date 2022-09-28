@@ -13,25 +13,18 @@ import {
     DeleteRecipeDto,
     CommonRecipeDto,
 } from "../../models/_.loader";
-import {
-    AuthRepository,
-    RecipeIngredientRepository,
-    RecipeIngredientListRepository,
-    RecipeRepository,
-} from "../repositories/_.exporter";
+import { AuthRepository, RecipeIngredientRepository, RecipeRepository } from "../repositories/_.exporter";
 import { MysqlProvider } from "../../modules/_.loader";
 
 export class RecipeService {
     private recipeRepository: RecipeRepository;
     private recipeIngredientRepository: RecipeIngredientRepository;
-    private recipeIngredientListRepository: RecipeIngredientListRepository;
     private authRepository: AuthRepository;
     private mysqlProvider: MysqlProvider;
 
     constructor() {
         this.recipeRepository = new RecipeRepository();
         this.recipeIngredientRepository = new RecipeIngredientRepository();
-        this.recipeIngredientListRepository = new RecipeIngredientListRepository();
         this.mysqlProvider = new MysqlProvider();
         this.authRepository = new AuthRepository();
     }
