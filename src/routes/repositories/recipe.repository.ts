@@ -319,7 +319,7 @@ export class RecipeRepository {
         return recipePackets;
     };
 
-    public getRecipeCategory = async (conn: PoolConnection, category: string) => {
+    public getRecipeCategory = async (conn: PoolConnection, category: string): Promise<boolean> => {
         const selectQuery = `
             SELECT * 
             FROM recipe_category
@@ -330,7 +330,7 @@ export class RecipeRepository {
 
         const [categoryPacket, _] = selectResult;
 
-        return categoryPacket;
+        return !categoryPacket ? true : false;
     };
 
     // Create
@@ -348,6 +348,8 @@ export class RecipeRepository {
         const { affectedRows, insertId } = resultSetHeader;
 
         if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
+
+        console.log(recipeDto);
 
         return insertId;
     };

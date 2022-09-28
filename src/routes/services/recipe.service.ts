@@ -51,7 +51,7 @@ export class RecipeService {
                 recipeDto.category.map(async (category) => {
                     const getRecipeCategory = await this.recipeRepository.getRecipeCategory(conn, category);
 
-                    if (getRecipeCategory.length <= 0) await this.recipeRepository.createRecipeCategory(conn, category);
+                    if (getRecipeCategory) await this.recipeRepository.createRecipeCategory(conn, category);
 
                     const createRecipeCategoryList = await this.recipeRepository.createRecipeCategoryList(
                         conn,
@@ -237,7 +237,7 @@ export class RecipeService {
             const updateRecipeCategoryList = updateRecipeDto.category.map(async (category) => {
                 const getRecipeCategory = await this.recipeRepository.getRecipeCategory(conn, category);
 
-                if (getRecipeCategory.length <= 0) await this.recipeRepository.createRecipeCategory(conn, category);
+                if (!getRecipeCategory) await this.recipeRepository.createRecipeCategory(conn, category);
                 this.recipeRepository.createRecipeCategoryList(conn, category, updateRecipeDto.recipeId);
             });
 
