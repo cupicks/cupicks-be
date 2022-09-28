@@ -406,7 +406,7 @@ export class RecipeRepository {
         return insertedIdList;
     };
 
-    public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<string> => {
+    public createUserRecipe = async (conn: PoolConnection, userId: number, recipeId: number): Promise<number> => {
         const query = `
             INSERT INTO user_recipe
                 (user_id, recipe_id)
@@ -417,11 +417,11 @@ export class RecipeRepository {
         const result = await conn.query<ResultSetHeader>(query, [userId, recipeId]);
 
         const resultSetHeader = result[0];
-        const { affectedRows } = resultSetHeader;
+        const { affectedRows, insertId } = resultSetHeader;
 
         if (affectedRows > 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
-        return JSON.stringify(result[0].insertId);
+        return insertId;
     };
 
     public createRecipeIngredientList = async (
