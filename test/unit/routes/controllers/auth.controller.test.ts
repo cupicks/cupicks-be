@@ -28,7 +28,8 @@ jest.mock("../../../../src/modules/factory/dto.factory", () => {
     };
 });
 
-describe("Auth Controller Test", /**
+describe("Auth Controller Test"
+/**
  * AuthControlelr 에 대한 단위 테스트의 주요 목적은 다음과 같습니다.
  *
  * 1. AuthController 가 선언되었는 지 여부
@@ -37,9 +38,8 @@ describe("Auth Controller Test", /**
  *      1. 실패할 경우 mockResponse 의 내장 메서드의 호출 여부 및 호출 매개변수 확인
  *      2. 성공할 경우 mockResponse 의 내장 메서드의 호출 여부 및 호출 매개변수 확인
  *
- * @since 2022-09-27
- */
-() => {
+ * @since 2022-09-26
+ */, () => {
     let sutAuthController: AuthController;
     let userDtoFixtureProvider: UserDtoFixtureProvider;
     let mockRequest: Request, mockResponse: Response, mockNextFunc: NextFunction;
@@ -337,6 +337,7 @@ describe("Auth Controller Test", /**
                 exceededDate: result?.exceededDate,
             });
         });
+
         it("should call res.status(500).json()", async () => {
             sutAuthController["authService"].sendEmail = jest.fn(async (): Promise<typeof result> => {
                 throw mockErrorInstance;

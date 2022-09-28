@@ -254,7 +254,7 @@ export class AuthService {
 
             const { email } = sendEmailDto;
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
-            if (isExistsUser)
+            if (isExistsUser === true)
                 throw new ConflictException(`${sendEmailDto.email} 은 이미 가입한 이메일입니다.`, "AUTH-001-01");
 
             const nowDayjsInstance: Dayjs = this.dayjsProvider.getDayjsInstance();
@@ -388,7 +388,8 @@ export class AuthService {
             await conn.beginTransaction();
 
             const isExistsUser = await this.authRepository.isExistsByEmail(conn, email);
-            if (isExistsUser) throw new ConflictException(`${email} 은 이미 가입한 이메일입니다.`, "AUTH-001-01");
+            if (isExistsUser === true)
+                throw new ConflictException(`${email} 은 이미 가입한 이메일입니다.`, "AUTH-001-01");
 
             const userVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(conn, email);
 
@@ -453,7 +454,7 @@ export class AuthService {
             );
 
             const isExists = await this.authRepository.isExistsByNickname(conn, confirmNicknameDto.nickname);
-            if (isExists)
+            if (isExists === true)
                 throw new ConflictException(
                     `${confirmNicknameDto.nickname} 은 이미 가입한 닉네임입니다.`,
                     "AUTH-001-02",
@@ -461,8 +462,8 @@ export class AuthService {
 
             const isExistsOthersNickname = await this.authVerifyListRepository.isExistsByNicknameExceptEmail(
                 conn,
-                confirmNicknameDto.nickname,
-                emailVerifyTokenPayload.email,
+                confirmNicknameDto?.nickname,
+                emailVerifyTokenPayload?.email,
             );
             if (isExistsOthersNickname === true)
                 throw new ConflictException(
@@ -472,16 +473,16 @@ export class AuthService {
 
             const findedVerifyList = await this.authVerifyListRepository.findVerifyListByEmail(
                 conn,
-                emailVerifyTokenPayload.email,
+                emailVerifyTokenPayload?.email,
             );
             if (findedVerifyList === null)
                 throw new NotFoundException(
-                    `${emailVerifyTokenPayload.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`,
+                    `${emailVerifyTokenPayload?.email} 은 인증번호 발송 과정이 진행되지 않았습니다.`,
                     "AUTH-004-01",
                 );
             if (findedVerifyList.isVerifiedEmail === 0)
                 throw new BadRequestException(
-                    `${emailVerifyTokenPayload.email} 은 인증번호 확인 과정이 진행되지 않았습니다.`,
+                    `${emailVerifyTokenPayload?.email} 은 인증번호 확인 과정이 진행되지 않았습니다.`,
                     "AUTH-004-04",
                 );
 
@@ -494,7 +495,7 @@ export class AuthService {
             const nowDayjsDbString = this.dayjsProvider.changeToProvidedFormat(nowDayjsInstance, "YYYY-MM-DD hh:mm:ss");
             await this.authVerifyListRepository.updateVerifyListByNickname(
                 conn,
-                emailVerifyTokenPayload.email,
+                emailVerifyTokenPayload?.email,
                 confirmNicknameDto.nickname,
                 nowDayjsDbString,
                 nicknameVerifyToken,
@@ -625,8 +626,6 @@ export class AuthService {
             const payload = this.jwtProvider.verifyToken<jwtLib.IResetPasswordToken>(
                 resetPasswordDto.resetPasswordToken,
             );
-            payload.email;
-            payload.hashedPassword;
 
             const findedUser = await this.authRepository.findUserByEmail(conn, payload.email);
             if (findedUser === null)
