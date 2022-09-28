@@ -123,4 +123,5 @@ export class PacketFixtureProvider {
             isVerifiedNickname: isVerifiedNickname ?? faker.datatype.boolean() ? 1 : 0,
         };
     }
+    //
 }

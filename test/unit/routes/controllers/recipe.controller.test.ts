@@ -12,7 +12,7 @@ import {
     GetRecipeDto,
     UpdateRecipeDto,
 } from "../../../../src/models/_.loader";
-import { RecipeDtoFixtureProvider } from "../../../_.fake.datas/fixture/recipe.dto.fixture.provider";
+import { RecipeDtoFixtureProvider } from "../../../_.fake.datas/fixture/_.exporter";
 
 jest.mock("../../../../src/routes/services/recipe.service", () => {
     return {

@@ -137,24 +137,52 @@ export class RecipeDtoFixtureProvider {
         category?: ERecipeCategory[],
     ): CreateRecipeDto {
         return new CreateRecipeDto({
-            title: title ?? faker.lorem.word(10),
-            content: content ?? faker.lorem.text(),
+            title: title ?? faker.lorem.word(),
+            content: content ?? faker.lorem.word(),
             isIced: isIced ?? faker.datatype.boolean(),
-            cupSize: cupSize ?? faker.lorem.word(10),
+            cupSize: cupSize ?? "355",
             isPublic: isPublic ?? faker.datatype.boolean(),
             ingredientList:
                 ingredientList ??
-                faker.helpers.arrayElements([1]).map((): IngredientDto => {
+                faker.helpers.arrayElements([1]).map(() => {
                     return {
-                        ingredientName: "오리지널 재료",
+                        ingredientName: "재료입니다.",
                         ingredientColor: "#FFFFFF",
                         ingredientAmount: "100",
                     };
                 }),
             userId: userId ?? faker.datatype.number({ min: 1, max: 100 }),
-            category: category ?? [ERecipeCategory.caffein],
         });
     }
+    // public getCreateRecipeDto(
+    //     title?: string,
+    //     content?: string,
+    //     isIced?: boolean,
+    //     cupSize?: string,
+    //     isPublic?: boolean,
+    //     ingredientList?: IngredientDto[],
+    //     userId?: number,
+    //     category?: ERecipeCategory[],
+    // ): CreateRecipeDto {
+    //     return new CreateRecipeDto({
+    //         title: title ?? faker.lorem.word(10),
+    //         content: content ?? faker.lorem.text(),
+    //         isIced: isIced ?? faker.datatype.boolean(),
+    //         cupSize: cupSize ?? faker.lorem.word(10),
+    //         isPublic: isPublic ?? faker.datatype.boolean(),
+    //         ingredientList:
+    //             ingredientList ??
+    //             faker.helpers.arrayElements([1]).map((): IngredientDto => {
+    //                 return {
+    //                     ingredientName: "오리지널 재료",
+    //                     ingredientColor: "#FFFFFF",
+    //                     ingredientAmount: "100",
+    //                 };
+    //             }),
+    //         userId: userId ?? faker.datatype.number({ min: 1, max: 100 }),
+    //         category: category ?? [ERecipeCategory.caffein],
+    //     });
+    // }
 
     public getGetRecipeDto(recipeId?: number, userId?: number | null): CommonRecipeDto {
         return new CommonRecipeDto({

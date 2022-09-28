@@ -86,11 +86,8 @@ describe("Auth Service Test", () => {
 
     describe("RecipeService.prototype.createRecipe", () => {
         let createRecipeDto: CreateRecipeDto;
-        let recipeId: number;
 
         beforeEach(() => {
-            recipeId = 1;
-
             createRecipeDto = recipeDtoFixtureProvider.getCreateRecipeDto();
         });
 
@@ -117,6 +114,52 @@ describe("Auth Service Test", () => {
             const jestFunc = jest.fn();
             jestFunc.mockReturnValue(true);
             sutRecipeService["authRepository"].isExistsById = jestFunc;
+
+            const jestFunc2 = jest.fn();
+            jestFunc2.mockReturnValue(1);
+            sutRecipeService["recipeRepository"].createRecipe = jestFunc2;
+
+            sutRecipeService["recipeRepository"].createRecipeIngredients = jest.fn();
+            sutRecipeService["recipeRepository"].createUserRecipe = jest.fn();
+            sutRecipeService["recipeRepository"].createRecipeIngredientList = jest.fn();
+            sutRecipeService["recipeRepository"].getRecipeCategory = jest.fn();
+            sutRecipeService["recipeRepository"].createRecipeCategory = jest.fn();
+
+            const createRecipe = await sutRecipeService.createRecipe(createRecipeDto);
+
+            expect(createRecipe).toBeDefined();
+            expect(createRecipe).toBe(1);
+
+            expect(sutRecipeService["recipeRepository"].createRecipe).toBeCalled();
+        });
+    });
+
+    describe("RecipeService.prototype.getRecipe", () => {
+        let getRecipeDto: CommonRecipeDto;
+        let recipeDto: RecipeDto;
+
+        beforeEach(() => {
+            getRecipeDto = recipeDtoFixtureProvider.getGetRecipeDto();
+            recipeDto = recipeDtoFixtureProvider.getRecipeDto({});
+        });
+
+        // 존재하지 않는 레시피입니다.", "RECIPE-001
+
+        it("should throw RECIPE-001, 존재하지 않는 레시피입니다.", async () => {
+            const jestFunc = jest.fn();
+            jestFunc.mockReturnValue(false);
+            sutRecipeService["recipeRepository"].findRecipeById = jestFunc;
+
+            try {
+                await sutRecipeService.getRecipe(getRecipeDto);
+            } catch (err) {
+                expect(err).toBeDefined();
+                expect(err).toBeInstanceOf(NotFoundException);
+
+                expect(err instanceof NotFoundException && err.statusCode).toBe(404);
+                expect(err instanceof NotFoundException && err.message).toBe("존재하지 않는 레시피입니다.");
+                expect(err instanceof NotFoundException && err.errorCode).toBe("RECIPE-001");
+            }
         });
     });
 });
