@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import { ERecipeCategory } from "../../../src/models/enums/e.recipe.category";
 
 import {
+    RecipeDto,
     CreateRecipeDto,
     CommonRecipeDto,
     DeleteRecipeDto,
@@ -21,11 +22,115 @@ import {
 // syrup = "syrup",
 
 export class RecipeDtoFixtureProvider {
+    public getRecipeDto({
+        recipeId,
+        nickname,
+        imageUrl,
+        resizedUrl,
+        title,
+        content,
+        isIced,
+        cupSize,
+        createdAt,
+        updatedAt,
+        ingredientList,
+        isLiked,
+    }: {
+        recipeId?: number;
+        nickname?: string;
+        imageUrl?: string;
+        resizedUrl?: string;
+        title?: string;
+        content?: string;
+        isIced?: 0 | 1;
+        cupSize?: string;
+        createdAt?: string;
+        updatedAt?: string;
+        ingredientList?: IngredientDto[];
+        isLiked?: boolean;
+    }): RecipeDto {
+        return new RecipeDto({
+            recipeId: recipeId ?? faker.datatype.number({ min: 1, max: 100 }),
+            nickname: nickname ?? faker.internet.userName().substring(0, 10),
+            imageUrl: imageUrl ?? faker.internet.url(),
+            resizedUrl: resizedUrl ?? faker.internet.url(),
+            title: title ?? faker.lorem.word(10),
+            content: content ?? faker.lorem.text(),
+            isIced: isIced ?? 1,
+            cupSize: cupSize ?? "591",
+            createdAt: createdAt ?? faker.date.recent().toString(),
+            updatedAt: updatedAt ?? faker.date.recent().toString(),
+            ingredientList:
+                ingredientList ??
+                faker.helpers.arrayElements([1]).map((): IngredientDto => {
+                    return {
+                        ingredientName: "오리지널 재료",
+                        ingredientColor: "#FFFFFF",
+                        ingredientAmount: "100",
+                    };
+                }),
+            isLiked: isLiked ?? faker.datatype.boolean(),
+        });
+    }
+
+    public getRecipesDto({
+        recipeId,
+        nickname,
+        imageUrl,
+        resizedUrl,
+        title,
+        content,
+        isIced,
+        cupSize,
+        createdAt,
+        updatedAt,
+        ingredientList,
+        isLiked,
+    }: {
+        recipeId?: number;
+        nickname?: string;
+        imageUrl?: string;
+        resizedUrl?: string;
+        title?: string;
+        content?: string;
+        isIced?: 0 | 1;
+        cupSize?: string;
+        createdAt?: string;
+        updatedAt?: string;
+        ingredientList?: IngredientDto[];
+        isLiked?: boolean;
+    }): RecipeDto[] {
+        return [
+            new RecipeDto({
+                recipeId: recipeId ?? faker.datatype.number({ min: 1, max: 100 }),
+                nickname: nickname ?? faker.internet.userName().substring(0, 10),
+                imageUrl: imageUrl ?? faker.internet.url(),
+                resizedUrl: resizedUrl ?? faker.internet.url(),
+                title: title ?? faker.lorem.word(10),
+                content: content ?? faker.lorem.text(),
+                isIced: isIced ?? 1,
+                cupSize: cupSize ?? "591",
+                createdAt: createdAt ?? faker.date.recent().toString(),
+                updatedAt: updatedAt ?? faker.date.recent().toString(),
+                ingredientList:
+                    ingredientList ??
+                    faker.helpers.arrayElements([1]).map((): IngredientDto => {
+                        return {
+                            ingredientName: "오리지널 재료",
+                            ingredientColor: "#FFFFFF",
+                            ingredientAmount: "100",
+                        };
+                    }),
+                isLiked: isLiked ?? faker.datatype.boolean(),
+            }),
+        ];
+    }
+
     public getCreateRecipeDto(
         title?: string,
         content?: string,
         isIced?: boolean,
-        cupSize?: number,
+        cupSize?: string,
         isPublic?: boolean,
         ingredientList?: IngredientDto[],
         userId?: number,
@@ -35,7 +140,7 @@ export class RecipeDtoFixtureProvider {
             title: title ?? faker.lorem.word(10),
             content: content ?? faker.lorem.text(),
             isIced: isIced ?? faker.datatype.boolean(),
-            cupSize: cupSize ?? faker.datatype.number(591),
+            cupSize: cupSize ?? faker.lorem.word(10),
             isPublic: isPublic ?? faker.datatype.boolean(),
             ingredientList:
                 ingredientList ??
