@@ -17,42 +17,46 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: Prepare Environment and Dependencies, and then Run Jest
-      #   run:  |
-      #     # pwd
-      #     #   touch .env.test
-      #     #   echo PORT=${{secrets.TEST_PORT}} >> .env.test
-      #     #   echo SALT=${{secrets.TEST_SALT}} >> .env.test
-      #     #   echo CORS_URL_ONE_WITHOUT_PORT=${{secrets.TEST_CORS_URL_ONE_WITHOUT_PORT}} >> .env.test
-      #     #   echo CORS_URL_TWO_WITHOUT_PORT=${{secrets.TEST_CORS_URL_TWO_WITHOUT_PORT}} >> .env.test
-      #     #   echo CORS_URL_THREE_WITHOUT_PORT=${{secrets.TEST_CORS_URL_THREE_WITHOUT_PORT}} >> .env.test
-      #     #   echo CORS_URL_FOUR_WITHOUT_PORT=${{secrets.TEST_CORS_URL_FOUR_WITHOUT_PORT}} >> .env.test
-      #     #   echo FROTN_REDIRECT_URL_WITHOUT_PORT=${{secrets.TEST_FROTN_REDIRECT_URL_WITHOUT_PORT}} >> .env.test
-      #     #   echo SERVER_URL_WITH_PORT=${{secrets.TEST_SERVER_URL_WITH_PORT}} >> .env.test
-      #     #   echo JWT_ACCESS_EXPIRED_IN=${{secrets.TEST_JWT_ACCESS_EXPIRED_IN}} >> .env.test
-      #     #   echo JWT_REFRESH_EXPIRED_IN=${{secrets.TEST_JWT_REFRESH_EXPIRED_IN}} >> .env.test
-      #     #   echo JWT_VERIFY_EXPIRED_IN=${{secrets.TEST_JWT_VERIFY_EXPIRED_IN}} >> .env.test
-      #     #   echo JWT_RESET_EXPIRED_IN=${{secrets.TEST_JWT_RESET_EXPIRED_IN}} >> .env.test
-      #     #   echo JWT_HASH_ALGOIRHTM=${{secrets.TEST_JWT_HASH_ALGOIRHTM}} >> .env.test
-      #     #   echo HASH_PASSPHRASE=${{secrets.TEST_HASH_PASSPHRASE}} >> .env.test
-      #     #   echo MYSQL_HOST=${{secrets.TEST_MYSQL_HOST}} >> .env.test
-      #     #   echo MYSQL_USER=${{secrets.TEST_MYSQL_USER}} >> .env.test
-      #     #   echo MYSQL_DATABASE=${{secrets.TEST_MYSQL_DATABASE}} >> .env.test
-      #     #   echo MYSQL_PASSWORD=${{secrets.TEST_MYSQL_PASSWORD}} >> .env.test
-      #     #   echo MYSQL_CONNECTION_LIMIT=${{secrets.TEST_MYSQL_CONNECTION_LIMIT}} >> .env.test
-      #     #   echo S3_ACCESS_KEY=${{secrets.TEST_S3_ACCESS_KEY}} >> .env.test
-      #     #   echo S3_SECRET_KEY=${{secrets.TEST_S3_SECRET_KEY}} >> .env.test
-      #     #   echo BUCKET=${{secrets.TEST_BUCKET}} >> .env.test
-      #     #   echo REGION=${{secrets.TEST_REGION}} >> .env.test
-      #     #   echo SES_API_VERSION=${{secrets.TEST_SES_API_VERSION}} >> .env.test
-      #     #   echo SES_API_REGION=${{secrets.TEST_SES_API_REGION}} >> .env.test
-      #     #   echo SES_ACCESS_KEY=${{secrets.TEST_SES_ACCESS_KEY}} >> .env.test
-      #     #   echo SES_SECRET_KEY=${{secrets.TEST_SES_SECRET_KEY}} >> .env.test
-      #     #   echo SES_SENDER_EMAIL=${{secrets.TEST_SES_SENDER_EMAIL}} >> .env.test
-
-      #     npm ci
-      #     npm test
+      - name: Create Testing Environment File
+        run:  |
+          pwd
+            cd /home/runner/work/cupicks-be/cupicks-be
+            touch .env.test
+            echo PORT=${{secrets.TEST_PORT}} >> .env.test
+            echo SALT=${{secrets.TEST_SALT}} >> .env.test
+            echo CORS_URL_ONE_WITHOUT_PORT=${{secrets.TEST_CORS_URL_ONE_WITHOUT_PORT}} >> .env.test
+            echo CORS_URL_TWO_WITHOUT_PORT=${{secrets.TEST_CORS_URL_TWO_WITHOUT_PORT}} >> .env.test
+            echo CORS_URL_THREE_WITHOUT_PORT=${{secrets.TEST_CORS_URL_THREE_WITHOUT_PORT}} >> .env.test
+            echo CORS_URL_FOUR_WITHOUT_PORT=${{secrets.TEST_CORS_URL_FOUR_WITHOUT_PORT}} >> .env.test
+            echo FROTN_REDIRECT_URL_WITHOUT_PORT=${{secrets.TEST_FROTN_REDIRECT_URL_WITHOUT_PORT}} >> .env.test
+            echo SERVER_URL_WITH_PORT=${{secrets.TEST_SERVER_URL_WITH_PORT}} >> .env.test
+            echo JWT_ACCESS_EXPIRED_IN=${{secrets.TEST_JWT_ACCESS_EXPIRED_IN}} >> .env.test
+            echo JWT_REFRESH_EXPIRED_IN=${{secrets.TEST_JWT_REFRESH_EXPIRED_IN}} >> .env.test
+            echo JWT_VERIFY_EXPIRED_IN=${{secrets.TEST_JWT_VERIFY_EXPIRED_IN}} >> .env.test
+            echo JWT_RESET_EXPIRED_IN=${{secrets.TEST_JWT_RESET_EXPIRED_IN}} >> .env.test
+            echo JWT_HASH_ALGOIRHTM=${{secrets.TEST_JWT_HASH_ALGOIRHTM}} >> .env.test
+            echo HASH_PASSPHRASE=${{secrets.TEST_HASH_PASSPHRASE}} >> .env.test
+            echo MYSQL_HOST=${{secrets.TEST_MYSQL_HOST}} >> .env.test
+            echo MYSQL_USER=${{secrets.TEST_MYSQL_USER}} >> .env.test
+            echo MYSQL_DATABASE=${{secrets.TEST_MYSQL_DATABASE}} >> .env.test
+            echo MYSQL_PASSWORD=${{secrets.TEST_MYSQL_PASSWORD}} >> .env.test
+            echo MYSQL_CONNECTION_LIMIT=${{secrets.TEST_MYSQL_CONNECTION_LIMIT}} >> .env.test
+            echo S3_ACCESS_KEY=${{secrets.TEST_S3_ACCESS_KEY}} >> .env.test
+            echo S3_SECRET_KEY=${{secrets.TEST_S3_SECRET_KEY}} >> .env.test
+            echo BUCKET=${{secrets.TEST_BUCKET}} >> .env.test
+            echo REGION=${{secrets.TEST_REGION}} >> .env.test
+            echo SES_API_VERSION=${{secrets.TEST_SES_API_VERSION}} >> .env.test
+            echo SES_API_REGION=${{secrets.TEST_SES_API_REGION}} >> .env.test
+            echo SES_ACCESS_KEY=${{secrets.TEST_SES_ACCESS_KEY}} >> .env.test
+            echo SES_SECRET_KEY=${{secrets.TEST_SES_SECRET_KEY}} >> .env.test
+            echo SES_SENDER_EMAIL=${{secrets.TEST_SES_SENDER_EMAIL}} >> .env.test
       
+      - name: Create Testing Jwt Key using ssh-keygen
+        run:  |
+          pwd
+            ssh-keygen -t rsa -P " " -b 4096 -m PEM -f private.pem -P ${{secrets.TEST_HASH_PASSPHRASE}}
+            ssh-keygen -e -m PEM -f private.pem > public.pem
+
       - name: Cachce node_modules
         uses: actions/cache@v2
         id: node-cache
