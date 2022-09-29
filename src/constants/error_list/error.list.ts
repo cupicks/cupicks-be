@@ -1,8 +1,9 @@
 // https://medium.com/suyeonme/ts-enum-vs-union-type-in-performance-3971825ea65a
 
 // AUTH PROFILE RECIPE COMMENT
-const ERROR_CODE_LIST = {
+export const ERROR_CODE_LIST = {
     //AUTH
+
     "이미 사용 중인 이메일": "AUTH-001-01",
     "이미 사용 중인 닉네임": "AUTH-001-02",
     "존재하지 않는 이메일": "AUTH-002",
@@ -27,29 +28,36 @@ const ERROR_CODE_LIST = {
     "프로필 수정을 위한 모든 매개변수 누락": "PROFILE-001",
 
     // RECIPE
+
     "존재하지 않는 레시피": "RECIPE-001",
     "인증절차 - 내가 작성한 레시피에 대한 인증 실패": "RECIPE-002",
     "좋아요 - 이미 좋아요 한 레시피": "RECIPE-003-01",
     "좋아요 - 좋아요 하지 않은 레시피": "RECIPE-003-02",
 
     // COMMENT
+
     "존재하지 않는 코멘트": "COMMENT-001",
-    "인증절차 - 내가 작성한 코멘트에 대한 인증 실패": "COMMENT-002",
+    "내가 작성한 코멘트에 대한 인증 실패": "COMMENT-002",
 
     // JWT
+
     "요청자의 JWT 토큰 만료 혹은 검증 실패": "REQUEST_JWT_FAIL",
 
     // VALIDATION
+
     "요청값의 유효성 검사 실패": "REQUEST_VALIDATION_FAIL",
 
     // DATABASE
+
     "데이터 베이스 연결 실패": "DATABASE_CONNECTION_FAIL",
     "부적절한 쿼리문의 실행": "DATABASE_UNKOWN_QUERY",
 
     // BCRYPT
+
     "암호화 에러": "BCRYPT_HASH_COMPARE_FAIL",
 
     // MULTER
+
     "지원하지 않는 이미지 형식": "FILE EXTENSION ERROR",
     "알 수 없는 에러": "UNKOWN",
 } as const;
