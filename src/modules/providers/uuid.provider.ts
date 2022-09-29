@@ -8,6 +8,9 @@ import { DayjsProvider } from "../_.loader";
 
 type TGetUuid = string;
 
+/**
+ * @deprecated
+ */
 const v4Options: V4Options = {
     // Array 16개의 임의바이트 랜덤
     random: [0x10, 0x91, 0x56, 0xbe, 0xc4, 0xfb, 0xc1, 0xea, 0x71, 0xb4, 0xef, 0xe1, 0x67, 0x1c, 0x58, 0x36],
@@ -16,8 +19,7 @@ const v4Options: V4Options = {
 export class UuidProvider {
     public getUuid(): TGetUuid {
         const dateFormat = new DayjsProvider().getDayabaseFormat();
-        const date = new DayjsProvider().getDayjsInstance().format(dateFormat);
-        const imageFileName = uuid(v4Options) + "-" + date;
+        const imageFileName = uuid().split("-")[0] + uuid().split("-")[1] + uuid().split("-")[2] + uuid().split("-")[3];
 
         return imageFileName;
     }
