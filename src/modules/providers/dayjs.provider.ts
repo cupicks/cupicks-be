@@ -1,5 +1,5 @@
 import "dayjs/locale/ko";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 export type TDatabaseFormat = "YYYY-MM-DD hh:mm:ss";
 export type TClientFormat = "YYYY년 MM월 DD일 hh:mm";

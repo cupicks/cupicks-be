@@ -1,4 +1,4 @@
-import * as jwtLib from "jsonwebtoken";
+import jwtLib from "jsonwebtoken";
 import { RequestHandler, Request, Response, NextFunction } from "express";
 import { JwtProvider } from "../../../modules/_.loader";
 

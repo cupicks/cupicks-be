@@ -1,6 +1,6 @@
-import * as cors from "cors";
-import * as morgan from "morgan";
-import * as express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import express from "express";
 import { TNODE_ENV } from "constants/_.loader";
 
 import { authRouter, profileRouter, recipeRouter, commentRouter, rankingRouter } from "./routes/routers/_.exporter";

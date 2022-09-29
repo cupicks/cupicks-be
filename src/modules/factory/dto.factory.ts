@@ -1,5 +1,5 @@
-import { JoiValidator } from "../../modules/_.loader";
 import { ParsedQs } from "qs";
+import { JoiValidator } from "../../modules/_.loader";
 
 export class DtoFactory {
     private joiValidator: JoiValidator;

@@ -1,8 +1,8 @@
 import { RequestHandler } from "express";
 
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import * as multer from "multer";
-import * as multerS3 from "multer-s3";
+import multer from "multer";
+import multerS3 from "multer-s3";
 
 import { IS3ConfigEnv } from "models/_.loader";
 import { UuidProvider } from "../_.loader";

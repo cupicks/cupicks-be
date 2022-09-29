@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 import { Env } from "../../models/env/env";
 import { TNODE_ENV } from "../../constants/_.loader";
 
