@@ -19,7 +19,11 @@ export class AuthRepository {
     // findUserByUserId
     // findUserByEmail
 
-    public isExistsByEmailOrNickname = async (conn: PoolConnection, email: string, nickname: string) => {
+    public isExistsByEmailOrNickname = async (
+        conn: PoolConnection,
+        email: string,
+        nickname: string,
+    ): Promise<boolean> => {
         const isExistsQuery = `SELECT user_id FROM user WHERE email = "${email}" OR nickname = "${nickname}";`;
         const isExistsResult = await conn.query<RowDataPacket[][]>(isExistsQuery);
 

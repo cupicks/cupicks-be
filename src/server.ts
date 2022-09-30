@@ -23,9 +23,10 @@ export default (async () => {
     const envProvider: EnvProvider = new EnvProvider();
     const env: Env = envProvider.getEnvInstance();
 
+    await MysqlProvider.init(env.MYSQL);
+
     JwtProvider.init(env.JWT);
     BcryptProvider.init(env.SALT);
-    MysqlProvider.init(env.MYSQL);
     MulterProvider.init(env.S3);
     AwsSesProvider.init(env.SES, env.URL.SERVER_URL_WITH_PORT);
 

@@ -18,7 +18,7 @@ export const multerMiddlewareForProfile: RequestHandler = async (req: Request, r
             const errorCode: TERROR_CODE = "UNKOWN";
             return res.status(401).json({
                 isSuccess: false,
-                message: err,
+                message: `${err}`,
                 errorCode,
             });
         }
@@ -42,7 +42,7 @@ export const multerMiddlewareForComment: RequestHandler = async (req: Request, r
             const errorCode: TERROR_CODE = "UNKOWN";
             return res.status(401).json({
                 isSuccess: false,
-                message: err,
+                message: `${err}`,
                 errorCode,
             });
         }

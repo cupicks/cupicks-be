@@ -4,18 +4,20 @@
       "json",
       "ts"
     ],
-    "rootDir": "test",
+    "rootDir": ".",
     "testRegex": ".*\\.test\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "esbuild-jest"
     },
+    "silent": true,
     "testEnvironment": "node",
-    "coverageDirectory": "./coverage",
+    "coverageDirectory": "coverage",
     "coveragePathIgnorePatterns": [
       "dist/",
       "backup/",
       "backup_integration/",
-      "coverage/lcov-report"
+      "coverage/lcov-report",
+      "test/"
     ],
     "collectCoverageFrom": [
       "**/*.(t|j)s"

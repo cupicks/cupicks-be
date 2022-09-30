@@ -152,7 +152,7 @@ export class DtoFactory {
         userId: number;
         nickname: string;
         commentId: number;
-        comment: string;
+        comment: string | string[] | ParsedQs | ParsedQs[] | undefined;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
     }): Promise<UpdateCommentDto> {

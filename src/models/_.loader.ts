@@ -75,7 +75,8 @@ import { ICommentPacket } from "./packets/i.comment.packet";
 
 // PACKET - RANKING
 import { IWeeklyBestPacket } from "./packets/i.weekly.packet";
-import { IBestRecipePacket, IBestRecipeCategoryPacket } from "./packets/i.best.recipe.packet";
+import { IBestRecipePacket } from "./packets/i.best.recipe.packet";
+import { IBestRecipeCategoryPacket } from "./packets/i.best.recipe.category.packet";
 
 export {
     Env,

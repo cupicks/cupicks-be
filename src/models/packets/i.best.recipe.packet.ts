@@ -14,7 +14,3 @@ export interface IBestRecipePacket extends RowDataPacket {
     isLiked: boolean;
     categoryName: string;
 }
-
-export interface IBestRecipeCategoryPacket extends Omit<IBestRecipePacket, "categoryName">, RowDataPacket {
-    categoryName: string;
-}

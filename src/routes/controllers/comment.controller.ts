@@ -13,13 +13,14 @@ import {
 
 import { JoiValidator } from "../../modules/_.loader";
 import { CommentService } from "../services/_.exporter";
-import { ICommentResponse } from "../../constants/_.loader";
 
 export class CommentController {
     private commentService: CommentService;
+    private dtoFactory: DtoFactory;
 
     constructor() {
         this.commentService = new CommentService();
+        this.dtoFactory = new DtoFactory();
     }
     // Create
 
@@ -27,35 +28,21 @@ export class CommentController {
         try {
             const file = req.file as Express.MulterS3.File;
 
-            const validator: CreateCommentDto = await new JoiValidator().validateAsync<CreateCommentDto>(
-                new CreateCommentDto({
-                    userId: res.locals.userId,
-                    nickname: res.locals.nickname,
-                    recipeId: req.query.recipeId,
-                    comment: req.query.comment,
-                    imageUrl: file?.location,
-                    resizedUrl: file?.location,
-                }),
-            );
+            const createCommentValidator: CreateCommentDto = await this.dtoFactory.getCreateCommentDto({
+                userId: res.locals.userId,
+                nickname: res.locals.nickname,
+                recipeId: req.query.recipeId,
+                comment: req.query.comment,
+                imageUrl: file?.location,
+                resizedUrl: file?.location,
+            });
 
-            const createComment: ICommentResponse = await this.commentService.createComment(validator);
+            const createComment = await this.commentService.createComment(createCommentValidator);
 
             return res.status(201).json({
                 isSuccess: false,
                 message: "댓글 작성에 성공하였습니다.",
-                comment: {
-                    userId: validator.userId,
-                    nickname: validator.nickname,
-                    userImageUrl: createComment.userImageUrl,
-                    userResizedUrl: createComment.userResizedUrl,
-                    recipeId: validator.recipeId,
-                    commentId: createComment.commentId,
-                    comment: validator.comment,
-                    imageUrl: validator.imageUrl ? validator.imageUrl : null,
-                    resizedUrl: validator.resizedUrl ? validator.resizedUrl : null,
-                    createdAt: createComment.createdAt,
-                    updatedAt: createComment.updatedAt,
-                },
+                commentList: createComment,
             });
         } catch (err) {
             const exception = this.errorHandler(err);
@@ -72,15 +59,13 @@ export class CommentController {
 
     public getComments: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const validator = await new JoiValidator().validateAsync<GetCommentDto>(
-                new GetCommentDto({
-                    recipeId: Number(req.query.recipeId),
-                    page: Number(req.query.page),
-                    count: Number(req.query.count),
-                }),
-            );
+            const getCommentsValidator = await this.dtoFactory.getGetCommentDto({
+                recipeId: Number(req.query.recipeId),
+                page: Number(req.query.page),
+                count: Number(req.query.count),
+            });
 
-            const getComments: ICommentPacket[] = await this.commentService.getComments(validator);
+            const getComments = await this.commentService.getComments(getCommentsValidator);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -104,32 +89,21 @@ export class CommentController {
         try {
             const file = req.file as Express.MulterS3.File;
 
-            const validator: UpdateCommentDto = await new JoiValidator().validateAsync<UpdateCommentDto>(
-                new UpdateCommentDto({
-                    userId: res.locals.userId,
-                    nickname: res.locals.nickname,
-                    commentId: Number(req.params.commentId),
-                    comment: req.query.comment,
-                    imageUrl: file?.location,
-                    resizedUrl: file?.location,
-                }),
-            );
+            const updateCommentValidator = await this.dtoFactory.getUpdateCommentDto({
+                userId: res.locals.userId,
+                nickname: res.locals.nickname,
+                commentId: Number(req.params.commentId),
+                comment: req.query.comment,
+                imageUrl: file?.location,
+                resizedUrl: file?.location,
+            });
 
-            const updateComment: ICommentPacket[] = await this.commentService.updateComment(validator);
+            const updateComment = await this.commentService.updateComment(updateCommentValidator);
 
             return res.status(200).json({
                 isSuccess: true,
                 message: "댓글 수정에 성공하였습니다.",
-                comment: {
-                    userId: validator.userId,
-                    nickname: validator.nickname,
-                    commentId: updateComment[0].commentId,
-                    imageUrl: updateComment[0].image_url,
-                    resizedUrl: null,
-                    comment: updateComment[0].comment,
-                    createdAt: updateComment[0].createdAt,
-                    updatedAt: updateComment[0].updatedAt,
-                },
+                comment: updateComment,
             });
         } catch (err) {
             const exception = this.errorHandler(err);
@@ -146,14 +120,12 @@ export class CommentController {
 
     public deleteComment: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const validator: DeleteCommentDto = await new JoiValidator().validateAsync<DeleteCommentDto>(
-                new DeleteCommentDto({
-                    userId: res.locals.userId,
-                    commentId: Number(req.params.commentId),
-                }),
-            );
+            const deleteCommentValidator = await this.dtoFactory.getDeleteCommentDto({
+                userId: res.locals.userId,
+                commentId: Number(req.params.commentId),
+            });
 
-            await this.commentService.deleteComment(validator);
+            await this.commentService.deleteComment(deleteCommentValidator);
 
             return res.status(200).json({
                 isSuccess: true,

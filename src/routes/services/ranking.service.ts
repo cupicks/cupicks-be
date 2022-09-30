@@ -38,7 +38,7 @@ export class RankingService {
                 bestRecipeDto.userId,
             );
 
-            const myLikeRecipeIdList = [];
+            const myLikeRecipeIdList: number[] = [];
 
             for (const value of myLikeRecipeIds) {
                 myLikeRecipeIdList.push(value.recipeId);
@@ -55,8 +55,6 @@ export class RankingService {
             );
 
             const weeklyBestRankingList: number[] = weeklyBestRecipe.map((value) => value.recipeId);
-
-            console.log(weeklyBestRankingList);
 
             const bestRecipeList: IBestRecipePacket[][] = await Promise.all(
                 weeklyBestRankingList.map(

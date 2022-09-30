@@ -7,39 +7,39 @@ import {
     BadRequestException,
 } from "../../models/_.loader";
 import { CommentRepository, RecipeRepository, AuthRepository } from "../repositories/_.exporter";
-import { MysqlProvider } from "../../modules/_.loader";
-import { MulterProvider } from "../../modules/_.loader";
+import { MysqlProvider, MulterProvider, DayjsProvider } from "../../modules/_.loader";
 import { ICommentPacket } from "../../models/_.loader";
-import { ICommentResponse } from "../../constants/_.loader";
 
 export class CommentService {
     private commentRepository: CommentRepository;
     private mysqlProvider: MysqlProvider;
     private recipeRepository: RecipeRepository;
     private authRepository: AuthRepository;
+    private dayjsProvider: DayjsProvider;
 
     constructor() {
         this.commentRepository = new CommentRepository();
         this.mysqlProvider = new MysqlProvider();
         this.recipeRepository = new RecipeRepository();
         this.authRepository = new AuthRepository();
+        this.dayjsProvider = new DayjsProvider();
     }
     // Create
-    public createComment = async (commentDto: CreateCommentDto): Promise<ICommentResponse> => {
+    public createComment = async (commentDto: CreateCommentDto): Promise<object[]> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
-            const date = new Date().toISOString().slice(0, 19).replace("T", " ");
+            const createdAt = this.dayjsProvider.getDayjsInstance().format(this.dayjsProvider.getClientFormat());
 
             await conn.beginTransaction();
 
-            const findRecipeById = await this.recipeRepository.findRecipeById(conn, commentDto.recipeId);
+            const findRecipeById: boolean = await this.recipeRepository.findRecipeById(conn, commentDto.recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
-            const isExists = await this.authRepository.isExistsById(conn, commentDto.userId);
+            const isExists: boolean = await this.authRepository.isExistsById(conn, commentDto.userId);
             if (isExists === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
-            const findUser = await this.commentRepository.findUser(conn, commentDto.userId);
+            const findUserById = await this.authRepository.findUserById(conn, commentDto.userId);
 
             const createComment = await this.commentRepository.createComment(conn, commentDto);
             const commentId = createComment;
@@ -48,13 +48,21 @@ export class CommentService {
 
             await conn.commit();
 
-            return {
-                commentId,
-                userImageUrl: findUser[0].imageUrl,
-                userResizedUrl: findUser[0].resizedUrl,
-                createdAt: date,
-                updatedAt: date,
-            };
+            return [
+                {
+                    userId: commentDto.userId,
+                    nickname: commentDto.nickname,
+                    userImageUrl: findUserById.imageUrl,
+                    userResizedUrl: findUserById.resizedUrl,
+                    recipeId: commentDto.recipeId,
+                    commentId: commentId,
+                    comment: commentDto.comment,
+                    imageUrl: commentDto.imageUrl ?? null,
+                    resizedUrl: commentDto.resizedUrl ?? null,
+                    createdAt: createdAt,
+                    updatedAt: createdAt,
+                },
+            ];
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -86,18 +94,18 @@ export class CommentService {
 
     // Update
 
-    public updateComment = async (updateCommentDto: UpdateCommentDto): Promise<ICommentPacket[]> => {
+    public updateComment = async (updateCommentDto: UpdateCommentDto): Promise<object> => {
         const conn = await this.mysqlProvider.getConnection();
         try {
-            const date = new Date().toISOString().slice(0, 19).replace("T", " ");
-
             await conn.beginTransaction();
 
-            const isExistsByUserId = await this.authRepository.isExistsById(conn, updateCommentDto.userId);
+            const isExistsByUserId: boolean = await this.authRepository.isExistsById(conn, updateCommentDto.userId);
             if (isExistsByUserId === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
-            const isExistsByCommentId = await this.commentRepository.findCommentByCommentId(
+            const findUserById = await this.authRepository.findUserById(conn, updateCommentDto.userId);
+
+            const isExistsByCommentId: ICommentPacket[] = await this.commentRepository.findCommentByCommentId(
                 conn,
                 updateCommentDto.commentId,
             );
@@ -122,7 +130,18 @@ export class CommentService {
 
             await conn.commit();
 
-            return findCommentById;
+            return {
+                userId: updateCommentDto.userId,
+                nickname: updateCommentDto.nickname,
+                userImageUrl: findUserById.imageUrl,
+                userResizedUrl: findUserById.resizedUrl,
+                commentId: updateCommentDto.commentId,
+                comment: updateCommentDto.comment,
+                imageUrl: updateCommentDto.imageUrl ?? null,
+                resizedUrl: updateCommentDto.resizedUrl ?? null,
+                createdAt: findCommentById[0].createdAt,
+                updatedAt: findCommentById[0].updatedAt,
+            };
         } catch (err) {
             await conn.rollback();
             throw err;
@@ -138,7 +157,7 @@ export class CommentService {
         try {
             await conn.beginTransaction();
 
-            const isExists = await this.authRepository.isExistsById(conn, deleteCommentDto.userId);
+            const isExists: boolean = await this.authRepository.isExistsById(conn, deleteCommentDto.userId);
             if (isExists === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 

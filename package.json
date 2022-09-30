@@ -21,7 +21,7 @@
     "test:unit:watch": "cross-env NODE_ENV=test jest --config ./jest/jest.config.unit.json --watch",
     "test:int:watch": "cross-env NODE_ENV=test jest --config ./jest/jest.config.int.json --watch",
     "test:e2e:watch": "cross-env NODE_ENV=test jest --config ./jest/jest.config.e2e.json  --watch",
-    "test:cov": "cross-env NODE_ENV=test jest --config ./jest.config.json --runInBand --coverage",
+    "test:cov": "cross-env NODE_ENV=test jest --config ./jest.config.json --coverage",
     "test:clear": "jest --clearCache",
     "prepare": "husky install"
   },

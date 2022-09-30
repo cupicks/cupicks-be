@@ -3,7 +3,7 @@ import * as dayjs from "dayjs";
 
 export type TDatabaseFormat = "YYYY-MM-DD hh:mm:ss";
 export type TClientFormat = "YYYY년 MM월 DD일 hh:mm";
-export type TWeeklyForamt = "YYYY-MM-DD";
+export type TWeeklyFormat = "YYYY-MM-DD";
 
 export type TProvidedFormat = TDatabaseFormat | TClientFormat;
 export interface IGetWeeklyPeriodDate {
@@ -28,7 +28,7 @@ export class DayjsProvider {
         return "YYYY년 MM월 DD일 hh:mm";
     }
 
-    public getWeeklyFormat(): TWeeklyForamt {
+    public getWeeklyFormat(): TWeeklyFormat {
         return "YYYY-MM-DD";
     }
 

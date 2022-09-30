@@ -11,7 +11,10 @@ export class RandomGenerator {
     }
 
     /**
-     * 특수문자 `!@#` 를 반환합니다.
+     * 특수문자 `!@` 를 반환합니다.
+     *
+     * 순서는 다음과 같습니다.
+     * - ["@", "!", "@", "@", "!"]
      */
     private getRandSpecialString(idx: number): string {
         const pattern = ["@", "!", "@", "@", "!"];
@@ -31,7 +34,7 @@ export class RandomGenerator {
     }
 
     /**
-     * 이 함수는 최소 2 개의 특수문자 `!@#` 를 포함하고 있는 12 개의 문자열 (숫자 + 영문) 을 반환합니다.
+     * 이 함수는 최소 2 개의 특수문자 `!@` 를 포함하고 있는 12 개의 문자열 (숫자 + 영문) 을 반환합니다.
      */
     public getRandomPassword(accWord?: string, depth = 1): string {
         const idx = Math.floor(Math.random() * 10);
