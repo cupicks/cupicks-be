@@ -23,7 +23,8 @@
     "test:e2e:watch": "cross-env NODE_ENV=test jest --config ./jest/jest.config.e2e.json  --watch",
     "test:cov": "cross-env NODE_ENV=test jest --config ./jest.config.json --coverage",
     "test:clear": "jest --clearCache",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:load": "artillery ./content/artillery/load.test.yml"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.161.0",
