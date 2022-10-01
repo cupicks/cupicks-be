@@ -1,0 +1,13 @@
+config:
+  target: http://localhost:2000
+  phases:
+    - duration: 10
+      arrivalRate: 30
+      name: Warm up
+scenarios:
+  - name: "레시피 전체 조회"
+    flow:
+    - get:
+        url: "/api/recipes"
+    - get:
+        url: "/api/ranking/weekly-recipe"
