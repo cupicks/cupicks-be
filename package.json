@@ -28,7 +28,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.161.0",
     "@aws-sdk/client-ses": "^3.163.0",
-    "artillery": "^2.0.0-23",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
@@ -60,6 +59,7 @@
     "@types/prettier": "^2.7.0",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "artillery": "^2.0.0-23",
     "esbuild-jest": "^0.5.0",
     "eslint": "^8.22.0",
     "husky": "^8.0.1",
