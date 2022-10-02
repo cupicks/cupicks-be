@@ -60,9 +60,14 @@ export default class App {
                 }
             }
         });
-        appServer.close((err) => {
-            console.log(`Server is shutdown from ${PORT}`);
-            process.exit(err ? 1 : 0);
+        process.on("SIGINT", () => {
+            console.log("SIGINT signal");
+            this.isAppGoingToBeClosed = true;
+
+            appServer.close((err) => {
+                console.log(`Server is shutdown from ${PORT}`);
+                process.exit(err ? 1 : 0);
+            });
         });
     }
 }
