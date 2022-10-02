@@ -106,7 +106,7 @@ export class DtoFactory {
     }): Promise<IngredientDto> {
         return await new IngredientDto(iDto);
     }
-    public async getCommonRecipeDto(iDto: { recipeId: number }): Promise<CommonRecipeDto> {
+    public async getCommonRecipeDto(iDto: { recipeId: number; userId: number | null }): Promise<CommonRecipeDto> {
         return await this.joiValidator.validateAsync<CommonRecipeDto>(new CommonRecipeDto(iDto));
     }
     public async getDeleteRecipeDto(iDto: { userId: number; recipeId: number }): Promise<DeleteRecipeDto> {
