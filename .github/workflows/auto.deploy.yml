@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Test ecosystem.config.json.sh
+        run: sh test.sh
+
       - name: Zip file
         run: zip -r ${{github.event.pull_request.timestamp}}_server.zip .github/workflows ./scripts ./jest ./src ./test ./appspec.yml ./gitignore ./package.json ./package-lock.json ./tsconfig.build.json ./tsconfig.json ./jest.config.json
 
