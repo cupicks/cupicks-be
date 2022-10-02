@@ -60,13 +60,6 @@ export default class App {
                 }
             }
         });
-        this.app.all("*", (req, res) => {
-            return res.json({
-                url: req.url,
-                baseUrl: req.baseUrl,
-                port: PORT,
-            });
-        });
 
         process.on("SIGINT", () => {
             console.log("SIGINT signal");
