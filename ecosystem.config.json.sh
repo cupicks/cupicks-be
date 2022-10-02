@@ -30,7 +30,7 @@ ECOSYSTEM_CONFIG_JSON=$(cat <<EOF
         "apps": [
                 {
                         "name": "app",
-                        "script": "app.js",
+                        "script": "./dist/server.js",
                         "instances": 2,
                         "instance_var": "APP_INSTANCE_SEQ",
                         "exec_mode": "cluster",
@@ -81,7 +81,7 @@ ECOSYSTEM_CONFIG_JSON=$(cat <<EOF
                 },
                 {
                         "name": "app-for-read-replica",
-                        "script": "app.js",
+                        "script": "./dist/server.js",
                         "instances": 2,
                         "instance_var": "APP_INSTANCE_SEQ",
                         "exec_mode": "cluster",
