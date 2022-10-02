@@ -3,7 +3,7 @@ REPOSITORY=/home/ubuntu/project
 
 cd $REPOSITORY
 
-sudo npm ci
+sudo npm install
 
 # sudo pm2 kill
 # sudo rm -r dist

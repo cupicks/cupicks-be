@@ -20,7 +20,7 @@ else
 fi
 
 MAIN_PORT=${2}
-READ_PORT=$(($2+1))
+READ_PORT=$((${2} + 1))
 
 MAIN_MYSQL_HOST=${16}
 SUB_MYSQL_HOST=${30}
@@ -92,7 +92,7 @@ ECOSYSTEM_CONFIG_JSON=$(cat <<EOF
                         "env_production": {
                             "NODE_ENV": "${1}",
 
-                            "PORT": "{{${READ_PORT} + 1}}",
+                            "PORT": "${READ_PORT}",
                             "SALT": "${3}",
 
                             "CORS_URL_ONE_WITHOUT_PORT": "${4}",
