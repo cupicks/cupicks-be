@@ -11,7 +11,7 @@ then
 else
         echo "Parameter Validation Fail : $# of PARAMS (NEED : ${NEEDS_NUMBER_OF_PARAMS})"
         echo "====================================="
-        echo "Create-Ecosystem.confgi.json is failed"
+        echo "Create-Ecosystem.config.json is failed"
         echo "The parameters required to create the file were not passed."
         echo "Please check the files included in .env.dev and .env.test."
         echo "process.exit(1)"
