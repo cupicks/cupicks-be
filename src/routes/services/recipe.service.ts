@@ -167,6 +167,10 @@ export class RecipeService {
                     ),
                 );
 
+                const recipeCommentList = await Promise.all(
+                    recipeIdList.map(async (recipeId) => await this.recipeRepository.getRecipeComment(conn, recipeId)),
+                );
+
                 const recipeDtoList = new Array<RecipeDto>();
 
                 const loopLength = recipeList.length;
@@ -190,6 +194,8 @@ export class RecipeService {
                         imageUrl: recipeList[i].imageUrl,
                         resizedUrl: recipeList[i].resizedUrl,
                         isLiked: myLikeRecipeIdList.includes(recipeList[i].recipeId) ? true : false,
+                        commentTotal: recipeCommentList[i].length,
+                        likeTotal: recipeList[i].likeTotal,
                     });
                     recipeDtoList.push(recipeDto);
                 }

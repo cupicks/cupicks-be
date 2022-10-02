@@ -21,4 +21,6 @@ export interface IRecipeCombinedPacket extends RowDataPacket {
     resizedUrl: string | undefined;
 
     isLiked: boolean;
+    likeTotal: number;
+    commentTotal?: number;
 }
