@@ -15,6 +15,8 @@ export interface IRecipeDto {
     updatedAt: string;
     ingredientList: IIngredientDto[];
     isLiked?: boolean;
+    commentTotal?: number;
+    likeTotal?: number;
 }
 
 export class RecipeDto implements IRecipeDto {
@@ -30,6 +32,8 @@ export class RecipeDto implements IRecipeDto {
     updatedAt: string;
     ingredientList: IIngredientDto[];
     isLiked: boolean;
+    commentTotal?: number;
+    likeTotal?: number;
 
     constructor({
         recipeId,
@@ -44,6 +48,8 @@ export class RecipeDto implements IRecipeDto {
         updatedAt,
         ingredientList,
         isLiked,
+        commentTotal,
+        likeTotal,
     }: IRecipeDto) {
         this.recipeId = recipeId;
 
@@ -59,5 +65,7 @@ export class RecipeDto implements IRecipeDto {
         this.updatedAt = updatedAt;
         this.ingredientList = ingredientList;
         this.isLiked = isLiked;
+        this.commentTotal = commentTotal;
+        this.likeTotal = likeTotal;
     }
 }
