@@ -91,10 +91,14 @@ export class RecipeService {
 
             const recipe: IRecipeCombinedPacket = await this.recipeRepository.getRecipe(conn, getRecipeDto.recipeId);
 
+            // console.log(recipe);
+
             const ingredientList = await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(
                 conn,
                 getRecipeDto.recipeId,
             );
+
+            const commentList = await this.recipeRepository.getRecipeComment(conn, getRecipeDto.recipeId);
 
             const userLikeRecipeExist = await this.recipeRepository.userLikeRecipeExist(
                 conn,
@@ -121,6 +125,8 @@ export class RecipeService {
                 imageUrl: recipe.imageUrl,
                 resizedUrl: recipe.resizedUrl,
                 isLiked: userLikeRecipeExist === true ? true : false,
+                likeTotal: recipe.likeTotal,
+                commentTotal: commentList.length,
                 // isLiked: myLikeRecipeIdList.includes(recipe.recipeId) ? true : false,
             });
 

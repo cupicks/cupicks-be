@@ -100,7 +100,8 @@ export class RecipeRepository {
             recipe.updated_at as updatedAt,
             user.nickname as nickname,
             user.image_url as imageUrl,
-            user.resized_url as resizedUrl
+            user.resized_url as resizedUrl,
+            count(user_like_recipe.user_id) as likeTotal
         FROM (
             SELECT
                 recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
@@ -111,7 +112,10 @@ export class RecipeRepository {
         LEFT OUTER JOIN user_recipe
             ON recipe.recipe_id = user_recipe.recipe_id
         LEFT OUTER JOIN user
-            ON user_recipe.user_id = user.user_id;`;
+            ON user_recipe.user_id = user.user_id
+        LEFT OUTER JOIN user_like_recipe
+            ON user_like_recipe.recipe_id = recipe.recipe_id
+            GROUP BY user_like_recipe.recipe_id;`;
         const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
         const [recipePackets] = selectResult;
 
