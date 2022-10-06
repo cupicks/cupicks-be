@@ -77,6 +77,7 @@ import { ICommentPacket } from "./packets/i.comment.packet";
 import { IWeeklyBestPacket } from "./packets/i.weekly.packet";
 import { IBestRecipePacket } from "./packets/i.best.recipe.packet";
 import { IBestRecipeCategoryPacket } from "./packets/i.best.recipe.category.packet";
+import { IBestRecipeCommentPacket } from "./packets/i.best.recipe.comment.packet";
 
 export {
     Env,
@@ -97,6 +98,7 @@ export {
     IWeeklyBestPacket,
     IBestRecipePacket,
     IBestRecipeCategoryPacket,
+    IBestRecipeCommentPacket,
     IRecipeOwnerPacket,
 
     // BaseDtos

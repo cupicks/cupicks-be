@@ -7,6 +7,7 @@ import {
     IBestRecipeCategoryPacket,
     IRecipeIngredientPacket,
     IRecipeLikePacket,
+    IBestRecipeCommentPacket,
     IIngredientDto,
     BestRecipeDto,
 } from "../../models/_.loader";
@@ -69,6 +70,12 @@ export class RankingService {
                 ),
             );
 
+            const bestRecipeCommentList: IBestRecipeCommentPacket[][] = await Promise.all(
+                weeklyBestRankingList.map(
+                    async (recipeId) => await this.recipeRepository.getRecipeComment(conn, recipeId),
+                ),
+            );
+
             const bestRecipeCategoryList: IBestRecipeCategoryPacket[][] = await Promise.all(
                 weeklyBestRankingList.map(
                     async (recipeId) => await this.rankingRepository.getBestRecipeCategory(conn, recipeId),
@@ -89,6 +96,7 @@ export class RankingService {
                     resizedUrl: bestRecipeList[i][0].resizedUrl,
                     isLiked: myLikeRecipeIdList.includes(bestRecipeList[i][0].recipeId) ? true : false,
                     likeTotal: weeklyBestRecipe[i].totalLike,
+                    commentTotal: bestRecipeCommentList[i].length,
                     ingredientList: bestRecipeIngredientList[i].map((ingredient): IIngredientDto => {
                         return {
                             ingredientName: ingredient.ingredientName,
