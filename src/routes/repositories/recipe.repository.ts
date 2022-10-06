@@ -4,6 +4,7 @@ import {
     CreateRecipeDto,
     IngredientDto,
     IRecipeCombinedPacket,
+    IBestRecipeCommentPacket,
     IRecipePacket,
     IRecipeLikePacket,
     UnkownError,
@@ -191,14 +192,14 @@ export class RecipeRepository {
         return recipePackets;
     };
 
-    public getRecipeComment = async (conn: PoolConnection, recipeId: number): Promise<RowDataPacket[]> => {
+    public getRecipeComment = async (conn: PoolConnection, recipeId: number): Promise<IBestRecipeCommentPacket[]> => {
         const query = `
             SELECT user_id, count(*)
             FROM recipe_comment
             WHERE recipe_comment.recipe_id = ?
             GROUP BY recipe_comment.comment_id ORDER BY count(*)`;
 
-        const selectResult = await conn.query<RowDataPacket[]>(query, [recipeId]);
+        const selectResult = await conn.query<IBestRecipeCommentPacket[]>(query, [recipeId]);
         const [recipePackets, _] = selectResult;
 
         return recipePackets;

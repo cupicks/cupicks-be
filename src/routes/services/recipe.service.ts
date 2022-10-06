@@ -6,6 +6,7 @@ import {
     IRecipeLikePacket,
     IRecipeIngredientPacket,
     IRecipeCombinedPacket,
+    IBestRecipeCommentPacket,
     NotFoundException,
     RecipeDto,
     UpdateRecipeDto,
@@ -167,7 +168,7 @@ export class RecipeService {
                     ),
                 );
 
-                const recipeCommentList = await Promise.all(
+                const recipeCommentList: IBestRecipeCommentPacket[][] = await Promise.all(
                     recipeIdList.map(async (recipeId) => await this.recipeRepository.getRecipeComment(conn, recipeId)),
                 );
 
