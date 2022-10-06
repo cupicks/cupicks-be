@@ -25,7 +25,7 @@ declare module "jsonwebtoken" {
         userId: number;
         email: string;
         nickname: string;
-        imageUrl?: string;
+        // imageUrl?: string;
     }
 
     export interface IEmailVerifyToken extends ICustomPayload {

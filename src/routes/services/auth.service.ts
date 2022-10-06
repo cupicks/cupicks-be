@@ -157,7 +157,7 @@ export class AuthService {
                 userId: findedUser.userId,
                 nickname: findedUser.nickname,
                 email: findedUser.email,
-                imageUrl: findedUser.imageUrl,
+                // imageUrl: findedUser.imageUrl,
             });
 
             await this.authRepository.updateUserRefreshToken(conn, findedUser.userId, refreshToken);
