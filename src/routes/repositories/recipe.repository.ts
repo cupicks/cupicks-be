@@ -173,8 +173,7 @@ export class RecipeRepository {
             recipe.updated_at as updatedAt,
             user.nickname as nickname,
             user.image_url as imageUrl,
-            user.resized_url as resizedUrl,
-            count(user_like_recipe.user_id) as likeTotal
+            user.resized_url as resizedUrl
         FROM (
             SELECT
                 recipe_id, cup_size, title, content, is_iced, is_public, created_at, updated_at
@@ -185,10 +184,7 @@ export class RecipeRepository {
         LEFT OUTER JOIN user_recipe
             ON recipe.recipe_id = user_recipe.recipe_id
         LEFT OUTER JOIN user
-            ON user_recipe.user_id = user.user_id
-        LEFT OUTER JOIN user_like_recipe	
-            ON recipe.recipe_id = user_like_recipe.recipe_id
-        GROUP BY user_like_recipe.recipe_id;`;
+            ON user_recipe.user_id = user.user_id;`;
 
         const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
         const [recipePackets, _] = selectResult;
@@ -204,6 +200,20 @@ export class RecipeRepository {
             GROUP BY recipe_comment.comment_id ORDER BY count(*)`;
 
         const selectResult = await conn.query<IBestRecipeCommentPacket[]>(query, [recipeId]);
+        const [recipePackets, _] = selectResult;
+
+        return recipePackets;
+    };
+
+    public getRecipeLike = async (conn: PoolConnection, recipeId: number): Promise<IRecipeLikePacket[]> => {
+        const query = `
+            SELECT count(*) as likeTotal
+            FROM user_like_recipe
+            WHERE user_like_recipe.recipe_id = ?
+            GROUP BY user_like_recipe.user_id ORDER BY count(*)
+        `;
+
+        const selectResult = await conn.query<IRecipeLikePacket[]>(query, [recipeId]);
         const [recipePackets, _] = selectResult;
 
         return recipePackets;
