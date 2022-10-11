@@ -33,7 +33,7 @@ export class UpdateCommentDto extends RequestQueryExtractor<"comment"> implement
         userId: number;
         nickname: string;
         commentId: number;
-        comment: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        comment: string;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
     }) {
@@ -41,7 +41,7 @@ export class UpdateCommentDto extends RequestQueryExtractor<"comment"> implement
         this.userId = userId;
         this.nickname = nickname;
         this.commentId = commentId;
-        this.comment = this.validateType(comment, "comment");
+        this.comment = comment;
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/comment\//, `/comment-resized/`) : undefined;
     }

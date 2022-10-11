@@ -139,7 +139,7 @@ export class DtoFactory {
         userId: number;
         nickname: string;
         recipeId: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        comment: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        comment: string;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
     }): Promise<CreateCommentDto> {
@@ -152,7 +152,7 @@ export class DtoFactory {
         userId: number;
         nickname: string;
         commentId: number;
-        comment: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        comment: string;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
     }): Promise<UpdateCommentDto> {
