@@ -32,7 +32,7 @@ export class CommentController {
                 userId: res.locals.userId,
                 nickname: res.locals.nickname,
                 recipeId: req.query.recipeId,
-                comment: req.query.comment,
+                comment: req.body.comment,
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
             });
@@ -89,11 +89,11 @@ export class CommentController {
         try {
             const file = req.file as Express.MulterS3.File;
 
-            const updateCommentValidator = await this.dtoFactory.getUpdateCommentDto({
+            const updateCommentValidator: UpdateCommentDto = await this.dtoFactory.getUpdateCommentDto({
                 userId: res.locals.userId,
                 nickname: res.locals.nickname,
                 commentId: Number(req.params.commentId),
-                comment: req.query.comment,
+                comment: req.body.comment,
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
             });
