@@ -13,11 +13,13 @@ export class RankingRepository {
     ): Promise<IWeeklyBestPacket[]> => {
         const query = `
             SELECT 
-                count(*) as totalLike, 
-                user_like_recipe.recipe_id as recipeId
+            count(*) as totalLike, 
+            user_like_recipe.recipe_id as recipeId
             FROM user_like_recipe
-            WHERE created_at BETWEEN ? AND ?
-            GROUP BY recipe_id ORDER BY count(*) DESC LIMIT 3;
+            LEFT JOIN recipe
+            ON recipe.recipe_id = user_like_recipe.recipe_id
+            WHERE user_like_recipe.created_at AND recipe.created_at BETWEEN ? AND ?
+            GROUP BY user_like_recipe.recipe_id ORDER BY count(*) DESC LIMIT 3;
         `;
 
         const selectResult = await conn.query<IWeeklyBestPacket[]>(query, [startDate, endDate]);
@@ -52,7 +54,7 @@ export class RankingRepository {
                     FROM user
                 ) user
             ON user_recipe.user_id = user.user_id
-            WHERE recipe.recipe_id = ?
+            WHERE recipe.recipe_id = ?;
         `;
 
         const selectResult = await conn.query<IBestRecipePacket[]>(query, [recipeId]);
