@@ -4,7 +4,14 @@
 
 > Cupick 은 **이미지만 보고 만드는 카페 레시피 제작 및 공유 서비스** 입니다. <br>
 > 
-> 2022.08.26 ~ 2022.10.07 까지 총 **42 일** 간 진행되었습니다.
+> 프로젝트는 2022.08.26 ~ 2022.10.07 까지 총 **42 일** 간 진행되었습니다.<br>
+> 종료 후, 2022.10.11 부터 **유저 테스트** 반영한 **추가 기능** 및 **리팩터링** 작업을 하고 있습니다.
+
+### 버전 관리
+
+| 버전 | 기간 |
+| ------- | --- |
+| v1.3.697 | 2022.08.26 ~ 2022.10.07 |
 
 ---
 
@@ -32,15 +39,72 @@
 
 | 포지션 | 이름 | Role |
 | :---- | :---- | :---- |
-| Backend, L | 이민석 | |
-| Backend | 윤승근 | |
+| Backend, L | 이민석 | 인증관련 API, 프로젝트 셋팅 |
+| Backend | 윤승근 | 레시피 API, 댓글 API, [cupikcs/cupicks-be-lambda](https://github.com/cupicks/cupicks-be-lambda) |
 
 ### 문서 리스트
 
-자유 양식
+- [API 리스트 (v1.3.697) _ 0928](https://www.notion.so/API-_-0928-158b92d9cf6e4601b4c0b04c22513cbb)
+- [API 명세서 (v1.3.697) _ 0928](https://www.notion.so/API-_-0928-ce1db36c2fa7491f8fec700be56cc45f)
 
-- [API 리스트 _ 0928](https://www.notion.so/API-_-0928-158b92d9cf6e4601b4c0b04c22513cbb)
-- [API 명세서 _ 0928](https://www.notion.so/API-_-0928-ce1db36c2fa7491f8fec700be56cc45f)
+### 트러블 슈팅
+
+- TypeScript _ReferenceError : Cannot Access_ with mysql2\/promise
+- TypeScript 컴파일러 튜닝 및 변경을 통한 컴파일러 성능 약 **75%** 단축
+- Lambda, Sharp
+- GitHub Action + Shell Script + CodeDeploy 를 이용한 **무중단 배포 자동화** 와 **좀비 프로세스 방지**
+- GitHub Action + Jest 를 이용한 **테스트 자동화** 로 컴파일링 실패 감지
+- GitHub Action 을 이용한 **Lambda 배포 자동화**
+
+### [라이브러리 선택 이유](https://github.com/cupicks/cupicks-be/wiki/3.-%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC-%EC%84%A0%ED%83%9D)
+
+1. JWT RS256 선택
+2. TypeScript 선택 이유
+3. MySQL 선택 이유
+4. Raw Query 선택 이유
+5. AWS Lambda 선택 이유
+    <details>
+        <summary>그 외의 Dependencies</summary>
+
+    1. env : 환경변수 설정을 도와주는 라이브러리
+    2. cors : CORS 설정을 손쉽게 도와주는 라이브러리
+    3. joi : 형태와 범위 등의 유효성 검사를 위한 라이브러리
+    4. bcrypt : 단방향 암호화를 위한 라이브러리
+    5. jsonwebtoken : JWT 를 만들기 위한 라이브러리로 RS256 알고리즘 선택
+    6. uuid : Bcrypt 
+    7. dayjs : Date 포맷팅, 연산 처리를 위한 경량 라이브러리
+    8. multer : multipart/form-data 파서를 포함하고 있는 이미지 처리용 미들웨어
+    9. morgan : 간단한 요청 로그를 노출 시킬 수 있게 도와주는 미들웨어
+
+    </details>
+    <details>
+        <summary>그 외의 devDependencies</summary>
+
+    1. cross-env : NODE_ENV 주입을 위한 라이브러리
+    2. husky, lint-staged, prettier : 개별 커밋에 prettier 자동 적용 (local hooks)
+    3. jest, esbuld-jest : 테스트 코드 실행을 위한 라이브러리 및 컴파일러
+    4. node-mocks-http : Mock Request, Response 라이브러리
+    5. @faker-js/faker : Mock Data 라이브러리
+    6. typescript, @types/* : TypeScript 컴파일러(tsc) 와 타입 파일
+
+    </details>
+
+<br>
+
+### [공급자 클래스](https://github.com/cupicks/cupicks-be/wiki/5.-%EA%B3%B5%EA%B8%89%EC%9E%90-%ED%81%B4%EB%9E%98%EC%8A%A4)
+
+1. EnvProvider + Env 으로 환경 변수 의 누락을 검출 하고 안정적인 공급을 구현
+2. CustomException + ErrorHandler 으로 사용한 비즈니스 로직 간소화
+3. DtoFactroy + JoiValidator + Dto 으로 도메인의 매개변수 간소화
+
+### ERD
+
+<details>
+    <summary>v1.3.697</summary>
+
+<image src="./ERD.png">
+
+</details>
 
 ---
 
@@ -48,9 +112,9 @@
 
 Team
 
-<img src="https://img.shields.io/badge/Husky-3766AB?style=flat-square&logo=Python&logoColor=white"/></a>
-<img src="https://img.shields.io/badge/Prettier-3766AB?style=flat-square&logo=Python&logoColor=white"/></a>
-<img src="https://img.shields.io/badge/Lint_staged-3766AB?style=flat-square&logo=Python&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Husky-CB3837?style=flat-square&logo=npm&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Prettier-F7B93E?style=flat-square&logo=Prettier&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Lint_staged-CB3837?style=flat-square&logo=npm&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/GitHub_Action-2088FF?style=flat-square&logo=GitHub Actions&logoColor=white"/></a>
 
 Dependencies
