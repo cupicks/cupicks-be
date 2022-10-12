@@ -47,7 +47,7 @@
 - [API 리스트 (v1.3.697) _ 0928](https://www.notion.so/API-_-0928-158b92d9cf6e4601b4c0b04c22513cbb)
 - [API 명세서 (v1.3.697) _ 0928](https://www.notion.so/API-_-0928-ce1db36c2fa7491f8fec700be56cc45f)
 
-### 트러블 슈팅
+### [트러블 슈팅](https://github.com/cupicks/cupicks-be/wiki/1.-%ED%8A%B8%EB%9F%AC%EB%B8%94-%EC%8A%88%ED%8C%85)
 
 - TypeScript _ReferenceError : Cannot Access_ with mysql2\/promise
 - TypeScript 컴파일러 튜닝 및 변경을 통한 컴파일러 성능 약 **75%** 단축
