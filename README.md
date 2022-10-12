@@ -48,9 +48,9 @@
 
 Team
 
-<img src="https://img.shields.io/badge/Husky-3766AB?style=flat-square&logo=Python&logoColor=white"/></a>
-<img src="https://img.shields.io/badge/Prettier-3766AB?style=flat-square&logo=Python&logoColor=white"/></a>
-<img src="https://img.shields.io/badge/Lint_staged-3766AB?style=flat-square&logo=Python&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Husky-CB3837?style=flat-square&logo=npm&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Prettier-F7B93E?style=flat-square&logo=Prettier&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Lint_staged-CB3837?style=flat-square&logo=npm&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/GitHub_Action-2088FF?style=flat-square&logo=GitHub Actions&logoColor=white"/></a>
 
 Dependencies
