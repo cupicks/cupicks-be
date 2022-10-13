@@ -217,7 +217,7 @@ export class AuthController {
 
     public sendPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const snedPasswordDto = await this.dtoFactory.getSendPasswordDto({ email: req?.query["email"] });
+            const snedPasswordDto = await this.dtoFactory.getSendPasswordDto({ email: req?.body["email"] });
 
             const result = await this.authService.sendPassword(snedPasswordDto);
 

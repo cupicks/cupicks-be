@@ -31,9 +31,7 @@ export class DtoFactory {
     public async getConfirmNicknameDto(iDto: IConfirmNicknameDto): Promise<ConfirmNicknameDto> {
         return await this.joiValidator.validateAsync<ConfirmNicknameDto>(new ConfirmNicknameDto(iDto));
     }
-    public async getSendPasswordDto(iDto: {
-        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<SendPasswordDto> {
+    public async getSendPasswordDto(iDto: ISendPasswordDto): Promise<SendPasswordDto> {
         return await this.joiValidator.validateAsync<SendPasswordDto>(new SendPasswordDto(iDto));
     }
     public async getResetPasswordDto(iDto: {
