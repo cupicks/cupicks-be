@@ -25,10 +25,7 @@ export class DtoFactory {
     }): Promise<PublishTokenDto> {
         return await this.joiValidator.validateAsync<PublishTokenDto>(new PublishTokenDto(iDto));
     }
-    public async getConfirmEmailDto(iDto: {
-        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        emailVerifyCode: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<ConfirmEmailDto> {
+    public async getConfirmEmailDto(iDto: IConfirmEmailDto): Promise<ConfirmEmailDto> {
         return await this.joiValidator.validateAsync<ConfirmEmailDto>(new ConfirmEmailDto(iDto));
     }
     public async getConfirmNicknameDto(iDto: {

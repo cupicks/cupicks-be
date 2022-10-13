@@ -164,8 +164,8 @@ export class AuthController {
     public confirmEmailCode: RequestHandler = async (req: Request, res: Response) => {
         try {
             const confirmEailDto = await this.dtoFactory.getConfirmEmailDto({
-                email: req?.query["email"],
-                emailVerifyCode: req?.query["email-verify-code"],
+                email: req?.body["email"],
+                emailVerifyCode: req?.body["emailVerifyCode"],
             });
 
             const result = await this.authService.confirmEmailCode(confirmEailDto);
