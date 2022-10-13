@@ -34,9 +34,7 @@ export class DtoFactory {
     public async getSendPasswordDto(iDto: ISendPasswordDto): Promise<SendPasswordDto> {
         return await this.joiValidator.validateAsync<SendPasswordDto>(new SendPasswordDto(iDto));
     }
-    public async getResetPasswordDto(iDto: {
-        resetPasswordToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<ResetPasswordDto> {
+    public async getResetPasswordDto(iDto: IResetPasswordDto): Promise<ResetPasswordDto> {
         return await this.joiValidator.validateAsync<ResetPasswordDto>(new ResetPasswordDto(iDto));
     }
     public async getSendEmailDto(iDto: ISendEmailDto): Promise<SendEmailDto> {

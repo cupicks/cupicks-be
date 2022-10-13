@@ -44,6 +44,6 @@ authRouter.patch("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ 
 
 authRouter.patch("/send-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendPassword);
 
-authRouter.get("/reset-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().resetPassword);
+authRouter.patch("/reset-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().resetPassword);
 
 export { authRouter };

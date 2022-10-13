@@ -243,7 +243,7 @@ export class AuthController {
     public resetPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
             const resetPasswordDto = await this.dtoFactory.getResetPasswordDto({
-                resetPasswordToken: req?.query["resetPasswordToken"],
+                resetPasswordToken: req?.body["resetPasswordToken"],
             });
 
             const email = await this.authService.resetPassword(resetPasswordDto);
