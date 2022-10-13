@@ -10,23 +10,14 @@ export interface IConfirmNicknameDto {
     nickname: string;
 }
 
-export class ConfirmNicknameDto
-    extends RequestQueryExtractor<"emailVerifyToken" | "nickname">
-    implements IBaseDto, IConfirmNicknameDto
-{
+export class ConfirmNicknameDto extends RequestQueryExtractor<string> implements IBaseDto, IConfirmNicknameDto {
     emailVerifyToken: string;
     nickname: string;
 
-    constructor({
-        emailVerifyToken,
-        nickname,
-    }: {
-        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }) {
+    constructor({ emailVerifyToken, nickname }: IConfirmNicknameDto) {
         super();
-        this.emailVerifyToken = this.validateType(emailVerifyToken, "emailVerifyToken");
-        this.nickname = this.validateType(nickname, "nickname");
+        this.emailVerifyToken = emailVerifyToken;
+        this.nickname = nickname;
     }
 
     getJoiInstance(): ObjectSchema<ConfirmNicknameDto> {

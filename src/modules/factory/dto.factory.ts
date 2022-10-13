@@ -28,10 +28,7 @@ export class DtoFactory {
     public async getConfirmEmailDto(iDto: IConfirmEmailDto): Promise<ConfirmEmailDto> {
         return await this.joiValidator.validateAsync<ConfirmEmailDto>(new ConfirmEmailDto(iDto));
     }
-    public async getConfirmNicknameDto(iDto: {
-        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<ConfirmNicknameDto> {
+    public async getConfirmNicknameDto(iDto: IConfirmNicknameDto): Promise<ConfirmNicknameDto> {
         return await this.joiValidator.validateAsync<ConfirmNicknameDto>(new ConfirmNicknameDto(iDto));
     }
     public async getSendPasswordDto(iDto: {
@@ -200,4 +197,5 @@ import {
     ICreateRecipeDto,
     GetMyProfileDto,
     ISignupUserDto,
+    IConfirmNicknameDto,
 } from "../../models/_.loader";

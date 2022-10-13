@@ -191,8 +191,8 @@ export class AuthController {
     public confirmNickname: RequestHandler = async (req: Request, res: Response) => {
         try {
             const confirmNicknameDto = await this.dtoFactory.getConfirmNicknameDto({
-                emailVerifyToken: req?.query["emailVerifyToken"],
-                nickname: req?.query["nickname"],
+                emailVerifyToken: req?.body["emailVerifyToken"],
+                nickname: req?.body["nickname"],
             });
 
             const result = await this.authService.confirmNickname(confirmNicknameDto);

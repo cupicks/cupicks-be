@@ -40,7 +40,7 @@ authRouter.patch("/send-email", /* applicationXWwwFormUrlencodedFilter */ new Au
 
 authRouter.patch("/confirm-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmEmailCode);
 
-authRouter.get("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmNickname);
+authRouter.patch("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmNickname);
 
 authRouter.get("/send-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendPassword);
 
