@@ -36,11 +36,11 @@ export class AuthController {
             const signupUserDto = await this.dtoFactory.getSignupUserDto({
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
-                password: req?.query["password"],
-                emailVerifyToken: req?.query["emailVerifyToken"],
-                nicknameVerifyToken: req?.query["nicknameVerifyToken"],
-                favorCategory: req?.query["favorCategory"],
-                disfavorCategory: req?.query["disfavorCategory"],
+                password: req?.body["password"],
+                emailVerifyToken: req?.body["emailVerifyToken"],
+                nicknameVerifyToken: req?.body["nicknameVerifyToken"],
+                favorCategory: req?.body["favorCategory"],
+                disfavorCategory: req?.body["disfavorCategory"],
             });
 
             const result = await this.authService.signup(signupUserDto);

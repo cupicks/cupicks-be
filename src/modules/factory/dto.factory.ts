@@ -8,15 +8,7 @@ export class DtoFactory {
     }
 
     // USER
-    public async getSignupUserDto(iDto: {
-        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        imageUrl: string | undefined;
-        resizedUrl: string | undefined;
-        nicknameVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<SignupUserDto> {
+    public async getSignupUserDto(iDto: ISignupUserDto): Promise<SignupUserDto> {
         return await this.joiValidator.validateAsync<SignupUserDto>(new SignupUserDto(iDto));
     }
 
@@ -212,4 +204,5 @@ import {
     IUpdateRecipeDto,
     ICreateRecipeDto,
     GetMyProfileDto,
+    ISignupUserDto,
 } from "../../models/_.loader";
