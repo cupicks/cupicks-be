@@ -9,12 +9,12 @@ export interface ISendEmailDto {
     email: string;
 }
 
-export class SendEmailDto extends RequestQueryExtractor<"email"> implements IBaseDto, ISendEmailDto {
+export class SendEmailDto extends RequestQueryExtractor<string> implements IBaseDto, ISendEmailDto {
     email: string;
 
-    constructor({ email }: { email: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
+    constructor({ email }: ISendEmailDto) {
         super();
-        this.email = this.validateType(email, "email");
+        this.email = email;
     }
 
     getJoiInstance(): ObjectSchema<SendEmailDto> {

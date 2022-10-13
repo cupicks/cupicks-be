@@ -138,7 +138,7 @@ export class AuthController {
 
     public sendEmail: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const sendEmailDto = await this.dtoFactory.getSendEmailDto({ email: req?.query["email"] });
+            const sendEmailDto = await this.dtoFactory.getSendEmailDto({ email: req?.body["email"] });
 
             const result = await this.authService.sendEmail(sendEmailDto);
 

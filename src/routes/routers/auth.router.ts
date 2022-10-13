@@ -36,7 +36,7 @@ authRouter.patch(
 
 authRouter.get("/token", /* applicationXWwwFormUrlencodedFilter */ new AuthController().publishToken);
 
-authRouter.get("/send-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendEmail);
+authRouter.patch("/send-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendEmail);
 
 authRouter.get("/confirm-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmEmailCode);
 
