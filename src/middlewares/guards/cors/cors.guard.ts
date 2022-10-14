@@ -1,4 +1,4 @@
-import * as cors from "cors";
+import cors from "cors";
 
 export function getCorsMiddleware(CORS_URL_LIST_WITHOUT_PORT: string[]) {
     return cors({

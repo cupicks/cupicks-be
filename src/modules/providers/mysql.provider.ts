@@ -1,4 +1,4 @@
-import * as mysql from "mysql2/promise";
+import mysql from "mysql2/promise";
 import { CustomException, DatabaseConnectionError, IMysqlEnv, UnkownTypeError } from "../../models/_.loader";
 
 export class MysqlProvider {

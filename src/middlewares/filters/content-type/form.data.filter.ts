@@ -1,4 +1,3 @@
-import e from "cors";
 import { RequestHandler, Request, Response, NextFunction } from "express";
 
 export const formDataFilter: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
