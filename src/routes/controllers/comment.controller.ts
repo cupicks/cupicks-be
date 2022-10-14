@@ -1,18 +1,19 @@
 import { RequestHandler, Request, Response } from "express";
 
+// Module Dependencies
+
+import { CommentService } from "../services/_.exporter";
 import { DtoFactory } from "../../modules/_.loader";
 
-import { CustomException, UnkownTypeError, UnkownError } from "../../models/_.loader";
+// Dtos
+
 import {
     CreateCommentDto,
-    DeleteCommentDto,
     UpdateCommentDto,
-    GetCommentDto,
-    ICommentPacket,
+    CustomException,
+    UnkownTypeError,
+    UnkownError,
 } from "../../models/_.loader";
-
-import { JoiValidator } from "../../modules/_.loader";
-import { CommentService } from "../services/_.exporter";
 
 export class CommentController {
     private commentService: CommentService;
@@ -132,7 +133,6 @@ export class CommentController {
                 message: "댓글 삭제에 성공하였습니다.",
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,

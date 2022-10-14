@@ -274,11 +274,9 @@ export class AuthService {
             const isFirstVerifiedEMail = userVerifyList === null;
             if (isFirstVerifiedEMail) {
                 // 신규 인증 진입
-                // console.log("1 depth 조건문 A : 신규 인증처리자 -> pass");
                 await this.authVerifyListRepository.createVerifyListByEmailAndCode(conn, email, emailVerifyCode);
             } else {
                 // 일일 이메일 발송 제한 초과의 경우
-                // console.log("1 depth 조건문 B : 중복 인증처리자 -> pass");
                 const { userVerifyListId, isExeededOfEmailSent, currentEmailSentCount, emailSentExceedingDate } =
                     userVerifyList;
                 const lastSendDate = this.dayjsProvider.changeToProvidedFormat(
@@ -320,7 +318,6 @@ export class AuthService {
                 // 일일 이메일 발송 제한 초과의 경우
                 const isExceededNow = currentEmailSentCount >= 5;
                 if (isExceededNow) {
-                    // console.log("2 depth 조건문 B-b : 제한일까지 사용 금지");
                     await this.authVerifyListRepository.exceedOfEmailSent(
                         conn,
                         userVerifyList.userVerifyListId,

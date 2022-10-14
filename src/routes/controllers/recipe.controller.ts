@@ -1,16 +1,22 @@
 import { RequestHandler, Request, Response } from "express";
 
+// Module Dependencies
+
+import { RecipeService } from "../services/_.exporter";
 import { DtoFactory } from "../../modules/_.loader";
 
-import { CustomException, RecipeDto, UnkownError, UnkownTypeError } from "../../models/_.loader";
+// Dtos, CustomExceptions
+
 import {
     CreateRecipeDto,
     UpdateRecipeDto,
     DeleteRecipeDto,
     CommonRecipeDto,
     GetRecipeDto,
+    CustomException,
+    UnkownError,
+    UnkownTypeError,
 } from "../../models/_.loader";
-import { RecipeService } from "../services/_.exporter";
 
 export class RecipeController {
     private recipeService: RecipeService;
@@ -43,7 +49,6 @@ export class RecipeController {
                 recipeId: createRecipe,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -71,7 +76,6 @@ export class RecipeController {
                 recipe: getRecipe,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -100,7 +104,6 @@ export class RecipeController {
                 recipeList: getRecipes,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -126,7 +129,7 @@ export class RecipeController {
                 category: req.body.category,
             });
 
-            const updateRecipe = await this.recipeService.updateRecipe(updateRecipeValidator);
+            await this.recipeService.updateRecipe(updateRecipeValidator);
 
             return res.status(200).json({
                 isSuccess: true,
@@ -134,7 +137,6 @@ export class RecipeController {
                 recipeId: updateRecipeValidator.recipeId,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -161,7 +163,6 @@ export class RecipeController {
                 message: "레시피 삭제에 성공하셨습니다.",
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -188,7 +189,6 @@ export class RecipeController {
                 message: "좋아요에 성공하셨습니다",
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -213,7 +213,6 @@ export class RecipeController {
                 message: `좋아요 취소에 성공하셨습니다.`,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,

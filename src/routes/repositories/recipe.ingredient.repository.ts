@@ -1,5 +1,5 @@
-import { IRecipeIngredientListPacket, IRecipeIngredientPacket } from "models/_.loader";
-import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
+import { IRecipeIngredientPacket } from "../../models/_.loader";
+import { PoolConnection } from "mysql2/promise";
 
 export class RecipeIngredientRepository {
     public getRecipeIngredientsByRecipeid = async (

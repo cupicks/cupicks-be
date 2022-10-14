@@ -1,8 +1,3 @@
-// v1: 타임스탬프(시간) 기준 ㅡ> 시간과 MAC 주소를 추측할 수 있으므로 보안상 취약
-// v3: MD5 해시 기준
-// v4: 랜덤값 기반
-// v5: SHA-1 해시 기준
-
 import { v4 as uuid, V4Options } from "uuid";
 import { DayjsProvider } from "../_.loader";
 
@@ -24,3 +19,8 @@ export class UuidProvider {
         return imageFileName;
     }
 }
+
+// v1: 타임스탬프(시간) 기준 ㅡ> 시간과 MAC 주소를 추측할 수 있으므로 보안상 취약
+// v3: MD5 해시 기준
+// v4: 랜덤값 기반
+// v5: SHA-1 해시 기준

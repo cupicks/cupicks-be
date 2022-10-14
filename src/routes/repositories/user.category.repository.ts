@@ -18,7 +18,6 @@ export class UserCategoryRepository {
         }
         createQuery = createQuery.slice(0, createQuery.length - 1) + ";";
 
-        console.log(createQuery);
         const createResult = await conn.query<ResultSetHeader>(createQuery);
 
         const [resultSetHeader] = createResult;
@@ -44,7 +43,6 @@ export class UserCategoryRepository {
             createQuery += ` (${userId}, "${favorCategory}"),`;
         }
         createQuery = createQuery.slice(0, createQuery.length - 1) + ";";
-        console.log(createQuery);
 
         const createResult = await conn.query<ResultSetHeader>(createQuery);
 

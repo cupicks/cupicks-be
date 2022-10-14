@@ -28,7 +28,7 @@ export default (async () => {
     JwtProvider.init(env.JWT);
     BcryptProvider.init(env.SALT);
     MulterProvider.init(env.S3);
-    AwsSesProvider.init(env.SES, env.URL.SERVER_URL_WITH_PORT);
+    AwsSesProvider.init(env.SES, env.URL.SERVER_URL_WITH_PORT, env.URL.FROTN_REDIRECT_URL_WITHOUT_PORT);
 
     AuthController.init(env.URL.FROTN_REDIRECT_URL_WITHOUT_PORT);
 

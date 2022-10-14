@@ -1,3 +1,6 @@
+// Type
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+
 import {
     CreateCommentDto,
     UnkownError,
@@ -5,12 +8,9 @@ import {
     DeleteCommentDto,
     GetCommentDto,
 } from "../../models/_.loader";
-import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { ICommentPacket } from "../../models/_.loader";
-import { count } from "console";
 
 export class CommentRepository {
-    // IsExists
     public isAuthenticated = async (
         conn: PoolConnection,
         updateAndDeleteCommentDto: UpdateCommentDto | DeleteCommentDto,
@@ -36,7 +36,7 @@ export class CommentRepository {
             updateAndDeleteCommentDto.userId,
             updateAndDeleteCommentDto.commentId,
         ]);
-        const [commentPackets, _] = selectResult;
+        const [commentPackets] = selectResult;
 
         return commentPackets ? true : false;
     };
@@ -102,7 +102,7 @@ export class CommentRepository {
             commentDto.resizedUrl,
         ]);
 
-        const [resultSetHeader, _] = insertResult;
+        const [resultSetHeader] = insertResult;
         const { affectedRows, insertId } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
@@ -127,7 +127,7 @@ export class CommentRepository {
             commentDto.recipeId,
             commentId,
         ]);
-        const [resultSetHeader, _] = insertResult;
+        const [resultSetHeader] = insertResult;
         const { affectedRows, insertId } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");

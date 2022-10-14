@@ -1,8 +1,12 @@
 import { RequestHandler, Request, Response } from "express";
 
-import { RankingService } from "../services/_.exporter";
+// Module Dependencies
 
+import { RankingService } from "../services/_.exporter";
 import { DtoFactory } from "../../modules/_.loader";
+
+// Dtos, CustomExceptions
+
 import { CustomException, UnkownError, UnkownTypeError, BestRecipeDto } from "../../models/_.loader";
 
 export class RankingController {
@@ -30,7 +34,6 @@ export class RankingController {
                 bestRecipeList: getWeeklyBestRecipes,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,

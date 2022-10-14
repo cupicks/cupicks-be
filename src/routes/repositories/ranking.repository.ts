@@ -23,7 +23,7 @@ export class RankingRepository {
         `;
 
         const selectResult = await conn.query<IWeeklyBestPacket[]>(query, [startDate, endDate]);
-        const [Packets, _] = selectResult;
+        const [Packets] = selectResult;
 
         return Packets;
     };
@@ -58,7 +58,7 @@ export class RankingRepository {
         `;
 
         const selectResult = await conn.query<IBestRecipePacket[]>(query, [recipeId]);
-        const [Packets, _] = selectResult;
+        const [Packets] = selectResult;
 
         return Packets;
     };
@@ -74,7 +74,7 @@ export class RankingRepository {
         `;
 
         const selectResult = await conn.query<IBestRecipeCategoryPacket[]>(query, [recipeId]);
-        const [Packets, _] = selectResult;
+        const [Packets] = selectResult;
 
         return Packets;
     };
