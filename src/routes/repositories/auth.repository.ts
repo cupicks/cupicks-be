@@ -1,6 +1,5 @@
 import { FieldPacket, PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
-    SignupUserDto,
     IUserPacket,
     IUserRefresthTokenPacket,
     EditProfileDto,
@@ -27,7 +26,7 @@ export class AuthRepository {
         const isExistsQuery = `SELECT user_id FROM user WHERE email = "${email}" OR nickname = "${nickname}";`;
         const isExistsResult = await conn.query<RowDataPacket[][]>(isExistsQuery);
 
-        const [rowDataPacket, _] = isExistsResult;
+        const [rowDataPacket] = isExistsResult;
         return rowDataPacket?.length === 1;
     };
 
@@ -265,7 +264,7 @@ export class AuthRepository {
         const updateQuery = this.getUpdateUserQuery(editDto);
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [ResultSetHeader, _] = updateResult;
+        const [ResultSetHeader] = updateResult;
         const { affectedRows } = ResultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
@@ -281,7 +280,7 @@ export class AuthRepository {
                 : `UPDATE user SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [ResultSetHeader, _] = updateResult;
+        const [ResultSetHeader] = updateResult;
         const { affectedRows } = ResultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
@@ -290,7 +289,7 @@ export class AuthRepository {
         const updateQuery = `UPDATE user SET password = "${hashedPassword}" WHERE email = "${email}";`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [ResultSetHeader, _] = updateResult;
+        const [ResultSetHeader] = updateResult;
         const { affectedRows } = ResultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
@@ -313,7 +312,7 @@ export class AuthRepository {
             user_id = ${userId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [ResultSetHeader, _] = updateResult;
+        const [ResultSetHeader] = updateResult;
         const { affectedRows } = ResultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };
@@ -336,7 +335,7 @@ export class AuthRepository {
             user_id = ${userId};`;
         const exceedResult = await conn.query<ResultSetHeader>(exceedQuery);
 
-        const [resultSetHeader, _] = exceedResult;
+        const [resultSetHeader] = exceedResult;
         const { affectedRows } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
@@ -344,11 +343,10 @@ export class AuthRepository {
 
     /** @deprecated */
     public updateUserRefreshTokenRowByUserId = async (conn: PoolConnection, userId: number, refreshToken: string) => {
-        console.log(refreshToken.length);
         const updateQuery = `UPDATE user_refresh_token SET refresh_token = "${refreshToken}" WHERE user_id = ${userId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [ResultSetHeader, _] = updateResult;
+        const [ResultSetHeader] = updateResult;
         const { affectedRows } = ResultSetHeader;
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
     };

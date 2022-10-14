@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import { ForBiddenException, CustomException, UnkownTypeError } from "../../models/_.loader";
 
 export class BcryptProvider {
-    // property
     static isInit = false;
     static SALT: number;
 
@@ -24,8 +23,6 @@ export class BcryptProvider {
 
     public async comparedPassword(inputPassword: string, existPassword: string): Promise<boolean> {
         this.validateIsInit();
-
-        console.log(inputPassword, existPassword);
 
         try {
             return await bcrypt.compare(inputPassword, existPassword);

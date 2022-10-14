@@ -1,5 +1,5 @@
-import { IRecipeIngredientListPacket } from "models/_.loader";
-import { PoolConnection, ResultSetHeader, FieldPacket, RowDataPacket } from "mysql2/promise";
+import { IRecipeIngredientListPacket } from "../../models/_.loader";
+import { PoolConnection } from "mysql2/promise";
 
 /** @deprecated */
 export class RecipeIngredientListRepository {
@@ -16,7 +16,7 @@ export class RecipeIngredientListRepository {
         WHERE recipe_id IN (${recipeidListString});`;
 
         const selectResult = await conn.query<IRecipeIngredientListPacket[]>(selectQuery);
-        const [recipeIngredientListPacket, _] = selectResult;
+        const [recipeIngredientListPacket] = selectResult;
         return recipeIngredientListPacket;
     };
 }

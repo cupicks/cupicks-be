@@ -42,7 +42,7 @@ export class AuthVerifyListRepository {
         FROM user_verify_list WHERE email = "${email}" LIMIT 1;`;
         const findReulst = await conn.query<IUserVerifyListPacket[]>(findQuery);
 
-        const [userVerifyListPacket, _] = findReulst;
+        const [userVerifyListPacket] = findReulst;
 
         return userVerifyListPacket.length !== 1 ? null : userVerifyListPacket[0];
     };
@@ -57,7 +57,7 @@ export class AuthVerifyListRepository {
         const insertQuery = `INSERT INTO user_verify_list (email, email_verified_code, is_verified_email) VALUES ("${email}", "${emailVerifyCode}", ${false});`;
         const insertResult = await conn.query<ResultSetHeader>(insertQuery);
 
-        const [resultSetHeader, _] = insertResult;
+        const [resultSetHeader] = insertResult;
 
         const { affectedRows } = resultSetHeader;
 
@@ -77,7 +77,7 @@ export class AuthVerifyListRepository {
             WHERE user_verify_list_id = ${userVerifyId};`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [resultSetHeader, _] = updateResult;
+        const [resultSetHeader] = updateResult;
 
         const { affectedRows } = resultSetHeader;
 
@@ -99,7 +99,7 @@ export class AuthVerifyListRepository {
 
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [resultSetHeader, _] = updateResult;
+        const [resultSetHeader] = updateResult;
 
         const { affectedRows } = resultSetHeader;
 
@@ -122,7 +122,7 @@ export class AuthVerifyListRepository {
             WHERE email = "${email}";`;
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [resultSetHeader, _] = updateResult;
+        const [resultSetHeader] = updateResult;
         const { affectedRows } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
@@ -150,7 +150,7 @@ export class AuthVerifyListRepository {
 
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [resultSetHeader, _] = updateResult;
+        const [resultSetHeader] = updateResult;
         const { affectedRows } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
@@ -175,7 +175,7 @@ export class AuthVerifyListRepository {
 
         const updateResult = await conn.query<ResultSetHeader>(updateQuery);
 
-        const [resultSetHeader, _] = updateResult;
+        const [resultSetHeader] = updateResult;
         const { affectedRows } = resultSetHeader;
 
         if (affectedRows !== 1) throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");

@@ -39,7 +39,7 @@ export class RecipeRepository {
         `;
 
         const [selectResult] = await conn.query<RowDataPacket[]>(query, [recipeId, userId]);
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets ? true : false;
     };
@@ -52,7 +52,7 @@ export class RecipeRepository {
         `;
 
         const selectResult = await conn.query<RowDataPacket[]>(query, [userId, recipeId]);
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets.length !== 0 ? true : false;
     };
@@ -65,7 +65,7 @@ export class RecipeRepository {
         `;
 
         const selectResult = await conn.query<RowDataPacket[]>(query, [userId, recipeId]);
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets.length !== 0 ? true : false;
     };
@@ -80,7 +80,7 @@ export class RecipeRepository {
         `;
 
         const selectResult = await conn.query<RowDataPacket[]>(query, recipeId);
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets.length !== 0 ? true : false;
     };
@@ -187,7 +187,7 @@ export class RecipeRepository {
             ON user_recipe.user_id = user.user_id;`;
 
         const selectResult = await conn.query<IRecipeCombinedPacket[]>(selectQuery);
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets;
     };
@@ -200,7 +200,7 @@ export class RecipeRepository {
             GROUP BY recipe_comment.comment_id ORDER BY count(*)`;
 
         const selectResult = await conn.query<IBestRecipeCommentPacket[]>(query, [recipeId]);
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets;
     };
@@ -214,7 +214,7 @@ export class RecipeRepository {
         `;
 
         const selectResult = await conn.query<IRecipeLikePacket[]>(query, [recipeId]);
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets;
     };
@@ -283,7 +283,7 @@ export class RecipeRepository {
             userId,
         ]);
 
-        const [iRecipePacket, _] = selectResult;
+        const [iRecipePacket] = selectResult;
 
         return iRecipePacket;
     };
@@ -347,7 +347,7 @@ export class RecipeRepository {
 
         const selectResult = await conn.query<IRecipeLikePacket[]>(selectQuery, [userId]);
 
-        const [recipePackets, _] = selectResult;
+        const [recipePackets] = selectResult;
 
         return recipePackets;
     };
@@ -361,7 +361,7 @@ export class RecipeRepository {
 
         const selectResult = await conn.query<RowDataPacket[]>(selectQuery, [category]);
 
-        const [categoryPacket, _] = selectResult;
+        const [categoryPacket] = selectResult;
 
         return categoryPacket;
     };
@@ -427,7 +427,7 @@ export class RecipeRepository {
         const createQuery = tmpCreateQuery.substring(0, tmpCreateQuery.length - 2) + ";";
 
         const createResult = await conn.query<ResultSetHeader>(createQuery);
-        const [resultSetHeader, _] = createResult;
+        const [resultSetHeader] = createResult;
 
         if (resultSetHeader.affectedRows !== ingredientList.length)
             throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");

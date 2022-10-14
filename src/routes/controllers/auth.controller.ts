@@ -28,11 +28,6 @@ export class AuthController {
         try {
             const file = req.file as Express.MulterS3.File;
 
-            /**
-             * 1주차 기술 피드백 - https://github.com/cupicks/cupicks-be/issues/51
-             *
-             * TypeScript 와 Dto 을 사용하고 있다면 class-validator 를 사용하고 미들웨어처럼 만드는 것은 어떨까요?
-             */
             const signupUserDto = await this.dtoFactory.getSignupUserDto({
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
@@ -51,8 +46,6 @@ export class AuthController {
                 user: result,
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -76,8 +69,6 @@ export class AuthController {
                 refreshToken: result?.refreshToken,
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -99,8 +90,6 @@ export class AuthController {
                 message: "로그아웃에 성공하셨습니다.",
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -124,8 +113,6 @@ export class AuthController {
                 accessToken: accessToken,
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -149,8 +136,6 @@ export class AuthController {
                 exceededDate: result?.exceededDate,
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -176,8 +161,6 @@ export class AuthController {
                 emailVerifyToken: result?.emailVerifyToken,
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -203,8 +186,6 @@ export class AuthController {
                 nicknameVerifyToken: result?.nicknameVerifyToken,
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -228,8 +209,6 @@ export class AuthController {
                 exceededDate: result?.exceededDate,
             });
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
@@ -248,11 +227,8 @@ export class AuthController {
 
             const email = await this.authService.resetPassword(resetPasswordDto);
 
-            // FE message : 'ㅇㅇㅇㅇ@naver.com 님 임시 비밀번호를 사용하실 수 있습니다.'
             return res.status(302).redirect(AuthController.FRONT_URL + `/signIn?email=` + email);
         } catch (err) {
-            console.log(err);
-            // 커스텀 예외와 예외를 핸들러를 이용한 비즈니스 로직 간소화
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,
