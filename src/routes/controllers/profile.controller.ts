@@ -26,10 +26,10 @@ export class ProfileController {
                 userId: res.locals.userId,
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
-                nickname: req?.query["nickname"],
-                password: req?.query["password"],
-                favorCategory: req?.query["favorCategory"],
-                disfavorCategory: req?.query["disfavorCategory"],
+                nickname: req?.body["nickname"],
+                password: req?.body["password"],
+                favorCategory: req?.body["favorCategory"],
+                disfavorCategory: req?.body["disfavorCategory"],
             });
 
             await this.profileService.editProfile(editDto);

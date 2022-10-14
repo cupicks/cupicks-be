@@ -16,12 +16,7 @@ export interface ISignupUserDto {
     disfavorCategory: ERecipeCategory[];
 }
 
-export class SignupUserDto
-    extends RequestQueryExtractor<
-        "password" | "nicknameVerifyToken" | "emailVerifyToken" | "favorCategory" | "disfavorCategory"
-    >
-    implements IBaseDto, ISignupUserDto
-{
+export class SignupUserDto extends RequestQueryExtractor<string> implements IBaseDto, ISignupUserDto {
     password: string;
     imageUrl: string | undefined;
     resizedUrl: string | undefined;
@@ -38,31 +33,22 @@ export class SignupUserDto
         nicknameVerifyToken,
         favorCategory,
         disfavorCategory,
-    }: {
-        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        imageUrl: string | undefined;
-        resizedUrl: string | undefined;
-        nicknameVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }) {
+    }: ISignupUserDto) {
         super();
-        this.password = this.validateType(password, "password");
-        this.emailVerifyToken = this.validateType(emailVerifyToken, "emailVerifyToken");
-        this.nicknameVerifyToken = this.validateType(nicknameVerifyToken, "nicknameVerifyToken");
+
+        console.error(favorCategory, disfavorCategory);
+
+        this.password = password;
+        this.emailVerifyToken = emailVerifyToken;
+        this.nicknameVerifyToken = nicknameVerifyToken;
 
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
 
-        const tempFavor = this.getStringSetOrUndefinedFromQuery(favorCategory, "favorCategory")
-            ?.map((str) => ERecipeCategory[str])
-            ?.filter((v) => v);
+        const tempFavor = favorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
         this.favorCategory = tempFavor ?? [];
 
-        const tempDisfavor = this.getStringSetOrUndefinedFromQuery(disfavorCategory, "disfavorCategory")
-            ?.map((str) => ERecipeCategory[str])
-            ?.filter((v) => v);
+        const tempDisfavor = disfavorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
         this.disfavorCategory = tempDisfavor ?? [];
     }
 

@@ -1,6 +1,8 @@
 import { faker } from "@faker-js/faker";
-import { ERecipeCategory } from "../../../../../src/models/enums/e.recipe.category";
 
+// Fixture Target
+
+import { ERecipeCategory } from "../../../../../src/models/enums/e.recipe.category";
 import {
     SignupUserDto,
     SigninUserDto,
@@ -14,6 +16,10 @@ import {
     UserDto,
 } from "../../../../../src/models/_.loader";
 
+// Support Fixture
+
+import { getRandERecipeCategory } from "../enum/e.recipe.category.fixture";
+
 export class UserDtoFixtureProvider {
     /**
      * - 매개변수가 없으면, 성공할 수 있는 값만 반환합니다.
@@ -25,8 +31,8 @@ export class UserDtoFixtureProvider {
         imageUrl?: string,
         resizedUrl?: string,
         password?: string,
-        favorCategory?: string,
-        disfavorCategory?: string,
+        favorCategory?: ERecipeCategory[],
+        disfavorCategory?: ERecipeCategory[],
     ): SignupUserDto {
         return new SignupUserDto({
             emailVerifyToken: emailVerifyToken ?? faker.word.noun(),
@@ -34,8 +40,8 @@ export class UserDtoFixtureProvider {
             imageUrl: imageUrl ?? faker.internet.url(),
             resizedUrl: resizedUrl ?? faker.internet.url(),
             password: password ?? faker.internet.password().padStart(8, "a").substring(0, 14) + "@",
-            favorCategory: favorCategory,
-            disfavorCategory: disfavorCategory,
+            favorCategory: [getRandERecipeCategory(), getRandERecipeCategory()],
+            disfavorCategory: [getRandERecipeCategory(), getRandERecipeCategory()],
         });
     }
 

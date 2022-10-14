@@ -10,24 +10,15 @@ export interface IConfirmEmailDto {
     email: string;
     emailVerifyCode: string;
 }
-export class ConfirmEmailDto
-    extends RequestQueryExtractor<"email" | "email-verify-code">
-    implements IBaseDto, IConfirmEmailDto
-{
+export class ConfirmEmailDto extends RequestQueryExtractor<string> implements IBaseDto, IConfirmEmailDto {
     email: string;
     emailVerifyCode: string;
 
-    constructor({
-        email,
-        emailVerifyCode,
-    }: {
-        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        emailVerifyCode: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }) {
+    constructor({ email, emailVerifyCode }: IConfirmEmailDto) {
         super();
 
-        this.email = this.validateType(email, "email");
-        this.emailVerifyCode = this.validateType(emailVerifyCode, "email-verify-code");
+        this.email = email;
+        this.emailVerifyCode = emailVerifyCode;
     }
 
     getJoiInstance(): ObjectSchema<ConfirmEmailDto> {
