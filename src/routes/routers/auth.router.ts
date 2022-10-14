@@ -13,7 +13,6 @@ const authRouter: Router = Router();
 authRouter.post(
     "/signup",
     /* formDataFilter */
-    preventLoginUserGuard,
     /**
      * 1주차 기술 피드백 - https://github.com/cupicks/cupicks-be/issues/51
      *
@@ -24,7 +23,7 @@ authRouter.post(
 );
 authRouter.post(
     "/signin",
-    /* applicationXWwwFormUrlencodedFilter */ preventLoginUserGuard,
+    /* applicationXWwwFormUrlencodedFilter */
     new AuthController().signin,
 );
 
