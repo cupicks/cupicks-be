@@ -1,4 +1,4 @@
-import * as jwtLib from "jsonwebtoken";
+import jwtLib from "jsonwebtoken";
 import { CustomException, IJwtEnv, JwtAuthorizationException, UnkownTypeError } from "../../models/_.loader";
 import { TALGORITHM } from "../../constants/_.loader";
 
