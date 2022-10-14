@@ -15,6 +15,7 @@
         "incremental": true,
         "moduleResolution": "node",
         "downlevelIteration": true,
+        "esModuleInterop": true,
   
         // nest-cli 에서 카피
         "skipLibCheck": true,

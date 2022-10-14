@@ -34,8 +34,8 @@ export class UserDtoFixtureProvider {
             imageUrl: imageUrl ?? faker.internet.url(),
             resizedUrl: resizedUrl ?? faker.internet.url(),
             password: password ?? faker.internet.password().padStart(8, "a").substring(0, 14) + "@",
-            favorCategory: favorCategory,
-            disfavorCategory: disfavorCategory,
+            favorCategory: favorCategory ?? [ERecipeCategory.caffein],
+            disfavorCategory: disfavorCategory ?? [ERecipeCategory.lemon],
         });
     }
 

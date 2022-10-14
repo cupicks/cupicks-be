@@ -36,11 +36,11 @@ export class AuthController {
             const signupUserDto = await this.dtoFactory.getSignupUserDto({
                 imageUrl: file?.location,
                 resizedUrl: file?.location,
-                password: req?.query["password"],
-                emailVerifyToken: req?.query["emailVerifyToken"],
-                nicknameVerifyToken: req?.query["nicknameVerifyToken"],
-                favorCategory: req?.query["favorCategory"],
-                disfavorCategory: req?.query["disfavorCategory"],
+                password: req?.body["password"],
+                emailVerifyToken: req?.body["emailVerifyToken"],
+                nicknameVerifyToken: req?.body["nicknameVerifyToken"],
+                favorCategory: req?.body["favorCategory"],
+                disfavorCategory: req?.body["disfavorCategory"],
             });
 
             const result = await this.authService.signup(signupUserDto);
@@ -138,7 +138,7 @@ export class AuthController {
 
     public sendEmail: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const sendEmailDto = await this.dtoFactory.getSendEmailDto({ email: req?.query["email"] });
+            const sendEmailDto = await this.dtoFactory.getSendEmailDto({ email: req?.body["email"] });
 
             const result = await this.authService.sendEmail(sendEmailDto);
 
@@ -164,8 +164,8 @@ export class AuthController {
     public confirmEmailCode: RequestHandler = async (req: Request, res: Response) => {
         try {
             const confirmEailDto = await this.dtoFactory.getConfirmEmailDto({
-                email: req?.query["email"],
-                emailVerifyCode: req?.query["email-verify-code"],
+                email: req?.body["email"],
+                emailVerifyCode: req?.body["emailVerifyCode"],
             });
 
             const result = await this.authService.confirmEmailCode(confirmEailDto);
@@ -191,8 +191,8 @@ export class AuthController {
     public confirmNickname: RequestHandler = async (req: Request, res: Response) => {
         try {
             const confirmNicknameDto = await this.dtoFactory.getConfirmNicknameDto({
-                emailVerifyToken: req?.query["emailVerifyToken"],
-                nickname: req?.query["nickname"],
+                emailVerifyToken: req?.body["emailVerifyToken"],
+                nickname: req?.body["nickname"],
             });
 
             const result = await this.authService.confirmNickname(confirmNicknameDto);
@@ -217,7 +217,7 @@ export class AuthController {
 
     public sendPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const snedPasswordDto = await this.dtoFactory.getSendPasswordDto({ email: req?.query["email"] });
+            const snedPasswordDto = await this.dtoFactory.getSendPasswordDto({ email: req?.body["email"] });
 
             const result = await this.authService.sendPassword(snedPasswordDto);
 
@@ -243,7 +243,7 @@ export class AuthController {
     public resetPassword: RequestHandler = async (req: Request, res: Response) => {
         try {
             const resetPasswordDto = await this.dtoFactory.getResetPasswordDto({
-                resetPasswordToken: req?.query["resetPasswordToken"],
+                resetPasswordToken: req?.body["resetPasswordToken"],
             });
 
             const email = await this.authService.resetPassword(resetPasswordDto);

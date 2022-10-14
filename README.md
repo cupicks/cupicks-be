@@ -39,7 +39,7 @@
 
 | 포지션 | 이름 | Role |
 | :---- | :---- | :---- |
-| Backend, L | 이민석 | 인증관련 API, 프로젝트 셋팅 |
+| Backend, L | 이민석 | 인증관련 API, 프로젝트 셋팅, 배포 및 테스트 자동화, 메일링(SES) |
 | Backend | 윤승근 | 레시피 API, 댓글 API, [cupikcs/cupicks-be-lambda](https://github.com/cupicks/cupicks-be-lambda) |
 
 ### 문서 리스트

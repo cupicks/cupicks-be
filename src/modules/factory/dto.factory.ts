@@ -1,5 +1,5 @@
-import { JoiValidator } from "../../modules/_.loader";
 import { ParsedQs } from "qs";
+import { JoiValidator } from "../../modules/_.loader";
 
 export class DtoFactory {
     private joiValidator: JoiValidator;
@@ -8,15 +8,7 @@ export class DtoFactory {
     }
 
     // USER
-    public async getSignupUserDto(iDto: {
-        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        imageUrl: string | undefined;
-        resizedUrl: string | undefined;
-        nicknameVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<SignupUserDto> {
+    public async getSignupUserDto(iDto: ISignupUserDto): Promise<SignupUserDto> {
         return await this.joiValidator.validateAsync<SignupUserDto>(new SignupUserDto(iDto));
     }
 
@@ -33,45 +25,25 @@ export class DtoFactory {
     }): Promise<PublishTokenDto> {
         return await this.joiValidator.validateAsync<PublishTokenDto>(new PublishTokenDto(iDto));
     }
-    public async getConfirmEmailDto(iDto: {
-        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        emailVerifyCode: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<ConfirmEmailDto> {
+    public async getConfirmEmailDto(iDto: IConfirmEmailDto): Promise<ConfirmEmailDto> {
         return await this.joiValidator.validateAsync<ConfirmEmailDto>(new ConfirmEmailDto(iDto));
     }
-    public async getConfirmNicknameDto(iDto: {
-        emailVerifyToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<ConfirmNicknameDto> {
+    public async getConfirmNicknameDto(iDto: IConfirmNicknameDto): Promise<ConfirmNicknameDto> {
         return await this.joiValidator.validateAsync<ConfirmNicknameDto>(new ConfirmNicknameDto(iDto));
     }
-    public async getSendPasswordDto(iDto: {
-        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<SendPasswordDto> {
+    public async getSendPasswordDto(iDto: ISendPasswordDto): Promise<SendPasswordDto> {
         return await this.joiValidator.validateAsync<SendPasswordDto>(new SendPasswordDto(iDto));
     }
-    public async getResetPasswordDto(iDto: {
-        resetPasswordToken: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<ResetPasswordDto> {
+    public async getResetPasswordDto(iDto: IResetPasswordDto): Promise<ResetPasswordDto> {
         return await this.joiValidator.validateAsync<ResetPasswordDto>(new ResetPasswordDto(iDto));
     }
-    public async getSendEmailDto(iDto: {
-        email: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<SendEmailDto> {
+    public async getSendEmailDto(iDto: ISendEmailDto): Promise<SendEmailDto> {
         return await this.joiValidator.validateAsync<SendEmailDto>(new SendEmailDto(iDto));
     }
 
     // PROFILE
 
-    public async getEditProfileDto(iDto: {
-        userId: number;
-        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        imageUrl: string | undefined;
-        resizedUrl: string | undefined;
-        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<EditProfileDto> {
+    public async getEditProfileDto(iDto: IEditProfileDto): Promise<EditProfileDto> {
         return await this.joiValidator.validateAsync<EditProfileDto>(new EditProfileDto(iDto));
     }
     public async getMyProfileDto(iDto: { userId: number }): Promise<GetMyProfileDto> {
@@ -212,4 +184,6 @@ import {
     IUpdateRecipeDto,
     ICreateRecipeDto,
     GetMyProfileDto,
+    ISignupUserDto,
+    IConfirmNicknameDto,
 } from "../../models/_.loader";

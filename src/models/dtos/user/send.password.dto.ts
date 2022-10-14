@@ -9,13 +9,13 @@ import { IBaseDto } from "../i.base.dto";
 export interface ISendPasswordDto {
     email: string;
 }
-export class SendPasswordDto extends RequestQueryExtractor<"email"> implements IBaseDto, ISendPasswordDto {
+export class SendPasswordDto extends RequestQueryExtractor<string> implements IBaseDto, ISendPasswordDto {
     email: string;
 
-    constructor({ email }: { email: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
+    constructor({ email }: ISendPasswordDto) {
         super();
 
-        this.email = this.validateType(email, "email");
+        this.email = email;
     }
 
     getJoiInstance(): ObjectSchema<SendPasswordDto> {
