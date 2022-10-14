@@ -1,7 +1,7 @@
 name: Automated-Deploy
 
 on:
-  pull_request:
+  push:
     branches:
       - 'main'
 
@@ -18,8 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Create ecosystem.config.json using ecosystem.config.json.sh
+        run: sh ecosystem.config.json.sh ${{ secrets.NODE_ENV }} ${{ secrets.PORT }} ${{ secrets.SALT }} ${{ secrets.CORS_URL_ONE_WITHOUT_PORT }} ${{ secrets.CORS_URL_TWO_WITHOUT_PORT }} ${{ secrets.CORS_URL_THREE_WITHOUT_PORT }} ${{ secrets.CORS_URL_FOUR_WITHOUT_PORT }} ${{ secrets.FROTN_REDIRECT_URL_WITHOUT_PORT }} ${{ secrets.SERVER_URL_WITH_PORT }} ${{ secrets.JWT_ACCESS_EXPIRED_IN }} ${{ secrets.JWT_REFRESH_EXPIRED_IN }} ${{ secrets.JWT_VERIFY_EXPIRED_IN }} ${{ secrets.JWT_RESET_EXPIRED_IN }} ${{ secrets.JWT_HASH_ALGOIRHTM }} ${{ secrets.HASH_PASSPHRASE }} ${{ secrets.MYSQL_HOST }} ${{ secrets.MYSQL_USER }} ${{ secrets.MYSQL_DATABASE }} ${{ secrets.MYSQL_PASSWORD }} ${{ secrets.MYSQL_CONNECTION_LIMIT }} ${{ secrets.S3_ACCESS_KEY }} ${{ secrets.S3_SECRET_KEY }} ${{ secrets.BUCKET }} ${{ secrets.REGION }} ${{ secrets.SES_API_VERSION }} ${{ secrets.SES_API_REGION }} ${{ secrets.SES_ACCESS_KEY }} ${{ secrets.SES_SECRET_KEY }} ${{ secrets.SES_SENDER_EMAIL }} ${{ secrets.MYSQL_HOST }}
+
       - name: Zip file
-        run: zip -r ${{github.event.pull_request.timestamp}}_server.zip .github/workflows ./scripts ./jest ./src ./test ./appspec.yml ./gitignore ./package.json ./package-lock.json ./tsconfig.build.json ./tsconfig.json ./jest.config.json
+        run: zip -r ${{github.event.pull_request.timestamp}}_server.zip .github/workflows ./scripts ./content ./jest ./src ./test ./appspec.yml ./gitignore ./package.json ./package-lock.json ./tsconfig.build.json ./tsconfig.json ./jest.config.json ./ecosystem.config.json
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1

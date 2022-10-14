@@ -9,16 +9,13 @@ import { IBaseDto } from "../i.base.dto";
 export interface IResetPasswordDto {
     resetPasswordToken: string;
 }
-export class ResetPasswordDto
-    extends RequestQueryExtractor<"resetPasswordToken">
-    implements IBaseDto, IResetPasswordDto
-{
+export class ResetPasswordDto extends RequestQueryExtractor<string> implements IBaseDto, IResetPasswordDto {
     resetPasswordToken: string;
 
-    constructor({ resetPasswordToken }: { resetPasswordToken: string | string[] | ParsedQs | ParsedQs[] | undefined }) {
+    constructor({ resetPasswordToken }: IResetPasswordDto) {
         super();
 
-        this.resetPasswordToken = this.validateType(resetPasswordToken, "resetPasswordToken");
+        this.resetPasswordToken = resetPasswordToken;
     }
 
     getJoiInstance(): ObjectSchema<ResetPasswordDto> {

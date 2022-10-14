@@ -36,14 +36,14 @@ authRouter.patch(
 
 authRouter.get("/token", /* applicationXWwwFormUrlencodedFilter */ new AuthController().publishToken);
 
-authRouter.get("/send-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendEmail);
+authRouter.patch("/send-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendEmail);
 
-authRouter.get("/confirm-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmEmailCode);
+authRouter.patch("/confirm-email", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmEmailCode);
 
-authRouter.get("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmNickname);
+authRouter.patch("/confirm-nickname", /* applicationXWwwFormUrlencodedFilter */ new AuthController().confirmNickname);
 
-authRouter.get("/send-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendPassword);
+authRouter.patch("/send-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().sendPassword);
 
-authRouter.get("/reset-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().resetPassword);
+authRouter.patch("/reset-password", /* applicationXWwwFormUrlencodedFilter */ new AuthController().resetPassword);
 
 export { authRouter };

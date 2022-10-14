@@ -12,6 +12,7 @@ import { getCorsMiddleware } from "./middlewares/guards/_.exporter";
  */
 export default class App {
     app: express.Application;
+    isAppGoingToBeClosed = false;
 
     constructor(MODE: TNODE_ENV, PORT: number, CORS_URL_LIST_WITHOUT_PORT: string[]) {
         this.app = express();
@@ -29,6 +30,14 @@ export default class App {
             this.app.use(morgan("combined"));
         }
 
+        this.app.use((req, res, next) => {
+            if (this.isAppGoingToBeClosed) {
+                res.set("Connection", "close");
+            }
+
+            next();
+        });
+
         this.app.use(getCorsMiddleware(CORS_URL_LIST_WITHOUT_PORT));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
@@ -43,8 +52,23 @@ export default class App {
     }
 
     runServer(MODE: TNODE_ENV, PORT: number) {
-        this.app.listen(PORT, () => {
-            if (MODE !== "test") console.log(`Server is running on ${PORT} with ${MODE} MODE`);
+        const appServer = this.app.listen(PORT, () => {
+            if (MODE !== "test") {
+                console.log(`Server is running on ${PORT} with ${MODE} MODE`);
+                if (MODE === "prod") {
+                    process.send("ready");
+                }
+            }
+        });
+
+        process.on("SIGINT", () => {
+            console.log("SIGINT signal");
+            this.isAppGoingToBeClosed = true;
+
+            appServer.close((err) => {
+                console.log(`Server is shutdown from ${PORT}`);
+                process.exit(err ? 1 : 0);
+            });
         });
     }
 }

@@ -7,6 +7,7 @@ import {
     IBestRecipeCategoryPacket,
     IRecipeIngredientPacket,
     IRecipeLikePacket,
+    IBestRecipeCommentPacket,
     IIngredientDto,
     BestRecipeDto,
 } from "../../models/_.loader";
@@ -69,6 +70,12 @@ export class RankingService {
                 ),
             );
 
+            const bestRecipeCommentList: IBestRecipeCommentPacket[][] = await Promise.all(
+                weeklyBestRankingList.map(
+                    async (recipeId) => await this.recipeRepository.getRecipeComment(conn, recipeId),
+                ),
+            );
+
             const bestRecipeCategoryList: IBestRecipeCategoryPacket[][] = await Promise.all(
                 weeklyBestRankingList.map(
                     async (recipeId) => await this.rankingRepository.getBestRecipeCategory(conn, recipeId),
@@ -78,17 +85,19 @@ export class RankingService {
             const bestRecipes = [];
 
             for (let i = 0; i < weeklyBestRankingList.length; i++) {
+                // console.log(bestRecipeList[i][0]?.recipeId);
                 const bestRecipe = {
-                    recipeId: bestRecipeList[i][0].recipeId,
-                    title: bestRecipeList[i][0].title,
-                    content: bestRecipeList[i][0].content,
-                    isIced: bestRecipeList[i][0].isIced,
-                    cupSize: bestRecipeList[i][0].cupSize,
-                    nickname: bestRecipeList[i][0].nickname,
-                    imageUrl: bestRecipeList[i][0].imageUrl,
-                    resizedUrl: bestRecipeList[i][0].resizedUrl,
-                    isLiked: myLikeRecipeIdList.includes(bestRecipeList[i][0].recipeId) ? true : false,
-                    likeTotal: weeklyBestRecipe[i].totalLike,
+                    recipeId: bestRecipeList[i][0]?.recipeId,
+                    title: bestRecipeList[i][0]?.title,
+                    content: bestRecipeList[i][0]?.content,
+                    isIced: bestRecipeList[i][0]?.isIced,
+                    cupSize: bestRecipeList[i][0]?.cupSize,
+                    nickname: bestRecipeList[i][0]?.nickname,
+                    imageUrl: bestRecipeList[i][0]?.imageUrl,
+                    resizedUrl: bestRecipeList[i][0]?.resizedUrl,
+                    isLiked: myLikeRecipeIdList.includes(bestRecipeList[i][0]?.recipeId) ? true : false,
+                    likeTotal: weeklyBestRecipe[i]?.totalLike,
+                    commentTotal: bestRecipeCommentList[i]?.length,
                     ingredientList: bestRecipeIngredientList[i].map((ingredient): IIngredientDto => {
                         return {
                             ingredientName: ingredient.ingredientName,

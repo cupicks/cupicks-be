@@ -424,7 +424,7 @@ describe("Auth Service Test", /**
                 userId: findedUser.userId,
                 nickname: findedUser.nickname,
                 email: findedUser.email,
-                imageUrl: findedUser.imageUrl,
+                // imageUrl: findedUser.imageUrl,
             });
 
             expect(sutAuthService["authRepository"].updateUserRefreshToken).toBeCalled();

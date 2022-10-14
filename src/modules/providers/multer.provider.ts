@@ -59,21 +59,22 @@ export class MulterProvider {
                 s3,
                 bucket: MulterProvider.BUCKET,
                 key(req, file, done) {
+                    const saveFileName = new UuidProvider().getUuid();
                     const ext = file.mimetype.split("/")[1];
 
-                    done(null, `${path}/${new UuidProvider().getUuid()}.${ext}`);
+                    done(null, `${path}/${saveFileName}` + "." + ext);
                 },
             }),
             fileFilter(req, file, done) {
                 const ext = file.mimetype.split("/")[1];
 
                 if (!["jpg", "jpeg", "png"].includes(ext)) {
-                    return done(new Error("FILE EXTENSION ERROR"));
+                    return done(new Error("지원하는 이미지 포맷은 JPG / JPEG / PNG 형식입니다."));
                 }
 
                 done(null, true);
             },
-            limits: { fileSize: 5 * 1024 * 1024 },
+            limits: { fileSize: 1 * 1024 * 1024 },
         });
     };
 

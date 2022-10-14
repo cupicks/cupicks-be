@@ -36,7 +36,7 @@ export class CreateCommentDto
         userId: number;
         nickname: string;
         recipeId: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        comment: string | string[] | ParsedQs | ParsedQs[] | undefined;
+        comment: string;
         imageUrl: string | undefined;
         resizedUrl: string | undefined;
     }) {
@@ -44,7 +44,7 @@ export class CreateCommentDto
         this.userId = userId;
         this.nickname = nickname;
         this.recipeId = +this.validateType(recipeId, "recipeId");
-        this.comment = this.validateType(comment, "comment");
+        this.comment = comment;
 
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/comment\//, `/comment-resized/`) : undefined;

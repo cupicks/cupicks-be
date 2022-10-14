@@ -60,6 +60,7 @@ export class RecipeController {
         try {
             const getRecipeValidator: CommonRecipeDto = await this.dtoFactory.getCommonRecipeDto({
                 recipeId: Number(req.params.recipeId),
+                userId: res.locals.userId,
             });
 
             const getRecipe = await this.recipeService.getRecipe(getRecipeValidator);

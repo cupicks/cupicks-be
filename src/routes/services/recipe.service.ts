@@ -6,6 +6,7 @@ import {
     IRecipeLikePacket,
     IRecipeIngredientPacket,
     IRecipeCombinedPacket,
+    IBestRecipeCommentPacket,
     NotFoundException,
     RecipeDto,
     UpdateRecipeDto,
@@ -90,10 +91,14 @@ export class RecipeService {
 
             const recipe: IRecipeCombinedPacket = await this.recipeRepository.getRecipe(conn, getRecipeDto.recipeId);
 
+            // console.log(recipe);
+
             const ingredientList = await this.recipeIngredientRepository.getRecipeIngredientsByRecipeid(
                 conn,
                 getRecipeDto.recipeId,
             );
+
+            const commentList = await this.recipeRepository.getRecipeComment(conn, getRecipeDto.recipeId);
 
             const userLikeRecipeExist = await this.recipeRepository.userLikeRecipeExist(
                 conn,
@@ -120,6 +125,8 @@ export class RecipeService {
                 imageUrl: recipe.imageUrl,
                 resizedUrl: recipe.resizedUrl,
                 isLiked: userLikeRecipeExist === true ? true : false,
+                likeTotal: recipe.likeTotal,
+                commentTotal: commentList.length,
                 // isLiked: myLikeRecipeIdList.includes(recipe.recipeId) ? true : false,
             });
 
@@ -167,6 +174,14 @@ export class RecipeService {
                     ),
                 );
 
+                const recipeCommentList: IBestRecipeCommentPacket[][] = await Promise.all(
+                    recipeIdList.map(async (recipeId) => await this.recipeRepository.getRecipeComment(conn, recipeId)),
+                );
+
+                const recipeLikeList: IRecipeLikePacket[][] = await Promise.all(
+                    recipeIdList.map(async (recipeId) => await this.recipeRepository.getRecipeLike(conn, recipeId)),
+                );
+
                 const recipeDtoList = new Array<RecipeDto>();
 
                 const loopLength = recipeList.length;
@@ -190,6 +205,8 @@ export class RecipeService {
                         imageUrl: recipeList[i].imageUrl,
                         resizedUrl: recipeList[i].resizedUrl,
                         isLiked: myLikeRecipeIdList.includes(recipeList[i].recipeId) ? true : false,
+                        commentTotal: recipeCommentList[i].length,
+                        likeTotal: recipeLikeList[i].length,
                     });
                     recipeDtoList.push(recipeDto);
                 }
