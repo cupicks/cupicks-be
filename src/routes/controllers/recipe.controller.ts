@@ -137,7 +137,6 @@ export class RecipeController {
                 recipeId: updateRecipeValidator.recipeId,
             });
         } catch (err) {
-            console.log(err);
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
                 isSuccess: false,

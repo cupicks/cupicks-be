@@ -1,4 +1,3 @@
-import cors from "cors";
 import morgan from "morgan";
 import express from "express";
 import { TNODE_ENV } from "constants/_.loader";
