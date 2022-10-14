@@ -35,6 +35,9 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
         disfavorCategory,
     }: ISignupUserDto) {
         super();
+
+        console.error(favorCategory, disfavorCategory);
+
         this.password = password;
         this.emailVerifyToken = emailVerifyToken;
         this.nicknameVerifyToken = nicknameVerifyToken;
@@ -42,14 +45,10 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
 
-        const tempFavor = this.getStringSetOrUndefinedFromQuery(favorCategory, "favorCategory")
-            ?.map((str) => ERecipeCategory[str])
-            ?.filter((v) => v);
+        const tempFavor = favorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
         this.favorCategory = tempFavor ?? [];
 
-        const tempDisfavor = this.getStringSetOrUndefinedFromQuery(disfavorCategory, "disfavorCategory")
-            ?.map((str) => ERecipeCategory[str])
-            ?.filter((v) => v);
+        const tempDisfavor = disfavorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
         this.disfavorCategory = tempDisfavor ?? [];
     }
 
