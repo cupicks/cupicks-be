@@ -17,10 +17,12 @@ export class AwsSesProvider {
     static ses: SES;
     static SES_SENDER_EMAIL: string;
     static SERVER_URL_WITH_PORT: string;
+    static FROTN_REDIRECT_URL_WITHOUT_PORT: string;
 
     static init(
         { SES_API_VERSION, SES_API_REGION, SES_ACCESS_KEY, SES_SECRET_KEY, SES_SENDER_EMAIL }: ISesConfigEnv,
         SERVER_URL_WITH_PORT: string,
+        FROTN_REDIRECT_URL_WITHOUT_PORT: string,
     ) {
         if (this.isInit === true) return;
 
@@ -35,6 +37,7 @@ export class AwsSesProvider {
 
         this.SES_SENDER_EMAIL = SES_SENDER_EMAIL;
         this.SERVER_URL_WITH_PORT = SERVER_URL_WITH_PORT;
+        this.FROTN_REDIRECT_URL_WITHOUT_PORT = FROTN_REDIRECT_URL_WITHOUT_PORT;
 
         return;
     }
@@ -169,7 +172,7 @@ export class AwsSesProvider {
     ) {
         const ses = this.getSesInstance();
         try {
-            const url = `${AwsSesProvider.SERVER_URL_WITH_PORT}/api/auth/reset-password?resetPasswordToken=${resetPasswordToken}`;
+            const url = `${AwsSesProvider.FROTN_REDIRECT_URL_WITHOUT_PORT}/confirm-password?resetPasswordToken=${resetPasswordToken}`;
 
             return await ses.sendEmail({
                 Source: AwsSesProvider.SES_SENDER_EMAIL,
