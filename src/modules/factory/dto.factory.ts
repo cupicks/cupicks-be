@@ -43,15 +43,7 @@ export class DtoFactory {
 
     // PROFILE
 
-    public async getEditProfileDto(iDto: {
-        userId: number;
-        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        imageUrl: string | undefined;
-        resizedUrl: string | undefined;
-        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }): Promise<EditProfileDto> {
+    public async getEditProfileDto(iDto: IEditProfileDto): Promise<EditProfileDto> {
         return await this.joiValidator.validateAsync<EditProfileDto>(new EditProfileDto(iDto));
     }
     public async getMyProfileDto(iDto: { userId: number }): Promise<GetMyProfileDto> {

@@ -36,31 +36,19 @@ export class EditProfileDto
         resizedUrl,
         favorCategory,
         disfavorCategory,
-    }: {
-        userId: number;
-        nickname: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        password: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        imageUrl: string | undefined;
-        resizedUrl: string | undefined;
-        favorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-        disfavorCategory: string | string[] | ParsedQs | ParsedQs[] | undefined;
-    }) {
+    }: IEditProfileDto) {
         super();
         this.userId = userId;
-        this.nickname = this.validateTypeOrUndefined(nickname, "nickname");
-        this.password = this.validateTypeOrUndefined(password, "password");
+        this.nickname = nickname;
+        this.password = password;
 
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
 
-        const tempFavor = this.getStringSetOrUndefinedFromQuery(favorCategory, "favorCategory")
-            ?.map((str) => ERecipeCategory[str])
-            ?.filter((v) => v);
+        const tempFavor = favorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
         this.favorCategory = tempFavor ?? [];
 
-        const tempDisfavor = this.getStringSetOrUndefinedFromQuery(disfavorCategory, "disfavorCategory")
-            ?.map((str) => ERecipeCategory[str])
-            ?.filter((v) => v);
+        const tempDisfavor = disfavorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
         this.disfavorCategory = tempDisfavor ?? [];
     }
 
