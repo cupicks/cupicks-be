@@ -225,9 +225,15 @@ export class AuthController {
                 resetPasswordToken: req?.body["resetPasswordToken"],
             });
 
-            const email = await this.authService.resetPassword(resetPasswordDto);
+            const result = await this.authService.resetPassword(resetPasswordDto);
 
-            return res.status(302).redirect(AuthController.FRONT_URL + `/signIn?email=` + email);
+            const { accessToken, refreshToken } = result;
+            return res.status(201).json({
+                isSuccess: true,
+                message: "임시 비밀번호로 변경이 완료 되었습니다.",
+                accessToken,
+                refreshToken,
+            });
         } catch (err) {
             const exception = this.errorHandler(err);
             return res.status(exception.statusCode).json({
