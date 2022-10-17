@@ -843,7 +843,7 @@ describe("Auth Service Test", /**
     /**
      * 다음 테스트 그룹은 재검토가 필요합니다.
      */
-    describe("AuthService.prototype.sendPassword", () => {
+    describe("AuthService.prototype.resetPassword", () => {
         let email: string;
         let hashedPassword: string;
         let resetPasswordToken: string;
@@ -890,7 +890,8 @@ describe("Auth Service Test", /**
 
             // result
 
-            expect(result).toBe(email);
+            expect(result.accessToken).toBeDefined();
+            expect(result.refreshToken).toBeDefined();
             expect(result).toBeDefined();
 
             // calling

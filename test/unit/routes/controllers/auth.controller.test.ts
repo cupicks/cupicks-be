@@ -28,8 +28,7 @@ jest.mock("../../../../src/modules/factory/dto.factory", () => {
     };
 });
 
-describe("Auth Controller Test"
-/**
+describe("Auth Controller Test", /**
  * AuthControlelr 에 대한 단위 테스트의 주요 목적은 다음과 같습니다.
  *
  * 1. AuthController 가 선언되었는 지 여부
@@ -39,7 +38,7 @@ describe("Auth Controller Test"
  *      2. 성공할 경우 mockResponse 의 내장 메서드의 호출 여부 및 호출 매개변수 확인
  *
  * @since 2022-09-26
- */, () => {
+ */ () => {
     let sutAuthController: AuthController;
     let userDtoFixtureProvider: UserDtoFixtureProvider;
     let mockRequest: Request, mockResponse: Response, mockNextFunc: NextFunction;
@@ -474,6 +473,8 @@ describe("Auth Controller Test"
     describe("AuthController.prototype.resetPassword", () => {
         let resetPasswordDto: ResetPasswordDto;
         let email: string;
+        const accessToken = "sample_token";
+        const refreshToken = "sample_refresh_token";
 
         beforeEach(() => {
             resetPasswordDto = userDtoFixtureProvider.getResetPasswordDto();
@@ -482,23 +483,37 @@ describe("Auth Controller Test"
             sutAuthController["dtoFactory"].getResetPasswordDto = jest.fn(
                 async (): Promise<ResetPasswordDto> => resetPasswordDto,
             );
-            sutAuthController["authService"].resetPassword = jest.fn(async (): Promise<string> => email);
+            sutAuthController["authService"].resetPassword = jest.fn(
+                async (): Promise<{
+                    accessToken: string;
+                    refreshToken: string;
+                }> => ({
+                    accessToken,
+                    refreshToken,
+                }),
+            );
         });
 
-        it("should call res.status(302).json()", async () => {
+        it("should call res.status(201).json()", async () => {
             await sutAuthController.resetPassword(mockRequest, mockResponse, mockNextFunc);
 
             expect(mockResponse.status).toBeCalled();
-            expect(mockResponse.status).toBeCalledWith(302);
+            expect(mockResponse.status).toBeCalledWith(201);
 
-            expect(mockResponse.json).not.toBeCalled();
-            expect(mockResponse.redirect).toBeCalled();
-            expect(mockResponse.redirect).toBeCalledWith(`${undefined}/signIn?email=${email}`);
+            expect(mockResponse.json).toBeCalled();
+            expect(mockResponse.json).toBeCalledWith({
+                isSuccess: true,
+                message: "임시 비밀번호로 변경이 완료 되었습니다.",
+                accessToken,
+                refreshToken,
+            });
         });
         it("should call res.status(500).json()", async () => {
-            sutAuthController["authService"].resetPassword = jest.fn(async (): Promise<string> => {
-                throw mockErrorInstance;
-            });
+            sutAuthController["authService"].resetPassword = jest.fn(
+                async (): Promise<{ accessToken: string; refreshToken: string }> => {
+                    throw mockErrorInstance;
+                },
+            );
 
             await sutAuthController.sendPassword(mockRequest, mockResponse, mockNextFunc);
 
