@@ -614,7 +614,12 @@ export class AuthService {
         }
     };
 
-    public resetPassword = async (resetPasswordDto: ResetPasswordDto): Promise<string> => {
+    public resetPassword = async (
+        resetPasswordDto: ResetPasswordDto,
+    ): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }> => {
         const conn = await this.mysqlProvider.getConnection();
 
         try {
@@ -630,8 +635,25 @@ export class AuthService {
 
             await this.authRepository.updateUserPassword(conn, payload.email, payload.hashedPassword);
 
+            const accessToken = this.jwtProvider.signAccessToken({
+                type: "AccessToken",
+                userId: findedUser.userId,
+                nickname: findedUser.nickname,
+            });
+
+            const refreshToken = this.jwtProvider.signRefreshToken({
+                type: "RefreshToken",
+                email: findedUser.email,
+                userId: findedUser.userId,
+                nickname: findedUser.nickname,
+            });
+
             await conn.commit();
-            return payload.email;
+
+            return {
+                accessToken,
+                refreshToken,
+            };
         } catch (err) {
             await conn.rollback();
             throw err;
