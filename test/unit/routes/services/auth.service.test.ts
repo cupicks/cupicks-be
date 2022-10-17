@@ -69,7 +69,7 @@ describe("Auth Service Test", /**
         JwtProvider.init(ENV.JWT);
         BcryptProvider.init(ENV.SALT);
         MulterProvider.init(ENV.S3);
-        AwsSesProvider.init(ENV.SES, ENV.URL.SERVER_URL_WITH_PORT);
+        AwsSesProvider.init(ENV.SES, ENV.URL.SERVER_URL_WITH_PORT, ENV.URL.FROTN_REDIRECT_URL_WITHOUT_PORT);
 
         sutAuthService = new AuthService();
     });
