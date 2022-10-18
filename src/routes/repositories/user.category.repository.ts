@@ -3,6 +3,9 @@ import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 import { UnkownError } from "../../models/_.loader";
 import { ERecipeCategory } from "../../models/enums/e.recipe.category";
 
+/**
+ * @deprecated
+ */
 export class UserCategoryRepository {
     // CREATE
     public createFavorCategoryList = async (
