@@ -1,7 +1,8 @@
 use cupick_dev;
 SELECT * FROM recipe_category;
 
-# Do
+-- Do
+
 DELETE FROM
     recipe_category_list
 WHERE
