@@ -25,6 +25,8 @@ import {
     ResetPasswordDto,
 } from "../../models/_.loader";
 import { Dayjs } from "dayjs";
+import { UserFavorRepository } from "routes/repositories/user.favor.repository";
+import { ResultSetHeader } from "mysql2";
 
 export class AuthService {
     private jwtProvider: JwtProvider;
@@ -37,6 +39,8 @@ export class AuthService {
     private authRepository: AuthRepository;
     private authVerifyListRepository: AuthVerifyListRepository;
     private userCategoryRepository: UserCategoryRepository;
+
+    private userFavorRepository: UserFavorRepository;
 
     constructor() {
         this.jwtProvider = new JwtProvider();
@@ -62,8 +66,12 @@ export class AuthService {
             password,
             imageUrl,
             resizedUrl,
-            favorCategory,
-            disfavorCategory,
+            favorCupSizeList,
+            favorTemperatureList,
+            favorCategoryList,
+            disfavorCupSizeList,
+            disfavorTemperatureList,
+            disfavorCategoryList,
         } = userDto;
 
         try {
@@ -104,8 +112,18 @@ export class AuthService {
                 userVerifyList.userVerifyListId,
             );
 
-            await this.userCategoryRepository.createFavorCategoryList(conn, createdUserId, favorCategory);
-            await this.userCategoryRepository.createDisfavorCategoryList(conn, createdUserId, disfavorCategory);
+            await Promise.all([
+                this.userFavorRepository.insertFavorCupSize(conn, createdUserId, favorCupSizeList),
+                this.userFavorRepository.insertFavorCategory(conn, createdUserId, favorCategoryList),
+                this.userFavorRepository.insertFavorTemperature(conn, createdUserId, favorTemperatureList),
+                this.userFavorRepository.insertDisfavorCupSize(conn, createdUserId, disfavorCupSizeList),
+                this.userFavorRepository.insertDisfavorCategory(conn, createdUserId, disfavorCategoryList),
+                this.userFavorRepository.insertDisfavorTemperature(conn, createdUserId, disfavorTemperatureList),
+            ]);
+
+            // @depreacted
+            // await this.userCategoryRepository.createFavorCategoryList(conn, createdUserId, favorCategory);
+            // await this.userCategoryRepository.createDisfavorCategoryList(conn, createdUserId, disfavorCategory);
 
             await conn.commit();
 
@@ -115,10 +133,14 @@ export class AuthService {
                 updatedAt: date,
                 email: email,
                 nickname: nicknameVerifyTokenPayload.nickname,
-                imageUrl: userDto.imageUrl,
-                resizedUrl: userDto.resizedUrl,
-                favorCategory: favorCategory,
-                disfavorCategory: disfavorCategory,
+                imageUrl,
+                resizedUrl,
+                favorCupSizeList,
+                favorTemperatureList,
+                favorCategoryList,
+                disfavorCupSizeList,
+                disfavorTemperatureList,
+                disfavorCategoryList,
             });
         } catch (err) {
             await conn.rollback();
