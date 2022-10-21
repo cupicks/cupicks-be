@@ -38,10 +38,10 @@ DROP TABLE IF EXISTS recipe;
 DROP TABLE IF EXISTS user_verify_list;
 DROP TABLE IF EXISTS recipe_category;
 
+
 CREATE TABLE IF NOT EXISTS recipe_category (
     name            VARCHAR(20) PRIMARY KEY
 );
-
 
 INSERT INTO recipe_category (name) VALUES ('milk'), ('caffein'), ('lemon'), ('syrup');
 

@@ -1,10 +1,22 @@
 import * as joi from "joi";
-import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
-import { ERecipeCategory } from "../../enums/_.exporter";
+
+import { ERecipeSize, ERecipeTemperature, ERecipeCategory } from "../../enums/_.exporter";
+
+// favorCupSizeList: [
+//     '355', '473', '591’
+//   ],
+//   favorTemperatureList: [
+//     ‘hot’, ‘ice’
+//   ],
+//   favorIngredientList: [],
+
+//   disfavorCupsizeList: []
+//   disfavorTemperatureList: []
+//   disfavorIngerdientList: []
 
 export interface ISignupUserDto {
     password: string;
@@ -12,8 +24,14 @@ export interface ISignupUserDto {
     resizedUrl: string | undefined;
     nicknameVerifyToken: string;
     emailVerifyToken: string;
-    favorCategory: ERecipeCategory[];
-    disfavorCategory: ERecipeCategory[];
+
+    favorCupSizeList: ERecipeSize[];
+    favorTemperatureList: ERecipeTemperature[];
+    favorCategoryList: ERecipeCategory[];
+
+    disfavorCupSizeList: ERecipeSize[];
+    disfavorTemperatureList: ERecipeTemperature[];
+    disfavorCategoryList: ERecipeCategory[];
 }
 
 export class SignupUserDto extends RequestQueryExtractor<string> implements IBaseDto, ISignupUserDto {
@@ -22,8 +40,14 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
     resizedUrl: string | undefined;
     nicknameVerifyToken: string;
     emailVerifyToken: string;
-    favorCategory: ERecipeCategory[];
-    disfavorCategory: ERecipeCategory[];
+
+    favorCupSizeList: ERecipeSize[];
+    favorTemperatureList: ERecipeTemperature[];
+    favorCategoryList: ERecipeCategory[];
+
+    disfavorCupSizeList: ERecipeSize[];
+    disfavorTemperatureList: ERecipeTemperature[];
+    disfavorCategoryList: ERecipeCategory[];
 
     constructor({
         password,
@@ -31,12 +55,28 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
         resizedUrl,
         emailVerifyToken,
         nicknameVerifyToken,
-        favorCategory,
-        disfavorCategory,
-    }: ISignupUserDto) {
-        super();
+        favorCupSizeList,
+        favorTemperatureList,
+        favorCategoryList,
+        disfavorCupSizeList,
+        disfavorTemperatureList,
+        disfavorCategoryList,
+    }: {
+        password: string;
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+        nicknameVerifyToken: string;
+        emailVerifyToken: string;
 
-        console.error(favorCategory, disfavorCategory);
+        favorCupSizeList: string | undefined;
+        favorTemperatureList: string | undefined;
+        favorCategoryList: string | undefined;
+
+        disfavorCupSizeList: string | undefined;
+        disfavorTemperatureList: string | undefined;
+        disfavorCategoryList: string | undefined;
+    }) {
+        super();
 
         this.password = password;
         this.emailVerifyToken = emailVerifyToken;
@@ -45,11 +85,45 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
 
-        const tempFavor = favorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
-        this.favorCategory = tempFavor ?? [];
+        // Favor
 
-        const tempDisfavor = disfavorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
-        this.disfavorCategory = tempDisfavor ?? [];
+        const tempfavorCupSizeList = favorCupSizeList
+            ?.split(",")
+            ?.map((str) => ERecipeSize[str])
+            ?.filter((v) => v);
+        this.favorCupSizeList = tempfavorCupSizeList ?? [];
+
+        const tempFavorTemperatureList = favorTemperatureList
+            ?.split(",")
+            ?.map((str) => ERecipeTemperature[str])
+            ?.filter((v) => v);
+        this.favorTemperatureList = tempFavorTemperatureList ?? [];
+
+        const tempFavorCategoryList = favorCategoryList
+            ?.split(",")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.favorCategoryList = tempFavorCategoryList ?? [];
+
+        // Disfavor
+
+        const tempDisfavorCupSizeList = disfavorCupSizeList
+            ?.split(",")
+            ?.map((str) => ERecipeSize[str])
+            ?.filter((v) => v);
+        this.disfavorCupSizeList = tempDisfavorCupSizeList ?? [];
+
+        const tempDisfavorTemperatureList = disfavorTemperatureList
+            ?.split(",")
+            ?.map((str) => ERecipeTemperature[str])
+            ?.filter((v) => v);
+        this.disfavorTemperatureList = tempDisfavorTemperatureList ?? [];
+
+        const tempDisfavorCategoryList = disfavorCategoryList
+            ?.split(",")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.disfavorCategoryList = tempDisfavorCategoryList ?? [];
     }
 
     getJoiInstance(): ObjectSchema<SignupUserDto> {
@@ -77,28 +151,67 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
                 .required()
                 .max(1000)
                 .message("NicknameVerifyToken 은 반드시 포함하여야 합니다."),
-            favorCategory: joi
+            // CupSize
+            favorCupSizeList: joi
+                .array()
+                .items(joi.string().equal(ERecipeSize.small, ERecipeSize.medium, ERecipeSize.large)),
+            disfavorCupSizeList: joi
+                .array()
+                .items(joi.string().equal(ERecipeSize.small, ERecipeSize.medium, ERecipeSize.large)),
+            // CupTemplature
+            favorTemperatureList: joi.array().items(joi.string().equal(ERecipeTemperature.ice, ERecipeTemperature.hot)),
+            disfavorTemperatureList: joi
+                .array()
+                .items(joi.string().equal(ERecipeTemperature.ice, ERecipeTemperature.hot)),
+            // CupIngredient
+            favorCategoryList: joi
                 .array()
                 .items(
                     joi
                         .string()
                         .equal(
-                            ERecipeCategory.milk,
-                            ERecipeCategory.caffein,
+                            ERecipeCategory.coffee_mlik,
+                            ERecipeCategory.whipping_cream,
+                            ERecipeCategory.vanilla_syrup,
+                            ERecipeCategory.hazelnut_syrup,
+                            ERecipeCategory.cramel_syrup,
+                            ERecipeCategory.choco_green_tea,
+                            ERecipeCategory.tea,
+                            ERecipeCategory.strawberry,
+                            ERecipeCategory.green_grape,
+                            ERecipeCategory.orange,
+                            ERecipeCategory.grapefruit,
                             ERecipeCategory.lemon,
-                            ERecipeCategory.syrup,
+                            ERecipeCategory.blue_berry,
+                            ERecipeCategory.tapioca_pearl,
+                            ERecipeCategory.sparkling_water,
+                            ERecipeCategory.mint,
+                            ERecipeCategory.cinnamon,
                         ),
                 ),
-            disfavorCategory: joi
+            disfavorCategoryList: joi
                 .array()
                 .items(
                     joi
                         .string()
                         .equal(
-                            ERecipeCategory.milk,
-                            ERecipeCategory.caffein,
+                            ERecipeCategory.coffee_mlik,
+                            ERecipeCategory.whipping_cream,
+                            ERecipeCategory.vanilla_syrup,
+                            ERecipeCategory.hazelnut_syrup,
+                            ERecipeCategory.cramel_syrup,
+                            ERecipeCategory.choco_green_tea,
+                            ERecipeCategory.tea,
+                            ERecipeCategory.strawberry,
+                            ERecipeCategory.green_grape,
+                            ERecipeCategory.orange,
+                            ERecipeCategory.grapefruit,
                             ERecipeCategory.lemon,
-                            ERecipeCategory.syrup,
+                            ERecipeCategory.blue_berry,
+                            ERecipeCategory.tapioca_pearl,
+                            ERecipeCategory.sparkling_water,
+                            ERecipeCategory.mint,
+                            ERecipeCategory.cinnamon,
                         ),
                 ),
         });

@@ -79,6 +79,9 @@ import { IBestRecipePacket } from "./packets/i.best.recipe.packet";
 import { IBestRecipeCategoryPacket } from "./packets/i.best.recipe.category.packet";
 import { IBestRecipeCommentPacket } from "./packets/i.best.recipe.comment.packet";
 
+// ENUM
+import { ERecipeCategory, ERecipeSize, ERecipeTemperature } from "./enums/_.exporter";
+
 export {
     Env,
     IJwtEnv,
@@ -164,4 +167,9 @@ export {
     UnkownError, // 500
     UnOverrideDtoError, // 500
     DatabaseConnectionError, //500
+
+    // ENUM
+    ERecipeCategory,
+    ERecipeSize,
+    ERecipeTemperature,
 };
