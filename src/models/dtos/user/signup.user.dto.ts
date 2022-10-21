@@ -61,7 +61,21 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
         disfavorCupSizeList,
         disfavorTemperatureList,
         disfavorCategoryList,
-    }: ISignupUserDto) {
+    }: {
+        password: string;
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+        nicknameVerifyToken: string;
+        emailVerifyToken: string;
+
+        favorCupSizeList: string | undefined;
+        favorTemperatureList: string | undefined;
+        favorCategoryList: string | undefined;
+
+        disfavorCupSizeList: string | undefined;
+        disfavorTemperatureList: string | undefined;
+        disfavorCategoryList: string | undefined;
+    }) {
         super();
 
         this.password = password;
@@ -73,27 +87,43 @@ export class SignupUserDto extends RequestQueryExtractor<string> implements IBas
 
         // Favor
 
-        const tempfavorCupSizeList = favorCupSizeList?.map((str) => ERecipeSize[str])?.filter((v) => v);
+        const tempfavorCupSizeList = favorCupSizeList
+            ?.split(",")
+            ?.map((str) => ERecipeSize[str])
+            ?.filter((v) => v);
         this.favorCupSizeList = tempfavorCupSizeList ?? [];
 
-        const tempFavorTemperatureList = favorTemperatureList?.map((str) => ERecipeTemperature[str])?.filter((v) => v);
+        const tempFavorTemperatureList = favorTemperatureList
+            ?.split(",")
+            ?.map((str) => ERecipeTemperature[str])
+            ?.filter((v) => v);
         this.favorTemperatureList = tempFavorTemperatureList ?? [];
 
-        const tempFavorCategoryList = favorCategoryList?.map((str) => ERecipeCategory[str])?.filter((v) => v);
-        this.favorCategoryList = tempFavorCategoryList;
+        const tempFavorCategoryList = favorCategoryList
+            ?.split(",")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.favorCategoryList = tempFavorCategoryList ?? [];
 
         // Disfavor
 
-        const tempDisfavorCupSizeList = disfavorCupSizeList?.map((str) => ERecipeSize[str])?.filter((v) => v);
-        this.favorCupSizeList = tempDisfavorCupSizeList ?? [];
+        const tempDisfavorCupSizeList = disfavorCupSizeList
+            ?.split(",")
+            ?.map((str) => ERecipeSize[str])
+            ?.filter((v) => v);
+        this.disfavorCupSizeList = tempDisfavorCupSizeList ?? [];
 
         const tempDisfavorTemperatureList = disfavorTemperatureList
+            ?.split(",")
             ?.map((str) => ERecipeTemperature[str])
             ?.filter((v) => v);
         this.disfavorTemperatureList = tempDisfavorTemperatureList ?? [];
 
-        const tempDisfavorCategoryList = disfavorCategoryList?.map((str) => ERecipeCategory[str])?.filter((v) => v);
-        this.disfavorCategoryList = tempDisfavorCategoryList;
+        const tempDisfavorCategoryList = disfavorCategoryList
+            ?.split(",")
+            ?.map((str) => ERecipeCategory[str])
+            ?.filter((v) => v);
+        this.disfavorCategoryList = tempDisfavorCategoryList ?? [];
     }
 
     getJoiInstance(): ObjectSchema<SignupUserDto> {

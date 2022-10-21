@@ -17,9 +17,9 @@ export class UserFavorRepository {
 
         if (cupSizeListLength === 0) return null;
 
-        let insertQuery = `INSERT INTO user_favor_cup_size_list (user_id, cup_size) VALUES `;
+        let insertQuery = `INSERT INTO user_favor_cup_size_list (user_id, cup_size) VALUES`;
         for (const cupSize of favorCupSizeList) {
-            insertQuery += `(${userId}, "${cupSize}"), `;
+            insertQuery += ` (${userId}, "${cupSize}"),`;
         }
         insertQuery = insertQuery.slice(0, insertQuery.length - 1) + ";";
 
@@ -44,9 +44,9 @@ export class UserFavorRepository {
 
         if (tmperatureListLength === 0) return null;
 
-        let insertQuery = `INSERT INTO user_favor_temperature_list (user_id, state) VALUES `;
+        let insertQuery = `INSERT INTO user_favor_temperature_list (user_id, state) VALUES`;
         for (const state of favorTemperatureList) {
-            insertQuery += `(${userId}, "${state}"), `;
+            insertQuery += ` (${userId}, "${state}"),`;
         }
         insertQuery = insertQuery.slice(0, insertQuery.length - 1) + ";";
 
@@ -60,16 +60,16 @@ export class UserFavorRepository {
     };
 
     /**
-     * `INSERT INTO user_favor_category_list_list (user_id, category_name) VALUES (?, ?), ...(?, ?);`
+     * `INSERT INTO user_favor_category_list (user_id, category_name) VALUES (?, ?), ...(?, ?);`
      */
     public insertFavorCategory = async (conn: PoolConnection, userId: number, favorCategoryList: ERecipeCategory[]) => {
         const categoryListLength = favorCategoryList?.length;
 
         if (categoryListLength === 0) return null;
 
-        let insertQuery = `INSERT INTO user_favor_category_list_list (user_id, category_name) VALUES `;
+        let insertQuery = `INSERT INTO user_favor_category_list (user_id, category_name) VALUES`;
         for (const category of favorCategoryList) {
-            insertQuery += `(${userId}, "${category}"), `;
+            insertQuery += ` (${userId}, "${category}"),`;
         }
         insertQuery = insertQuery.slice(0, insertQuery.length - 1) + ";";
 
@@ -96,9 +96,9 @@ export class UserFavorRepository {
 
         if (cupSizeListLength === 0) return null;
 
-        let insertQuery = `INSERT INTO user_disfavor_cup_size_list (user_id, cup_size) VALUES `;
+        let insertQuery = `INSERT INTO user_disfavor_cup_size_list (user_id, cup_size) VALUES`;
         for (const cupSize of disfavorCupSizeList) {
-            insertQuery += `(${userId}, "${cupSize}"), `;
+            insertQuery += ` (${userId}, "${cupSize}"),`;
         }
         insertQuery = insertQuery.slice(0, insertQuery.length - 1) + ";";
 
@@ -123,9 +123,9 @@ export class UserFavorRepository {
 
         if (tmperatureListLength === 0) return null;
 
-        let insertQuery = `INSERT INTO user_disfavor_temperature_list (user_id, state) VALUES `;
+        let insertQuery = `INSERT INTO user_disfavor_temperature_list (user_id, state) VALUES`;
         for (const state of disfavorTemperatureList) {
-            insertQuery += `(${userId}, "${state}"), `;
+            insertQuery += ` (${userId}, "${state}"),`;
         }
         insertQuery = insertQuery.slice(0, insertQuery.length - 1) + ";";
 
@@ -150,9 +150,9 @@ export class UserFavorRepository {
 
         if (categoryListLength === 0) return null;
 
-        let insertQuery = `INSERT INTO user_disfavor_category_list (user_id, category_name) VALUES `;
+        let insertQuery = `INSERT INTO user_disfavor_category_list (user_id, category_name) VALUES`;
         for (const category of disfavorCategoryList) {
-            insertQuery += `(${userId}, "${category}"), `;
+            insertQuery += ` (${userId}, "${category}"),`;
         }
         insertQuery = insertQuery.slice(0, insertQuery.length - 1) + ";";
 
