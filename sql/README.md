@@ -36,5 +36,10 @@ Cupick 이 **42 일** 간 진행된 공식 프로젝트 기간이 종료 되었�
 
 | Filename                               | Description     | Issue |
 | -------------------------------------- | --------------- | ----- |
-| 2022-10-17 1210 create recipe_cup_size | recipe_cup_size | 
-| 2022-10-17 1217 update recipe_category | recipe_category | 
+| 2022-10-17 1210 create recipe_cup_size | 참조용 레시피 사이즈 규격 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
+| 2022-10-17 1217 update recipe_category | 참조용 레시피 재료 카테고리 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
+| 2022-10-18 1010 create receip_temperature | 참조용 레시피 온도 규격 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
+| 2022-10-18 1026 create user_favor_cup_size_list | 유저 선호 체계 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
+| 2022-10-18 1028 create user_favor_cup_temperature_list | 유저 선호 체계 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
+| 2022-10-18 1028 create user_disfavor_cup_size_list | 유저 비선호 체계 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
+| 2022-10-18 1030 create user_disfavor_cup_temperature_list | 유저 비선호 체계 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
