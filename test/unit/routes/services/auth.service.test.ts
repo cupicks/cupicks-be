@@ -79,8 +79,8 @@ describe("Auth Service Test", /**
     });
 
     it("AuthService must be defined", () => expect(AuthService).toBeDefined());
-    it("AuthService.prototype contain 9 dependencies and 9 methods", () => {
-        expect(Object.keys(sutAuthService).length).toBe(18);
+    it("AuthService.prototype contain 10 dependencies and 9 methods", () => {
+        expect(Object.keys(sutAuthService).length).toBe(19);
 
         expect(sutAuthService["jwtProvider"]).toBeDefined();
         expect(sutAuthService["mysqlProvider"]).toBeDefined();
@@ -92,7 +92,9 @@ describe("Auth Service Test", /**
 
         expect(sutAuthService["authRepository"]).toBeDefined();
         expect(sutAuthService["authVerifyListRepository"]).toBeDefined();
+
         expect(sutAuthService["userCategoryRepository"]).toBeDefined();
+        expect(sutAuthService["userFavorRepository"]).toBeDefined();
 
         expect(sutAuthService.signup).toBeDefined();
         expect(typeof sutAuthService.signup).toBe("function");
@@ -298,30 +300,41 @@ describe("Auth Service Test", /**
                 isExeededOfEmailSent: 1,
             };
 
-            const jestFunc = jest.fn();
-            jestFunc.mockReturnValue(returnUserVerifyList);
-            sutAuthService["authVerifyListRepository"].findVerifyListByEmail = jestFunc;
+            const mockFindVerifyListByEmail = jest.fn();
+            mockFindVerifyListByEmail.mockReturnValue(returnUserVerifyList);
+            sutAuthService["authVerifyListRepository"].findVerifyListByEmail = mockFindVerifyListByEmail;
 
-            const jestFunc2 = jest.fn();
-            jestFunc2.mockReturnValue(false);
-            sutAuthService["authRepository"].isExistsByEmail = jestFunc2;
+            const mockIsExistsByEmail = jest.fn();
+            mockIsExistsByEmail.mockReturnValue(false);
+            sutAuthService["authRepository"].isExistsByEmail = mockIsExistsByEmail;
 
-            const jestFunc3 = jest.fn();
-            jestFunc3.mockReturnValue("hello");
-            sutAuthService["dayjsProvider"].changeToProvidedFormat = jestFunc3;
+            const mockChangeToProvidedFormat = jest.fn();
+            mockChangeToProvidedFormat.mockReturnValue("hello");
+            sutAuthService["dayjsProvider"].changeToProvidedFormat = mockChangeToProvidedFormat;
             sutAuthService["dayjsProvider"].getDayjsInstance = jest.fn();
             sutAuthService["dayjsProvider"].getDayabaseFormat = jest.fn();
 
-            const jestFunc4 = jest.fn();
-            jestFunc4.mockReturnValue(123456);
-            sutAuthService["authRepository"].createUser = jestFunc4;
+            const mockCreateUser = jest.fn();
+            mockCreateUser.mockReturnValue(123456);
+            sutAuthService["authRepository"].createUser = mockCreateUser;
             sutAuthService["userCategoryRepository"].createFavorCategoryList = jest.fn();
             sutAuthService["userCategoryRepository"].createDisfavorCategoryList = jest.fn();
+
+            sutAuthService["userCategoryRepository"].createFavorCategoryList = jest.fn();
+            sutAuthService["userCategoryRepository"].createDisfavorCategoryList = jest.fn();
+
+            sutAuthService["userFavorRepository"].insertFavorCupSize = jest.fn();
+            sutAuthService["userFavorRepository"].insertFavorCategory = jest.fn();
+            sutAuthService["userFavorRepository"].insertFavorTemperature = jest.fn();
+            sutAuthService["userFavorRepository"].insertDisfavorCupSize = jest.fn();
+            sutAuthService["userFavorRepository"].insertDisfavorCategory = jest.fn();
+            sutAuthService["userFavorRepository"].insertDisfavorTemperature = jest.fn();
+
+            sutAuthService["mysqlProvider"].getConnection = jest.fn(
+                async () => await mockModule.Providers.getMockConnection(),
+            );
 
             const userDto = await sutAuthService.signup(signupUserDto);
-
-            sutAuthService["userCategoryRepository"].createFavorCategoryList = jest.fn();
-            sutAuthService["userCategoryRepository"].createDisfavorCategoryList = jest.fn();
 
             expect(userDto).toBeDefined();
             expect(userDto).toBeInstanceOf(UserDto);
