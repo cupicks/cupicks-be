@@ -25,6 +25,7 @@ import {
     ResetPasswordDto,
 } from "../../models/_.loader";
 import { Dayjs } from "dayjs";
+import { UserFavorRepository } from "../repositories/user.favor.repository";
 
 export class AuthService {
     private jwtProvider: JwtProvider;
@@ -38,6 +39,8 @@ export class AuthService {
     private authVerifyListRepository: AuthVerifyListRepository;
     private userCategoryRepository: UserCategoryRepository;
 
+    private userFavorRepository: UserFavorRepository;
+
     constructor() {
         this.jwtProvider = new JwtProvider();
         this.mysqlProvider = new MysqlProvider();
@@ -49,11 +52,13 @@ export class AuthService {
 
         this.authRepository = new AuthRepository();
         this.authVerifyListRepository = new AuthVerifyListRepository();
+
         this.userCategoryRepository = new UserCategoryRepository();
+        this.userFavorRepository = new UserFavorRepository();
     }
 
     public signup = async (userDto: SignupUserDto): Promise<UserDto> => {
-        const conn = await this.mysqlProvider.getConnection();
+        const conn = await this.mysqlProvider?.getConnection();
 
         userDto.password = this.bcryptProvider.hashPassword(userDto.password);
         const {
@@ -62,8 +67,12 @@ export class AuthService {
             password,
             imageUrl,
             resizedUrl,
-            favorCategory,
-            disfavorCategory,
+            favorCupSizeList,
+            favorTemperatureList,
+            favorCategoryList,
+            disfavorCupSizeList,
+            disfavorTemperatureList,
+            disfavorCategoryList,
         } = userDto;
 
         try {
@@ -104,8 +113,18 @@ export class AuthService {
                 userVerifyList.userVerifyListId,
             );
 
-            await this.userCategoryRepository.createFavorCategoryList(conn, createdUserId, favorCategory);
-            await this.userCategoryRepository.createDisfavorCategoryList(conn, createdUserId, disfavorCategory);
+            await Promise.all([
+                this.userFavorRepository.insertFavorCupSize(conn, createdUserId, favorCupSizeList),
+                this.userFavorRepository.insertFavorCategory(conn, createdUserId, favorCategoryList),
+                this.userFavorRepository.insertFavorTemperature(conn, createdUserId, favorTemperatureList),
+                this.userFavorRepository.insertDisfavorCupSize(conn, createdUserId, disfavorCupSizeList),
+                this.userFavorRepository.insertDisfavorCategory(conn, createdUserId, disfavorCategoryList),
+                this.userFavorRepository.insertDisfavorTemperature(conn, createdUserId, disfavorTemperatureList),
+            ]);
+
+            // @depreacted
+            // await this.userCategoryRepository.createFavorCategoryList(conn, createdUserId, favorCategory);
+            // await this.userCategoryRepository.createDisfavorCategoryList(conn, createdUserId, disfavorCategory);
 
             await conn.commit();
 
@@ -115,10 +134,14 @@ export class AuthService {
                 updatedAt: date,
                 email: email,
                 nickname: nicknameVerifyTokenPayload.nickname,
-                imageUrl: userDto.imageUrl,
-                resizedUrl: userDto.resizedUrl,
-                favorCategory: favorCategory,
-                disfavorCategory: disfavorCategory,
+                imageUrl,
+                resizedUrl,
+                favorCupSizeList,
+                favorTemperatureList,
+                favorCategoryList,
+                disfavorCupSizeList,
+                disfavorTemperatureList,
+                disfavorCategoryList,
             });
         } catch (err) {
             await conn.rollback();
