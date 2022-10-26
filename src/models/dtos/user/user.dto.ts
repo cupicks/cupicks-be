@@ -1,4 +1,4 @@
-import { ERecipeCategory } from "models/enums/e.recipe.category";
+import { ERecipeCategory, ERecipeSize, ERecipeTemperature } from "../../enums/_.exporter";
 
 export interface IUserDto {
     userId: number;
@@ -8,8 +8,14 @@ export interface IUserDto {
     resizedUrl: string | null;
     createdAt: string | null;
     updatedAt: string | null;
-    favorCategory: ERecipeCategory[] | null;
-    disfavorCategory: ERecipeCategory[] | null;
+
+    favorCupSizeList: ERecipeSize[] | null;
+    favorTemperatureList: ERecipeTemperature[] | null;
+    favorCategoryList: ERecipeCategory[] | null;
+
+    disfavorCupSizeList: ERecipeSize[] | null;
+    disfavorTemperatureList: ERecipeTemperature[] | null;
+    disfavorCategoryList: ERecipeCategory[] | null;
 }
 
 export class UserDto implements IUserDto {
@@ -20,8 +26,14 @@ export class UserDto implements IUserDto {
     resizedUrl: string | null;
     createdAt: string | null;
     updatedAt: string | null;
-    favorCategory: ERecipeCategory[] | null;
-    disfavorCategory: ERecipeCategory[] | null;
+
+    favorCupSizeList: ERecipeSize[] | null;
+    favorTemperatureList: ERecipeTemperature[] | null;
+    favorCategoryList: ERecipeCategory[] | null;
+
+    disfavorCupSizeList: ERecipeSize[] | null;
+    disfavorTemperatureList: ERecipeTemperature[] | null;
+    disfavorCategoryList: ERecipeCategory[] | null;
 
     constructor(userDto: {
         userId: number;
@@ -31,8 +43,14 @@ export class UserDto implements IUserDto {
         resizedUrl: string | undefined;
         createdAt: string | undefined;
         updatedAt: string | undefined;
-        favorCategory: ERecipeCategory[] | undefined;
-        disfavorCategory: ERecipeCategory[] | undefined;
+
+        favorCupSizeList: ERecipeSize[] | undefined;
+        favorTemperatureList: ERecipeTemperature[] | undefined;
+        favorCategoryList: ERecipeCategory[] | undefined;
+
+        disfavorCupSizeList: ERecipeSize[] | undefined;
+        disfavorTemperatureList: ERecipeTemperature[] | undefined;
+        disfavorCategoryList: ERecipeCategory[] | undefined;
     }) {
         this.userId = userDto.userId;
         this.email = userDto.email;
@@ -43,7 +61,13 @@ export class UserDto implements IUserDto {
 
         this.createdAt = userDto.createdAt ? userDto.createdAt : null;
         this.updatedAt = userDto.updatedAt ? userDto.updatedAt : null;
-        this.favorCategory = userDto.favorCategory ? userDto.favorCategory : null;
-        this.disfavorCategory = userDto.disfavorCategory ? userDto.disfavorCategory : null;
+
+        this.favorCupSizeList = userDto.favorCupSizeList ? userDto.favorCupSizeList : null;
+        this.favorTemperatureList = userDto.favorTemperatureList ? userDto.favorTemperatureList : null;
+        this.favorCategoryList = userDto.favorCategoryList ? userDto.favorCategoryList : null;
+
+        this.disfavorCupSizeList = userDto.disfavorCupSizeList ? userDto.disfavorCupSizeList : null;
+        this.disfavorTemperatureList = userDto.disfavorTemperatureList ? userDto.disfavorTemperatureList : null;
+        this.disfavorCategoryList = userDto.disfavorCategoryList ? userDto.disfavorCategoryList : null;
     }
 }

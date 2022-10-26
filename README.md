@@ -46,15 +46,17 @@
 
 - [API 리스트 (v1.3.697) _ 0928](https://www.notion.so/API-_-0928-158b92d9cf6e4601b4c0b04c22513cbb)
 - [API 명세서 (v1.3.697) _ 0928](https://www.notion.so/API-_-0928-ce1db36c2fa7491f8fec700be56cc45f)
+- [API 리스트 (작업 중) _ 1008](https://www.notion.so/API-_-1008-5206e8bbb3bb474987354da04217271f)
+- [API 명세서 (작업 중) _ 1008](https://www.notion.so/API-_-1008-ed3337a7bb874779a99bab61177790fc)
 
 ### [트러블 슈팅](https://github.com/cupicks/cupicks-be/wiki/1.-%ED%8A%B8%EB%9F%AC%EB%B8%94-%EC%8A%88%ED%8C%85)
 
 - TypeScript _ReferenceError : Cannot Access_ with mysql2\/promise
 - TypeScript 컴파일러 튜닝 및 변경을 통한 컴파일러 성능 약 **75%** 단축
-- Lambda, Sharp
 - GitHub Action + Shell Script + CodeDeploy 를 이용한 **무중단 배포 자동화** 와 **좀비 프로세스 방지**
 - GitHub Action + Jest 를 이용한 **테스트 자동화** 로 컴파일링 실패 감지
 - GitHub Action 을 이용한 **Lambda 배포 자동화**
+- Lambda, Sharp 를 이용한 이미지 압축
 
 ### [라이브러리 선택 이유](https://github.com/cupicks/cupicks-be/wiki/3.-%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC-%EC%84%A0%ED%83%9D)
 
@@ -98,6 +100,8 @@
 3. DtoFactroy + JoiValidator + Dto 으로 도메인의 매개변수 간소화
 
 ### ERD
+
+- [SQL Files](./sql/README.md)
 
 <details>
     <summary>v1.3.697</summary>

@@ -1,3 +1,5 @@
 import { ERecipeCategory } from "./e.recipe.category";
+import { ERecipeSize } from "./e.recipe.cup.size";
+import { ERecipeTemperature } from "./e.recipe.temperature";
 
-export { ERecipeCategory };
+export { ERecipeCategory, ERecipeSize, ERecipeTemperature };

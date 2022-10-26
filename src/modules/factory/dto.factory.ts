@@ -8,7 +8,21 @@ export class DtoFactory {
     }
 
     // USER
-    public async getSignupUserDto(iDto: ISignupUserDto): Promise<SignupUserDto> {
+    public async getSignupUserDto(iDto: {
+        password: string;
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+        nicknameVerifyToken: string;
+        emailVerifyToken: string;
+
+        favorCupSizeList: string | undefined;
+        favorTemperatureList: string | undefined;
+        favorCategoryList: string | undefined;
+
+        disfavorCupSizeList: string | undefined;
+        disfavorTemperatureList: string | undefined;
+        disfavorCategoryList: string | undefined;
+    }): Promise<SignupUserDto> {
         return await this.joiValidator.validateAsync<SignupUserDto>(new SignupUserDto(iDto));
     }
 
@@ -43,7 +57,22 @@ export class DtoFactory {
 
     // PROFILE
 
-    public async getEditProfileDto(iDto: IEditProfileDto): Promise<EditProfileDto> {
+    public async getEditProfileDto(iDto: {
+        userId: number;
+        nickname: string | undefined;
+        password: string | undefined;
+
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+
+        favorCupSizeList: string | undefined;
+        favorTemperatureList: string | undefined;
+        favorCategoryList: string | undefined;
+
+        disfavorCupSizeList: string | undefined;
+        disfavorTemperatureList: string | undefined;
+        disfavorCategoryList: string | undefined;
+    }): Promise<EditProfileDto> {
         return await this.joiValidator.validateAsync<EditProfileDto>(new EditProfileDto(iDto));
     }
     public async getMyProfileDto(iDto: { userId: number }): Promise<GetMyProfileDto> {

@@ -28,8 +28,14 @@ export class ProfileController {
                 resizedUrl: file?.location,
                 nickname: req?.body["nickname"],
                 password: req?.body["password"],
-                favorCategory: req?.body["favorCategory"],
-                disfavorCategory: req?.body["disfavorCategory"],
+
+                favorCupSizeList: req?.body["favorCupSizeList"],
+                favorTemperatureList: req?.body["favorTemperatureList"],
+                favorCategoryList: req?.body["favorCategoryList"],
+
+                disfavorCupSizeList: req?.body["disfavorCupSizeList"],
+                disfavorTemperatureList: req?.body["disfavorTemperatureList"],
+                disfavorCategoryList: req?.body["disfavorCategoryList"],
             });
 
             await this.profileService.editProfile(editDto);

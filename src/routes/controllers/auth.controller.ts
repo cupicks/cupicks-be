@@ -34,8 +34,14 @@ export class AuthController {
                 password: req?.body["password"],
                 emailVerifyToken: req?.body["emailVerifyToken"],
                 nicknameVerifyToken: req?.body["nicknameVerifyToken"],
-                favorCategory: req?.body["favorCategory"],
-                disfavorCategory: req?.body["disfavorCategory"],
+
+                favorCupSizeList: req?.body["favorCupSizeList"],
+                favorTemperatureList: req?.body["favorTemperatureList"],
+                favorCategoryList: req?.body["favorCategoryList"],
+
+                disfavorCupSizeList: req?.body["disfavorCupSizeList"],
+                disfavorTemperatureList: req?.body["disfavorTemperatureList"],
+                disfavorCategoryList: req?.body["disfavorCategoryList"],
             });
 
             const result = await this.authService.signup(signupUserDto);
