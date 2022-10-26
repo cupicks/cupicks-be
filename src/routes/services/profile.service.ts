@@ -1,5 +1,4 @@
 import { AuthRepository } from "../repositories/auth.repository";
-import { BcryptProvider, MulterProvider, MysqlProvider } from "../../modules/_.loader";
 import {
     EditProfileDto,
     GetMyProfileDto,
@@ -9,9 +8,15 @@ import {
     IUserPacket,
     NotFoundException,
     RecipeDto,
+    GetLikeRecipeDto,
 } from "../../models/_.loader";
-import { RecipeRepository, RecipeIngredientRepository, UserCategoryRepository } from "../repositories/_.exporter";
-import { GetLikeRecipeDto } from "models/dtos/profile/get.like.recipe.dto";
+import { BcryptProvider, MulterProvider, MysqlProvider } from "../../modules/_.loader";
+import {
+    RecipeRepository,
+    RecipeIngredientRepository,
+    UserCategoryRepository,
+    UserFavorRepository,
+} from "../repositories/_.exporter";
 
 export class ProfileService {
     private mysqlProvider: MysqlProvider;
@@ -20,6 +25,7 @@ export class ProfileService {
     private recipeRepository: RecipeRepository;
     private recipeIngredientRepository: RecipeIngredientRepository;
     private userCategoryRepository: UserCategoryRepository;
+    private userFavorRepository: UserFavorRepository;
 
     constructor() {
         this.bcryptProvider = new BcryptProvider();
@@ -29,6 +35,7 @@ export class ProfileService {
         this.recipeRepository = new RecipeRepository();
         this.recipeIngredientRepository = new RecipeIngredientRepository();
         this.userCategoryRepository = new UserCategoryRepository();
+        this.userFavorRepository = new UserFavorRepository();
     }
 
     public editProfile = async (editDto: EditProfileDto): Promise<void> => {
@@ -54,19 +61,43 @@ export class ProfileService {
             await this.authRepository.updateUserProfile(conn, editDto);
             await Promise.all([
                 (async () => {
-                    await this.userCategoryRepository.deleteAllFavorCateogryList(conn, editDto.userId);
-                    await this.userCategoryRepository.createFavorCategoryList(
+                    await this.userFavorRepository.deleteFavorCupSize(conn, editDto.userId);
+                    await this.userFavorRepository.insertFavorCupSize(conn, editDto.userId, editDto.favorCupSizeList);
+                })(),
+                (async () => {
+                    await this.userFavorRepository.deleteFavorTemperature(conn, editDto.userId);
+                    await this.userFavorRepository.insertFavorTemperature(
                         conn,
                         editDto.userId,
-                        editDto.favorCategory,
+                        editDto.favorTemperatureList,
                     );
                 })(),
                 (async () => {
-                    await this.userCategoryRepository.deleteAllDisfavorCateogryList(conn, editDto.userId);
-                    await this.userCategoryRepository.createDisfavorCategoryList(
+                    await this.userFavorRepository.deleteFavorCategory(conn, editDto.userId);
+                    await this.userFavorRepository.insertFavorCategory(conn, editDto.userId, editDto.favorCategoryList);
+                })(),
+                (async () => {
+                    await this.userFavorRepository.deleteDisfavorCupSize(conn, editDto.userId);
+                    await this.userFavorRepository.insertDisfavorCupSize(
                         conn,
                         editDto.userId,
-                        editDto.disfavorCategory,
+                        editDto.disfavorCupSizeList,
+                    );
+                })(),
+                (async () => {
+                    await this.userFavorRepository.deleteDisfavorTemperature(conn, editDto.userId);
+                    await this.userFavorRepository.insertDisfavorTemperature(
+                        conn,
+                        editDto.userId,
+                        editDto.disfavorTemperatureList,
+                    );
+                })(),
+                (async () => {
+                    await this.userFavorRepository.deleteDisfavorCategory(conn, editDto.userId);
+                    await this.userFavorRepository.insertDisfavorCategory(
+                        conn,
+                        editDto.userId,
+                        editDto.disfavorCategoryList,
                     );
                 })(),
             ]);
