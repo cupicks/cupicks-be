@@ -6,18 +6,6 @@ import { RequestQueryExtractor } from "../request.query.extractor";
 
 import { ERecipeSize, ERecipeTemperature, ERecipeCategory } from "../../enums/_.exporter";
 
-// favorCupSizeList: [
-//     '355', '473', '591’
-//   ],
-//   favorTemperatureList: [
-//     ‘hot’, ‘ice’
-//   ],
-//   favorIngredientList: [],
-
-//   disfavorCupsizeList: []
-//   disfavorTemperatureList: []
-//   disfavorIngerdientList: []
-
 export interface ISignupUserDto {
     password: string;
     imageUrl: string | undefined;

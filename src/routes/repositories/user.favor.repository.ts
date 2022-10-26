@@ -3,7 +3,7 @@ import { PoolConnection, ResultSetHeader } from "mysql2/promise";
 import { ERecipeSize, ERecipeTemperature, ERecipeCategory, UnkownError } from "../../models/_.loader";
 
 export class UserFavorRepository {
-    // Favor
+    // INSERT
 
     /**
      * `INSERT INTO user_favor_cup_size_list (user_id, cup_size) VALUES (?, ?), ...(?, ?);`
@@ -81,8 +81,6 @@ export class UserFavorRepository {
 
         return resultSetHeader;
     };
-
-    // Disfavor
 
     /**
      * `INSERT INTO user_disfavor_cup_size_list (user_id, cup_size) VALUES (?, ?), ...(?, ?);`
@@ -163,5 +161,37 @@ export class UserFavorRepository {
             throw new UnkownError("부적절한 쿼리문이 실행된 것 같습니다.", "DATABASE_UNKOWN_QUERY");
 
         return resultSetHeader;
+    };
+
+    // DELETE
+
+    public deleteAllFavorCateogryList = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_favor_category_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
+    };
+
+    public deleteFavorCupSize = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_favor_cup_size_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
+    };
+    public deleteFavorTemperature = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_favor_temperature_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
+    };
+    public deleteFavorCategory = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_favor_category_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
+    };
+    public deleteDisfavorCupSize = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_disfavor_cup_size_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
+    };
+    public deleteDisfavorTemperature = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_disfavor_temperature_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
+    };
+    public deleteDisfavorCategory = async (conn: PoolConnection, userId: number): Promise<void> => {
+        const deleteQuery = `DELETE FROM user_disfavor_category_list WHERE user_id = ?;`;
+        await conn.query<ResultSetHeader>(deleteQuery, [userId]);
     };
 }
