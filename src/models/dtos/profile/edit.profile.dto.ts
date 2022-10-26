@@ -1,10 +1,11 @@
 import * as joi from "joi";
-import { ParsedQs } from "qs";
 import { ObjectSchema } from "joi";
 
 import { IBaseDto } from "../i.base.dto";
 import { RequestQueryExtractor } from "../request.query.extractor";
-import { ERecipeCategory } from "../../enums/_.exporter";
+
+import { ERecipeSize, ERecipeTemperature, ERecipeCategory } from "../../enums/_.exporter";
+
 export interface IEditProfileDto {
     userId: number;
     nickname: string | undefined;
@@ -12,8 +13,14 @@ export interface IEditProfileDto {
 
     imageUrl: string | undefined;
     resizedUrl: string | undefined;
-    favorCategory: ERecipeCategory[];
-    disfavorCategory: ERecipeCategory[];
+
+    favorCupSizeList: ERecipeSize[];
+    favorTemperatureList: ERecipeTemperature[];
+    favorCategoryList: ERecipeCategory[];
+
+    disfavorCupSizeList: ERecipeSize[];
+    disfavorTemperatureList: ERecipeTemperature[];
+    disfavorCategoryList: ERecipeCategory[];
 }
 
 export class EditProfileDto
@@ -25,8 +32,14 @@ export class EditProfileDto
     password: string | undefined;
     imageUrl: string | undefined;
     resizedUrl: string | undefined;
-    favorCategory: ERecipeCategory[];
-    disfavorCategory: ERecipeCategory[];
+
+    favorCupSizeList: ERecipeSize[];
+    favorTemperatureList: ERecipeTemperature[];
+    favorCategoryList: ERecipeCategory[];
+
+    disfavorCupSizeList: ERecipeSize[];
+    disfavorTemperatureList: ERecipeTemperature[];
+    disfavorCategoryList: ERecipeCategory[];
 
     constructor({
         userId,
@@ -34,9 +47,28 @@ export class EditProfileDto
         password,
         imageUrl,
         resizedUrl,
-        favorCategory,
-        disfavorCategory,
-    }: IEditProfileDto) {
+        favorCupSizeList,
+        favorTemperatureList,
+        favorCategoryList,
+        disfavorCupSizeList,
+        disfavorTemperatureList,
+        disfavorCategoryList,
+    }: {
+        userId: number;
+        nickname: string | undefined;
+        password: string | undefined;
+
+        imageUrl: string | undefined;
+        resizedUrl: string | undefined;
+
+        favorCupSizeList: string | undefined;
+        favorTemperatureList: string | undefined;
+        favorCategoryList: string | undefined;
+
+        disfavorCupSizeList: string | undefined;
+        disfavorTemperatureList: string | undefined;
+        disfavorCategoryList: string | undefined;
+    }) {
         super();
         this.userId = userId;
         this.nickname = nickname;
@@ -45,11 +77,60 @@ export class EditProfileDto
         this.imageUrl = imageUrl;
         this.resizedUrl = resizedUrl ? resizedUrl.replace(/\/profile\//, `/profile-resized/`) : undefined;
 
-        const tempFavor = favorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
-        this.favorCategory = tempFavor ?? [];
+        // Favor
 
-        const tempDisfavor = disfavorCategory?.map((str) => ERecipeCategory[str])?.filter((v) => v);
-        this.disfavorCategory = tempDisfavor ?? [];
+        const tempfavorCupSizeList =
+            favorCupSizeList
+                ?.split(",")
+                ?.map((str) => ERecipeSize[str])
+                ?.filter((v) => v) ?? [];
+        const favorCupSizeSet = new Set(tempfavorCupSizeList);
+        this.favorCupSizeList = [...favorCupSizeSet];
+
+        const tempFavorTemperatureList =
+            favorTemperatureList
+                ?.split(",")
+                ?.map((str) => ERecipeTemperature[str])
+                ?.filter((v) => v) ?? [];
+        const favorTemperatureSet = new Set(tempFavorTemperatureList);
+        this.favorTemperatureList = [...favorTemperatureSet];
+
+        const tempFavorCategoryList =
+            favorCategoryList
+                ?.split(",")
+                ?.map((str) => ERecipeCategory[str])
+                ?.filter((v) => v) ?? [];
+        const favorCategorySet = new Set(tempFavorCategoryList);
+        this.favorCategoryList = [...favorCategorySet];
+
+        // Disfavor
+
+        const tempDisfavorCupSizeList =
+            disfavorCupSizeList
+                ?.split(",")
+                ?.map((str) => ERecipeSize[str])
+                ?.map((enumStr) => (favorCupSizeSet.has(enumStr) ? undefined : enumStr))
+                ?.filter((v) => v) ?? [];
+        const disfavorCupSizeSet = new Set(tempDisfavorCupSizeList);
+        this.disfavorCupSizeList = [...disfavorCupSizeSet];
+
+        const tempDisfavorTemperatureList =
+            disfavorTemperatureList
+                ?.split(",")
+                ?.map((str) => ERecipeTemperature[str])
+                ?.map((enumStr) => (favorTemperatureSet.has(enumStr) ? undefined : enumStr))
+                ?.filter((v) => v) ?? [];
+        const disfavorTemperatureSet = new Set(tempDisfavorTemperatureList);
+        this.disfavorTemperatureList = [...disfavorTemperatureSet];
+
+        const tempDisfavorCategoryList =
+            disfavorCategoryList
+                ?.split(",")
+                ?.map((str) => ERecipeCategory[str])
+                ?.map((enumStr) => (favorCategorySet.has(enumStr) ? undefined : enumStr))
+                ?.filter((v) => v) ?? [];
+        const disfavorCategorySet = new Set(tempDisfavorCategoryList);
+        this.disfavorCategoryList = [...disfavorCategorySet];
     }
 
     getJoiInstance(): ObjectSchema<EditProfileDto> {
@@ -76,13 +157,25 @@ export class EditProfileDto
                 ),
             imageUrl: joi.string().max(255).message("imageUrl 은 255 자 이하여야 합니다."),
             resizedUrl: joi.string().max(255).message("resizedUrl 은 255 자 이하여야 합니다."),
-            favorCategory: joi
+            // CupSize
+            favorCupSizeList: joi
+                .array()
+                .items(joi.string().equal(ERecipeSize.small, ERecipeSize.medium, ERecipeSize.large)),
+            disfavorCupSizeList: joi
+                .array()
+                .items(joi.string().equal(ERecipeSize.small, ERecipeSize.medium, ERecipeSize.large)),
+            // CupTemplature
+            favorTemperatureList: joi.array().items(joi.string().equal(ERecipeTemperature.ice, ERecipeTemperature.hot)),
+            disfavorTemperatureList: joi
+                .array()
+                .items(joi.string().equal(ERecipeTemperature.ice, ERecipeTemperature.hot)),
+            // CupIngredient
+            favorCategoryList: joi
                 .array()
                 .items(
                     joi
                         .string()
                         .equal(
-                            ERecipeCategory.blue_berry,
                             ERecipeCategory.coffee_mlik,
                             ERecipeCategory.whipping_cream,
                             ERecipeCategory.vanilla_syrup,
@@ -102,13 +195,12 @@ export class EditProfileDto
                             ERecipeCategory.cinnamon,
                         ),
                 ),
-            disfavorCategory: joi
+            disfavorCategoryList: joi
                 .array()
                 .items(
                     joi
                         .string()
                         .equal(
-                            ERecipeCategory.blue_berry,
                             ERecipeCategory.coffee_mlik,
                             ERecipeCategory.whipping_cream,
                             ERecipeCategory.vanilla_syrup,
