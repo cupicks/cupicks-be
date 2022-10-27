@@ -1,5 +1,11 @@
 import * as jwtLib from "jsonwebtoken";
-import { AuthRepository, AuthVerifyListRepository, UserCategoryRepository } from "../repositories/_.exporter";
+
+import {
+    AuthRepository,
+    AuthVerifyListRepository,
+    UserCategoryRepository,
+    UserFavorRepository,
+} from "../repositories/_.exporter";
 import {
     AwsSesProvider,
     BcryptProvider,
@@ -25,7 +31,6 @@ import {
     ResetPasswordDto,
 } from "../../models/_.loader";
 import { Dayjs } from "dayjs";
-import { UserFavorRepository } from "../repositories/user.favor.repository";
 
 export class AuthService {
     private jwtProvider: JwtProvider;
