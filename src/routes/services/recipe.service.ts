@@ -14,36 +14,48 @@ import {
     DeleteRecipeDto,
     CommonRecipeDto,
 } from "../../models/_.loader";
+
 import {
     AuthRepository,
     RecipeIngredientRepository,
     RecipeIngredientListRepository,
     RecipeRepository,
 } from "../repositories/_.exporter";
-import { MysqlProvider } from "../../modules/_.loader";
+import { DayjsProvider, MysqlProvider } from "../../modules/_.loader";
+import { BedgePublisher } from "../publishers/_.exporter";
 
 export class RecipeService {
     private recipeRepository: RecipeRepository;
     private recipeIngredientRepository: RecipeIngredientRepository;
     private recipeIngredientListRepository: RecipeIngredientListRepository;
+
     private authRepository: AuthRepository;
     private mysqlProvider: MysqlProvider;
+    private dayjsprovider: DayjsProvider;
+
+    private bedgePublisher: BedgePublisher;
 
     constructor() {
         this.recipeRepository = new RecipeRepository();
         this.recipeIngredientRepository = new RecipeIngredientRepository();
         this.recipeIngredientListRepository = new RecipeIngredientListRepository();
+
         this.mysqlProvider = new MysqlProvider();
         this.authRepository = new AuthRepository();
+        this.dayjsprovider = new DayjsProvider();
+
+        this.bedgePublisher = new BedgePublisher();
     }
     // Create
 
     createRecipe = async (recipeDto: CreateRecipeDto): Promise<number> => {
         const conn = await this.mysqlProvider.getConnection();
+        const { userId } = recipeDto;
+
         try {
             await conn.beginTransaction();
 
-            const isExists = await this.authRepository.isExistsById(conn, recipeDto.userId);
+            const isExists = await this.authRepository.isExistsById(conn, userId);
             if (isExists === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
@@ -51,7 +63,7 @@ export class RecipeService {
 
             const ingredientList: IngredientDto[] = recipeDto.ingredientList;
             const insertedIdList = await this.recipeRepository.createRecipeIngredients(conn, recipeId, ingredientList);
-            const createUserRecipe = await this.recipeRepository.createUserRecipe(conn, recipeDto.userId, recipeId);
+            const createUserRecipe = await this.recipeRepository.createUserRecipe(conn, userId, recipeId);
 
             await this.recipeRepository.createRecipeIngredientList(conn, recipeId, insertedIdList);
 
@@ -68,6 +80,8 @@ export class RecipeService {
                     );
                 }),
             );
+
+            await this.bedgePublisher.handleActRecipeCount(userId);
 
             await conn.commit();
             return recipeId;
