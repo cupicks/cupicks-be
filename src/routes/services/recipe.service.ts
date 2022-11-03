@@ -28,8 +28,8 @@ export class RecipeService {
     private recipeRepository: RecipeRepository;
     private recipeIngredientRepository: RecipeIngredientRepository;
     private recipeIngredientListRepository: RecipeIngredientListRepository;
-
     private authRepository: AuthRepository;
+
     private mysqlProvider: MysqlProvider;
     private dayjsprovider: DayjsProvider;
 
