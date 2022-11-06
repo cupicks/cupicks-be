@@ -56,7 +56,11 @@ export class CommentService {
 
             await conn.commit();
 
+            // Bedge System
+            const targetRecipe = await this.recipeRepository.getRecipe(conn, recipeId);
             this.bedgePublisher.handleActCommentCount(userId);
+            this.bedgePublisher.handleGetCommentCount(targetRecipe.userId);
+
             return [
                 {
                     userId: commentDto.userId,
