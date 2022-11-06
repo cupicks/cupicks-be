@@ -1,5 +1,5 @@
-import { NotFoundException } from "models/_.loader";
 import { MysqlProvider } from "../../modules/_.loader";
+import { NotFoundException } from "../../models/_.loader";
 import { BedgeRepsitory, AuthRepository } from "../repositories/_.exporter"
 
 export class BedgeService {
