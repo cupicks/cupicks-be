@@ -98,6 +98,7 @@ export class RecipeRepository {
             recipe.is_public as isPublic,
             recipe.created_at as createdAt,
             recipe.updated_at as updatedAt,
+            user.user_id as userId,
             user.nickname as nickname,
             user.image_url as imageUrl,
             user.resized_url as resizedUrl,

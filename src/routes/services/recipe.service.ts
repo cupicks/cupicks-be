@@ -362,6 +362,12 @@ export class RecipeService {
 
             await this.recipeRepository.likeRecipe(conn, likeRecipeDto);
 
+
+            // Bedge System
+            const targetRecipe = await this.recipeRepository.getRecipe(conn, likeRecipeDto.recipeId);
+            this.bedgePublisher.handleActLikecount(likeRecipeDto.userId);
+            this.bedgePublisher.handleGetLikecount(targetRecipe.userId);
+
             await conn.commit();
         } catch (err) {
             await conn.rollback();

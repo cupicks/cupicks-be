@@ -16,6 +16,7 @@ export interface IRecipeCombinedPacket extends RowDataPacket {
     ingredientAmount: string;
     isPublic: 0 | 1;
 
+    userId: number;
     nickname: string;
     imageUrl: string | undefined;
     resizedUrl: string | undefined;
