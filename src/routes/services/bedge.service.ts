@@ -1,13 +1,17 @@
+import { NotFoundException } from "models/_.loader";
 import { MysqlProvider } from "../../modules/_.loader";
-import { BedgeRepsitory } from "../repositories/bedge.repository"
+import { BedgeRepsitory, AuthRepository } from "../repositories/_.exporter"
 
 export class BedgeService {
 
     private mysqlProvider: MysqlProvider;
+    private authRepository: AuthRepository;
     private bedgeRepository: BedgeRepsitory;
 
     constructor() {
         this.mysqlProvider = new MysqlProvider();
+
+        this.authRepository = new AuthRepository();
         this.bedgeRepository = new BedgeRepsitory();
     }
 
@@ -18,6 +22,10 @@ export class BedgeService {
 
         try {
             await conn.beginTransaction();
+
+            const isExists = await this.authRepository.isExistsById(conn, userId);
+            if (isExists === false)
+                throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
             const result = await this.bedgeRepository.findBedgeListByUserId(conn, userId);
 
