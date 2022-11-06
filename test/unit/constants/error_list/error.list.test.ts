@@ -1,4 +1,4 @@
-import { ERROR_CODE_LIST } from "../../../../src/constants/error_list/error.list";
+import { ERROR_CODE_LIST } from "../../../../src/constants/error_code_list/error.code";
 
 describe("ERROR_CODE_LIST", () => {
     it("ERROR_CODE_LIST must be defined", () => expect(ERROR_CODE_LIST).toBeDefined());

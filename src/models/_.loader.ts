@@ -79,6 +79,11 @@ import { IBestRecipePacket } from "./packets/i.best.recipe.packet";
 import { IBestRecipeCategoryPacket } from "./packets/i.best.recipe.category.packet";
 import { IBestRecipeCommentPacket } from "./packets/i.best.recipe.comment.packet";
 
+// PACKET - ARCHIVMENT
+
+import { IArchivementPacket } from "./packets/i.archivement.packet";
+import { IBedgePacket } from "./packets/i.bedge.packet";
+
 // ENUM
 import { ERecipeCategory, ERecipeSize, ERecipeTemperature } from "./enums/_.exporter";
 
@@ -103,6 +108,8 @@ export {
     IBestRecipeCategoryPacket,
     IBestRecipeCommentPacket,
     IRecipeOwnerPacket,
+    IArchivementPacket,
+    IBedgePacket,
 
     // BaseDtos
     IBaseDto,
