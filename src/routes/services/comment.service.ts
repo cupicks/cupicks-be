@@ -9,13 +9,17 @@ import {
 import { CommentRepository, RecipeRepository, AuthRepository } from "../repositories/_.exporter";
 import { MysqlProvider, MulterProvider, DayjsProvider } from "../../modules/_.loader";
 import { ICommentPacket } from "../../models/_.loader";
+import { BedgePublisher } from "../publishers/_.exporter";
 
 export class CommentService {
     private commentRepository: CommentRepository;
-    private mysqlProvider: MysqlProvider;
     private recipeRepository: RecipeRepository;
     private authRepository: AuthRepository;
+
+    private mysqlProvider: MysqlProvider;
     private dayjsProvider: DayjsProvider;
+
+    private bedgePublisher: BedgePublisher;
 
     constructor() {
         this.commentRepository = new CommentRepository();
@@ -23,23 +27,27 @@ export class CommentService {
         this.recipeRepository = new RecipeRepository();
         this.authRepository = new AuthRepository();
         this.dayjsProvider = new DayjsProvider();
+
+        this.bedgePublisher = new BedgePublisher();
     }
     // Create
     public createComment = async (commentDto: CreateCommentDto): Promise<object[]> => {
         const conn = await this.mysqlProvider.getConnection();
+
+        const { userId, recipeId } = commentDto;
         try {
             const createdAt = this.dayjsProvider.getDayjsInstance().format(this.dayjsProvider.getClientFormat());
 
             await conn.beginTransaction();
 
-            const findRecipeById: boolean = await this.recipeRepository.findRecipeById(conn, commentDto.recipeId);
+            const findRecipeById: boolean = await this.recipeRepository.findRecipeById(conn, recipeId);
             if (!findRecipeById) throw new NotFoundException("존재하지 않는 레시피입니다.", "RECIPE-001");
 
-            const isExists: boolean = await this.authRepository.isExistsById(conn, commentDto.userId);
+            const isExists: boolean = await this.authRepository.isExistsById(conn, userId);
             if (isExists === false)
                 throw new NotFoundException(`이미 탈퇴한 사용자의 AccessToken 입니다.`, "AUTH-007-01");
 
-            const findUserById = await this.authRepository.findUserById(conn, commentDto.userId);
+            const findUserById = await this.authRepository.findUserById(conn, userId);
 
             const createComment = await this.commentRepository.createComment(conn, commentDto);
             const commentId = createComment;
@@ -47,6 +55,11 @@ export class CommentService {
             await this.commentRepository.createRecipeComment(conn, commentDto, commentId);
 
             await conn.commit();
+
+            // Bedge System
+            const targetRecipe = await this.recipeRepository.getRecipe(conn, recipeId);
+            this.bedgePublisher.handleActCommentCount(userId);
+            this.bedgePublisher.handleGetCommentCount(targetRecipe.userId);
 
             return [
                 {

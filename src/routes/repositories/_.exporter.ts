@@ -1,3 +1,4 @@
+// Services
 import { AuthRepository } from "../repositories/auth.repository";
 import { AuthVerifyListRepository } from "./auth.verify.list.repository";
 
@@ -10,6 +11,10 @@ import { CommentRepository } from "./comment.repository";
 
 import { UserCategoryRepository } from "./user.category.repository";
 import { UserFavorRepository } from "./user.favor.repository";
+
+// Publishers
+import { ArchivementRepository } from "./archivement.repository";
+import { BedgeRepsitory } from "./bedge.repository";
 
 export {
     // Auth
@@ -28,4 +33,8 @@ export {
     // UserCategory
     UserCategoryRepository,
     UserFavorRepository,
+
+    // For Publishers
+    ArchivementRepository,
+    BedgeRepsitory,
 };
