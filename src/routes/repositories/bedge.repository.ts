@@ -31,6 +31,20 @@ export class BedgeRepsitory {
         return bedge ?? null;
     }
 
+    public async findBedgeListByUserId(
+        conn: PoolConnection,
+        userId: number
+    ): Promise<IBedgePacket[]> {
+        const findQuery = `SELECT
+            user_id as userId, bedge_name as bedgeName, created_at as createdAt
+        FROM user_bedge_list WHERE user_id =?;`;
+
+        const findResult = await conn.query<IBedgePacket[]>(findQuery);
+        const [findListPacket] = findResult;
+
+        return findListPacket ?? [];
+    }
+
     public async publishBedge(
         conn: PoolConnection,
         userId: number,
