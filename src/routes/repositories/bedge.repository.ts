@@ -39,7 +39,7 @@ export class BedgeRepsitory {
             user_id as userId, bedge_name as bedgeName, created_at as createdAt
         FROM user_bedge_list WHERE user_id =?;`;
 
-        const findResult = await conn.query<IBedgePacket[]>(findQuery);
+        const findResult = await conn.query<IBedgePacket[]>(findQuery, [userId]);
         const [findListPacket] = findResult;
 
         return findListPacket ?? [];
