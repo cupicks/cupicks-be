@@ -1,4 +1,4 @@
-export enum EBedgeCode {
+export enum EBadgeCode {
     "1ST_ACT_RECIPE" = "레시피 첫 발자국",
     "1ST_ACT_COMMENT" = "댓글 첫 발자국",
     "1ST_ACT_LIKE" = "좋아요 첫 발자국",

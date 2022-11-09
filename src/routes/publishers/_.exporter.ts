@@ -1,3 +1,3 @@
-import { BedgePublisher } from "./bedge.publisher";
+import { BadgePublisher } from "./badge.publisher";
 
-export { BedgePublisher };
+export { BadgePublisher };

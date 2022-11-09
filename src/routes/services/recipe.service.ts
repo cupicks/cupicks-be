@@ -22,7 +22,7 @@ import {
     RecipeRepository,
 } from "../repositories/_.exporter";
 import { DayjsProvider, MysqlProvider } from "../../modules/_.loader";
-import { BedgePublisher } from "../publishers/_.exporter";
+import { BadgePublisher } from "../publishers/_.exporter";
 
 export class RecipeService {
     private recipeRepository: RecipeRepository;
@@ -33,7 +33,7 @@ export class RecipeService {
     private mysqlProvider: MysqlProvider;
     private dayjsprovider: DayjsProvider;
 
-    private bedgePublisher: BedgePublisher;
+    private badgePublisher: BadgePublisher;
 
     constructor() {
         this.recipeRepository = new RecipeRepository();
@@ -44,7 +44,7 @@ export class RecipeService {
         this.authRepository = new AuthRepository();
         this.dayjsprovider = new DayjsProvider();
 
-        this.bedgePublisher = new BedgePublisher();
+        this.badgePublisher = new BadgePublisher();
     }
     // Create
 
@@ -81,7 +81,7 @@ export class RecipeService {
                 }),
             );
 
-            await this.bedgePublisher.handleActRecipeCount(userId);
+            await this.badgePublisher.handleActRecipeCount(userId);
 
             await conn.commit();
             return recipeId;
@@ -365,8 +365,8 @@ export class RecipeService {
 
             // Bedge System
             const targetRecipe = await this.recipeRepository.getRecipe(conn, likeRecipeDto.recipeId);
-            this.bedgePublisher.handleActLikecount(likeRecipeDto.userId);
-            this.bedgePublisher.handleGetLikecount(targetRecipe.userId);
+            this.badgePublisher.handleActLikecount(likeRecipeDto.userId);
+            this.badgePublisher.handleGetLikecount(targetRecipe.userId);
 
             await conn.commit();
         } catch (err) {

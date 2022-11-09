@@ -2,7 +2,7 @@ import morgan from "morgan";
 import express from "express";
 import { TNODE_ENV } from "constants/_.loader";
 
-import { authRouter, profileRouter, recipeRouter, commentRouter, rankingRouter, bedgeRouter } from "./routes/routers/_.exporter";
+import { authRouter, profileRouter, recipeRouter, commentRouter, rankingRouter, badgeRouter } from "./routes/routers/_.exporter";
 
 import { getCorsMiddleware } from "./middlewares/guards/_.exporter";
 
@@ -48,7 +48,7 @@ export default class App {
         this.app.use("/api/recipes", recipeRouter);
         this.app.use("/api/comments", commentRouter);
         this.app.use("/api/ranking", rankingRouter);
-        this.app.use("/api/bedge", bedgeRouter);
+        this.app.use("/api/badge", badgeRouter);
     }
 
     runServer(MODE: TNODE_ENV, PORT: number) {

@@ -1,18 +1,18 @@
 import { MysqlProvider } from "../../modules/_.loader";
 import { NotFoundException } from "../../models/_.loader";
-import { BedgeRepsitory, AuthRepository } from "../repositories/_.exporter"
+import { BadgeRepository, AuthRepository } from "../repositories/_.exporter"
 
-export class BedgeService {
+export class BadgeService {
 
     private mysqlProvider: MysqlProvider;
     private authRepository: AuthRepository;
-    private bedgeRepository: BedgeRepsitory;
+    private bedgeRepository: BadgeRepository;
 
     constructor() {
         this.mysqlProvider = new MysqlProvider();
 
         this.authRepository = new AuthRepository();
-        this.bedgeRepository = new BedgeRepsitory();
+        this.bedgeRepository = new BadgeRepository();
     }
 
 

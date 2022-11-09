@@ -1,6 +1,6 @@
-import { EArchivementCode, EBedgeCode } from "../../models/enums/_.exporter";
+import { EArchivementCode, EBadgeCode } from "../../models/enums/_.exporter";
 import { DayjsProvider, MysqlProvider } from "../../modules/_.loader";
-import { ArchivementRepository, BedgeRepsitory } from "../repositories/_.exporter";
+import { ArchivementRepository, BadgeRepository } from "../repositories/_.exporter";
 
 /**
  * 모든 archivement는 서로 다른 수의 bedge를 발행하는 조건이 됩니다.
@@ -9,18 +9,18 @@ import { ArchivementRepository, BedgeRepsitory } from "../repositories/_.exporte
  * arcvhiment_list :  ~/src/models/e.archivment.code.ts
  * bedge_list : ~/src/models/e.bedge.code.ts
  */
-export class BedgePublisher {
+export class BadgePublisher {
     private mysqlProvider: MysqlProvider;
     private dayjsProvider: DayjsProvider;
     private archivementRepository: ArchivementRepository;
-    private bedgeRepository: BedgeRepsitory;
+    private bedgeRepository: BadgeRepository;
 
     constructor() {
         this.mysqlProvider = new MysqlProvider();
         this.dayjsProvider = new DayjsProvider();
 
         this.archivementRepository = new ArchivementRepository();
-        this.bedgeRepository = new BedgeRepsitory();
+        this.bedgeRepository = new BadgeRepository();
     }
 
     public async handleActRecipeCount(userId: number): Promise<void> {
@@ -58,18 +58,18 @@ export class BedgePublisher {
                 const bedge = await this.bedgeRepository.findSingleBedgeByUserId(
                     conn,
                     userId,
-                    EBedgeCode["3RD_ACT_RECIPE"],
+                    EBadgeCode["3RD_ACT_RECIPE"],
                 );
                 if (bedge === null)
-                    await this.bedgeRepository.publishBedge(conn, userId, EBedgeCode["3RD_ACT_RECIPE"], dbDatetime);
+                    await this.bedgeRepository.publishBedge(conn, userId, EBadgeCode["3RD_ACT_RECIPE"], dbDatetime);
             } else if (archivementCount >= 1) {
                 const bedge = await this.bedgeRepository.findSingleBedgeByUserId(
                     conn,
                     userId,
-                    EBedgeCode["1ST_ACT_RECIPE"],
+                    EBadgeCode["1ST_ACT_RECIPE"],
                 );
                 if (bedge === null)
-                    await this.bedgeRepository.publishBedge(conn, userId, EBedgeCode["1ST_ACT_RECIPE"], dbDatetime);
+                    await this.bedgeRepository.publishBedge(conn, userId, EBadgeCode["1ST_ACT_RECIPE"], dbDatetime);
             }
         } catch (err) {
             throw err;
@@ -113,10 +113,10 @@ export class BedgePublisher {
                 const bedge = await this.bedgeRepository.findSingleBedgeByUserId(
                     conn,
                     userId,
-                    EBedgeCode["3RD_ACT_COMMENT"],
+                    EBadgeCode["3RD_ACT_COMMENT"],
                 );
                 if (bedge === null)
-                    await this.bedgeRepository.publishBedge(conn, userId, EBedgeCode["3RD_GET_COMMENT"], dbDatetime);
+                    await this.bedgeRepository.publishBedge(conn, userId, EBadgeCode["3RD_GET_COMMENT"], dbDatetime);
             }
         } catch (err) {
             throw err;
@@ -160,10 +160,10 @@ export class BedgePublisher {
                 const bedge = await this.bedgeRepository.findSingleBedgeByUserId(
                     conn,
                     userId,
-                    EBedgeCode["3RD_GET_COMMENT"],
+                    EBadgeCode["3RD_GET_COMMENT"],
                 );
                 if (bedge === null)
-                    await this.bedgeRepository.publishBedge(conn, userId, EBedgeCode["3RD_GET_COMMENT"], dbDatetime);
+                    await this.bedgeRepository.publishBedge(conn, userId, EBadgeCode["3RD_GET_COMMENT"], dbDatetime);
             }
         } catch (err) {
             throw err;
@@ -207,10 +207,10 @@ export class BedgePublisher {
                 const bedge = await this.bedgeRepository.findSingleBedgeByUserId(
                     conn,
                     userId,
-                    EBedgeCode["1ST_ACT_LIKE"],
+                    EBadgeCode["1ST_ACT_LIKE"],
                 );
                 if (bedge === null)
-                    await this.bedgeRepository.publishBedge(conn, userId, EBedgeCode["1ST_ACT_LIKE"], dbDatetime);
+                    await this.bedgeRepository.publishBedge(conn, userId, EBadgeCode["1ST_ACT_LIKE"], dbDatetime);
             }
         } catch (err) {
             throw err;
@@ -255,10 +255,10 @@ export class BedgePublisher {
                 const bedge = await this.bedgeRepository.findSingleBedgeByUserId(
                     conn,
                     userId,
-                    EBedgeCode["3RD_GET_LIKE"],
+                    EBadgeCode["3RD_GET_LIKE"],
                 );
                 if (bedge === null)
-                    await this.bedgeRepository.publishBedge(conn, userId, EBedgeCode["3RD_GET_LIKE"], dbDatetime);
+                    await this.bedgeRepository.publishBedge(conn, userId, EBadgeCode["3RD_GET_LIKE"], dbDatetime);
             }
         } catch (err) {
             throw err;
