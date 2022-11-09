@@ -1,16 +1,16 @@
 import { RequestHandler, Request, Response } from "express";
 
-import { BedgeService } from "../services/bedge.service";
+import { BadgeService } from "../services/badge.service";
 import { DtoFactory } from "../../modules/_.loader";
 import { CustomException, UnkownError, UnkownTypeError } from "../../models/_.loader";
 
-export class BedgeController {
+export class BadgeController {
 
-    private bedgeService: BedgeService;
+    private badgeService: BadgeService;
     private dtoFactory: DtoFactory;
 
     constructor() {
-        this.bedgeService = new BedgeService();
+        this.badgeService = new BadgeService();
         this.dtoFactory = new DtoFactory();
     }
 
@@ -19,11 +19,11 @@ export class BedgeController {
         try {
             const userId = res.locals.userId;
 
-            const result = await this.bedgeService.getBedgeList(userId);
+            const result = await this.badgeService.getBedgeList(userId);
 
             return res.json({
                 isSuccess: true,
-                message: '뱃지 조회에 성공하셨니다.',
+                message: '뱃지 조회에 성공하셨습니다.',
                 bedgeList: result
             });
 

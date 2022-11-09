@@ -14,7 +14,7 @@ import { UserFavorRepository } from "./user.favor.repository";
 
 // Publishers
 import { ArchivementRepository } from "./archivement.repository";
-import { BedgeRepsitory } from "./bedge.repository";
+import { BadgeRepository } from "./badge.repository";
 
 export {
     // Auth
@@ -36,5 +36,5 @@ export {
 
     // For Publishers
     ArchivementRepository,
-    BedgeRepsitory,
+    BadgeRepository,
 };

@@ -3,6 +3,6 @@ import { RecipeController } from "./recipe.controller";
 import { ProfileController } from "./profile.controller";
 import { CommentController } from "./comment.controller";
 import { RankingController } from "./ranking.controller";
-import { BedgeController } from "./bedge.controller";
+import { BadgeController } from "./badge.controller";
 
-export { AuthController, RecipeController, ProfileController, CommentController, RankingController, BedgeController };
+export { AuthController, RecipeController, ProfileController, CommentController, RankingController, BadgeController };
