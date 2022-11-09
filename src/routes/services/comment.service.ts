@@ -9,7 +9,7 @@ import {
 import { CommentRepository, RecipeRepository, AuthRepository } from "../repositories/_.exporter";
 import { MysqlProvider, MulterProvider, DayjsProvider } from "../../modules/_.loader";
 import { ICommentPacket } from "../../models/_.loader";
-import { BedgePublisher } from "../publishers/_.exporter";
+import { BadgePublisher } from "../publishers/_.exporter";
 
 export class CommentService {
     private commentRepository: CommentRepository;
@@ -19,7 +19,7 @@ export class CommentService {
     private mysqlProvider: MysqlProvider;
     private dayjsProvider: DayjsProvider;
 
-    private bedgePublisher: BedgePublisher;
+    private badgePublisher: BadgePublisher;
 
     constructor() {
         this.commentRepository = new CommentRepository();
@@ -28,7 +28,7 @@ export class CommentService {
         this.authRepository = new AuthRepository();
         this.dayjsProvider = new DayjsProvider();
 
-        this.bedgePublisher = new BedgePublisher();
+        this.badgePublisher = new BadgePublisher();
     }
     // Create
     public createComment = async (commentDto: CreateCommentDto): Promise<object[]> => {
@@ -58,8 +58,8 @@ export class CommentService {
 
             // Bedge System
             const targetRecipe = await this.recipeRepository.getRecipe(conn, recipeId);
-            this.bedgePublisher.handleActCommentCount(userId);
-            this.bedgePublisher.handleGetCommentCount(targetRecipe.userId);
+            this.badgePublisher.handleActCommentCount(userId);
+            this.badgePublisher.handleGetCommentCount(targetRecipe.userId);
 
             return [
                 {
