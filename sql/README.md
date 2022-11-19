@@ -19,7 +19,7 @@ Cupick 이 **42 일** 간 진행된 공식 프로젝트 기간이 종료 되었�
 
 또한, **ORM** 을 사용하지 않는 환경 에서의 Migration 을 위해서 직접 migration 을 위한 Do 및 Undo 구문을 추가하였습니다.
 
-현재 진행 중인 migration 목록은 [v1.3.697 이후](./README.md#v13697-이후) 를 참고해주세요.
+현재 진행 중인 migration 목록은 [v1.4.0 이후](./README.md#v140-이후) 를 참고해주세요.
 
 ---
 
@@ -34,6 +34,14 @@ Cupick 이 **42 일** 간 진행된 공식 프로젝트 기간이 종료 되었�
 
 ### v1.4.0 이후
 
+서비스 변경 시점 마다 `Migration Query`를 만들어서 실행<br>
+
+데이터 안정성을 위해서 다음과 같은 순서로 실행
+
+1. \*\*_test 에서 쿼리문 작성 및 테스트
+2. \*\*_dev 에서 쿼리문 실행 및 검증
+3. \*\*_prod 에 적용
+
 | Filename                               | Description     | Issue |
 | -------------------------------------- | --------------- | ----- |
 | 2022-10-17 1210 create recipe_cup_size | 참조용 레시피 사이즈 규격 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
@@ -43,3 +51,7 @@ Cupick 이 **42 일** 간 진행된 공식 프로젝트 기간이 종료 되었�
 | 2022-10-18 1028 create user_favor_cup_temperature_list | 유저 선호 체계 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
 | 2022-10-18 1028 create user_disfavor_cup_size_list | 유저 비선호 체계 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
 | 2022-10-18 1030 create user_disfavor_cup_temperature_list | 유저 비선호 체계 | [#274](https://github.com/cupicks/cupicks-be/issues/274) |
+| 2022-10-27 1000-create-archivement | 뱃지 시스템 | [#280](https://github.com/cupicks/cupicks-be/issues/280) |
+| 2022-10-27 1005-create-user-archivement_list | 뱃지 시스템 | [#280](https://github.com/cupicks/cupicks-be/issues/280) |
+| 2022-10-27 1012-create-bedge | 뱃지 시스템 | [#280](https://github.com/cupicks/cupicks-be/issues/280) |
+| 2022-10-27 1028-create-user-bedge-list | 뱃지 시스템 | [#280](https://github.com/cupicks/cupicks-be/issues/280) |
