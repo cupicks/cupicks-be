@@ -101,12 +101,24 @@
 
 ### ERD
 
-- [SQL Files](./sql/README.md)
+- [Database 작업 방식에 대하여...](./sql/README.md)
 
 <details>
     <summary>v1.3.697</summary>
 
-<image src="./ERD.png">
+<image src="./ERD-v1.3.697.png">
+
+</details>
+<details>
+    <summary>v1.4.1</summary>
+
+<image src="./ERD-v1.3.697.png">
+
+</details>
+<details>
+    <summary>v.1.4.2</summary>
+
+<image src="./ERD-now.png">
 
 </details>
 
