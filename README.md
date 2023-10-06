@@ -32,7 +32,7 @@
 
 | 포지션 | 이름 | number | email | Link |
 | :---- | :---- | :---- | :---- | :---- |
-| Backend, L | 이민석 | 010-9781-8756 | workstation19961002@gmail.com | [GitHub](https://github.com/unchaptered) |
+| Backend, L | 이민석 | - | workstation19961002@gmail.com | [GitHub](https://github.com/unchaptered) |
 | Backend | 윤승근 | 010-4991-7593 | axisotherwise@gmail.com | [GitHub](https://github.com/axisotherwise) |
 
 ### BE 역할
